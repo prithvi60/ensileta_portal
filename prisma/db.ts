@@ -1,27 +1,39 @@
+// import { PrismaClient } from "@prisma/client";
+// import { Pool, neonConfig } from '@neondatabase/serverless'
+// import { PrismaNeon } from '@prisma/adapter-neon'
+// import ws from 'ws'
+
+// const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
+
+// export const prisma = globalForPrisma.prisma || new PrismaClient();
+
+// if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+
+import ws from "ws";
 import { PrismaClient } from "@prisma/client";
+import { PrismaNeon } from "@prisma/adapter-neon";
+import { Pool, neonConfig } from "@neondatabase/serverless";
 
-const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
+const prismaClientSingleton = () => {
+  neonConfig.webSocketConstructor = ws;
+  const connectionString = `${process.env.DATABASE_URL}`;
 
-export const prisma = globalForPrisma.prisma || new PrismaClient();
+  const pool = new Pool({ connectionString });
+  const adapter = new PrismaNeon(pool);
+  //   const adapter = new PrismaNeon(pool, {
+  //     schema: "myPostgresSchema",
+  //   });
+  const prisma = new PrismaClient({ adapter });
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+  return prisma;
+};
 
-// async function main() {
-//   // ... you will write your Prisma Client queries here
-//   // await prisma.user.create({
-//   //   data: {
-//   //     name: "rish",
-//   //     email: "rish14@gmail.com",
-//   //   },
-//   // });
-// }
+declare const globalThis: {
+  prismaGlobal: ReturnType<typeof prismaClientSingleton>;
+} & typeof global;
 
-// main()
-//   .then(async () => {
-//     await prisma.$disconnect();
-//   })
-//   .catch(async (e) => {
-//     console.error(e);
-//     await prisma.$disconnect();
-//     process.exit(1);
-//   });
+const prisma = globalThis.prismaGlobal ?? prismaClientSingleton();
+
+export default prisma;
+
+if (process.env.NODE_ENV !== "production") globalThis.prismaGlobal = prisma;

@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
@@ -8,7 +9,10 @@ datasource db {
 }
 
 model users {
-  id    Int     @id
-  name  String  @db.VarChar(50)
-  email String? @db.VarChar(20)
+  id       Int      @id @default(autoincrement())
+  username String   @unique @db.VarChar(50)
+  email    String   @unique @db.VarChar(20)
+  password String
+  createAt DateTime @default(now())
+  updateAt DateTime @updatedAt
 }
