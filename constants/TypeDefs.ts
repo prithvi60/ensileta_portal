@@ -2,7 +2,7 @@ export const typeDefs = `#graphql
   type User {
     id: Int!
     username: String!
-    email: String
+    email: String!
   }
 
   type Query {
@@ -11,7 +11,7 @@ export const typeDefs = `#graphql
   }
 
   type Mutation {
-    signUp(username: String!, email: String!, password: String!, confirmPassword: String!): String!
+    signUp(username: String!, email: String!, password: String!, confirmPassword: String!): User!
     login(email: String!, password: String!): String!,
     logout: Boolean!
   }

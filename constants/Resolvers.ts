@@ -32,16 +32,19 @@ export const resolvers = {
       }
 
       const hashedPwd = await bcrypt.hash(password, 10);
-
-      const userData = await prisma.users.create({
-        data: {
-          username,
-          email,
-          password: hashedPwd,
-        },
-      });
-
-      return userData;
+      try {
+        const userData = await prisma.users.create({
+          data: {
+            username,
+            email,
+            password: hashedPwd,
+          },
+        });
+        return userData;
+      } catch (error) {
+        console.error("Error creating user:", error);
+        throw new Error("Failed to create user");
+      }
     },
     login: async (
       _: any,

@@ -1,6 +1,8 @@
 "use client"
-import { NextUIProvider } from '@nextui-org/system'
+
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
+import { SessionProvider } from 'next-auth/react';
+
 
 export function Providers({ children }: { children: React.ReactNode }) {
     const client = new ApolloClient({
@@ -10,10 +12,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
     });
     return (
-        <ApolloProvider client={client} >
-            <NextUIProvider>
+        <SessionProvider>
+            <ApolloProvider client={client} >
                 {children}
-            </NextUIProvider>
-        </ApolloProvider>
+            </ApolloProvider>
+        </SessionProvider>
     )
 }

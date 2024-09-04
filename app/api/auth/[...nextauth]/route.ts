@@ -4,7 +4,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import prisma from "@/prisma/db";
 
-export default NextAuth({
+const handler = NextAuth({
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -23,10 +23,10 @@ export default NextAuth({
           where: { email: credentials.email },
         });
 
-        console.log("User password:", user?.password);
-        console.log("Provided password:", credentials.password);
+        // console.log("User password:", user?.password);
+        // console.log("Provided password:", credentials.password);
         if (
-          user &&
+          user?.email &&
           (await bcrypt.compare(credentials.password, user.password))
         ) {
           return {
@@ -40,7 +40,28 @@ export default NextAuth({
     }),
   ],
   pages: {
-    signIn: "/login",
+    signIn: "/auth/signin",
   },
   adapter: PrismaAdapter(prisma),
+  session: {
+    strategy: "jwt",
+    maxAge: 24 * 60 * 60,
+  },
+  // callbacks: {
+  //   async session({ session, token }) {
+  //     if (token) {
+  //       session.user = token;
+  //     }
+  //     return session;
+  //   },
+  //   async jwt({ token, user }) {
+  //     if (user) {
+  //       token.id = user.id;
+  //       token.email = user.email;
+  //     }
+  //     return token;
+  //   },
+  // },
 });
+
+export { handler as GET, handler as POST };
