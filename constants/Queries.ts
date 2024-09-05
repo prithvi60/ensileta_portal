@@ -25,3 +25,13 @@ export const LOGIN = gql`
     login(email: $email, password: $password)
   }
 `;
+
+export const USER = gql`
+  query User($userId: Int!) {
+    user(id: $userId) {
+      id
+      username
+      email
+    }
+  }
+`;

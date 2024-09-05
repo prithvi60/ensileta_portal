@@ -10,7 +10,6 @@ export const SignIn = () => {
     const router = useRouter();
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault()
         e.preventDefault();
         const result = await signIn("credentials", {
             redirect: false,

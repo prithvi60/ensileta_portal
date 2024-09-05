@@ -27,7 +27,7 @@ export const SignUp = () => {
             const result = await signUp({ variables: { username, email, password, confirmPassword } })
 
             if (result) {
-                router.push("/portal/dashboard")
+                router.push("/portal/dashboard/customerProfile")
             }
         } catch (error) {
             alert(error);
