@@ -30,12 +30,12 @@ export const LOGIN = gql`
   }
 `;
 
-export const USER = gql`
-  query User {
-    user {
-      id
+export const GET_USER_PROFILE = gql`
+  query GetUserProfile {
+    userProfile {
       username
       email
+      id
     }
   }
 `;

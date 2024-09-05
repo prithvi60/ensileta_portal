@@ -3,37 +3,79 @@ import { signIn } from 'next-auth/react';
 import Link from 'next/link'
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react'
+import { zodResolver } from "@hookform/resolvers/zod";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { z } from "zod";
+import toast from 'react-hot-toast';
+
+const schema = z.object({
+    email: z.string().email({ message: "Invalid email address" }),
+    password: z.string().min(6),
+});
+
+type FormFields = z.infer<typeof schema>;
 
 export const SignIn = () => {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
     const router = useRouter();
+    const {
+        register,
+        handleSubmit,
+        setError,
+        formState: { errors, isSubmitting },
+    } = useForm<FormFields>({
+        resolver: zodResolver(schema),
+    });
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        const result = await signIn("credentials", {
-            redirect: false,
-            email,
-            password,
-        });
+    const onSubmit: SubmitHandler<FormFields> = async (data) => {
+        try {
+            const result = await signIn("credentials", {
+                redirect: false,
+                ...data
+            });
+            if (result?.error) {
+                setError("root", { message: result.error });
+                toast.error(result.error, {
+                    position: "top-right",
+                    duration: 3000,
+                    style: {
+                        border: '1px solid #C72422',
+                        padding: '16px',
+                        color: '#C72422',
+                    },
+                    iconTheme: {
+                        primary: '#C72422',
+                        secondary: '#FFFAEE',
+                    },
+                });
+            } else {
+                router.push("/portal/dashboard")
+                toast.success('Logged in successfully', {
+                    position: "top-right",
+                    duration: 3000,
+                    style: {
+                        border: '1px solid #139F9B',
+                        padding: '16px',
+                        color: '#139F9B',
+                    },
+                    iconTheme: {
+                        primary: '#139F9B',
+                        secondary: '#FFFAEE',
+                    },
+                });
+            }
 
-        // console.log("result", result);
-
-
-        if (result?.error) {
-            console.error(result.error);
-        } else {
-            console.log("Logged in successfully");
-            router.push("/portal/dashboard")
+        } catch (error) {
+            console.error("An unexpected error occurred:", error);
+            setError("root", { message: "An unexpected error occurred" });
+            toast.error("An unexpected error occurred");
         }
+    };
 
-
-    }
     return (
         <div className="rounded-md border-4 border-[#139F9B] bg-white shadow-xl m-4">
             <div className="flex flex-wrap items-center">
                 <div className="hidden w-full xl:block xl:w-1/2">
-                    <div className="p-4 sm:px-16 sm:py-8 space-y-5 text-center">
+                    <div className="p-4 sm:px-16 sm:py-0 space-y-5 text-center">
                         <Link className="mb-5.5 inline-block tracking-wider font-sans font-bold text-[#139F9B] text-lg md:text-2xl" href="/">
                             Welcome To Ensileta Portal
                         </Link>
@@ -167,14 +209,14 @@ export const SignIn = () => {
                     </div>
                 </div>
 
-                <div className="w-full p-4 sm:px-16 sm:py-8 xl:w-1/2 xl:border-l-2">
+                <div className="w-full p-4 sm:px-16 sm:py-0 xl:w-1/2 xl:border-l-2">
                     <div className="w-full p-4 sm:p-12.5 xl:p-17.5 text-[#0E132A]">
                         <span className="mb-1.5 block font-medium ">Start for free</span>
                         <h2 className="mb-9 text-2xl font-bold text-[#0E132A] sm:text-title-xl2">
                             Sign In to Ensileta Portal
                         </h2>
 
-                        <form onSubmit={handleSubmit}>
+                        <form onSubmit={handleSubmit(onSubmit)}>
                             <div className="mb-4">
                                 <label className="mb-2.5 block font-medium text-[#0E132A]">
                                     Email
@@ -183,10 +225,10 @@ export const SignIn = () => {
                                     <input
                                         type="email"
                                         placeholder="Enter your email"
-                                        className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-[#0E132A] outline-none focus:border-primary focus-visible:shadow-none"
-                                        required value={email} onChange={(e) => setEmail(e.target.value)} />
+                                        className="w-full rounded-lg border border-stroke bg-transparent py-2 pl-6 pr-10 text-[#0E132A] outline-none focus:border-primary focus-visible:shadow-none"
+                                        {...register("email")} />
 
-                                    <span className="absolute right-4 top-4">
+                                    <span className="absolute right-4 top-2">
                                         <svg
                                             className="fill-current"
                                             width="22"
@@ -204,6 +246,9 @@ export const SignIn = () => {
                                         </svg>
                                     </span>
                                 </div>
+                                {errors.email && (
+                                    <div className="text-[#C72422] mt-1">{errors.email.message}</div>
+                                )}
                             </div>
 
                             <div className="mb-6">
@@ -214,10 +259,10 @@ export const SignIn = () => {
                                     <input
                                         type="password"
                                         placeholder="6+ Characters, 1 Capital letter"
-                                        className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-[#0E132A] outline-none focus:border-primary focus-visible:shadow-none"
-                                        required value={password} onChange={(e) => setPassword(e.target.value)} />
+                                        className="w-full rounded-lg border border-stroke bg-transparent py-2 pl-6 pr-10 text-[#0E132A] outline-none focus:border-primary focus-visible:shadow-none"
+                                        {...register("password")} />
 
-                                    <span className="absolute right-4 top-4">
+                                    <span className="absolute right-4 top-2">
                                         <svg
                                             className="fill-current"
                                             width="22"
@@ -239,17 +284,20 @@ export const SignIn = () => {
                                         </svg>
                                     </span>
                                 </div>
+                                {errors.password && (
+                                    <div className="text-[#C72422] mt-1">{errors.password.message}</div>
+                                )}
                             </div>
 
-                            <div className="mb-5">
-                                <input
-                                    type="submit"
-                                    value="Sign In"
-                                    className="w-full cursor-pointer rounded-lg p-4 text-white transition hover:bg-opacity-90 bg-[#139F9B]"
-                                />
-                            </div>
+                            {/* <div className=""> */}
+                            <button
+                                disabled={isSubmitting}
+                                type="submit"
+                                className="w-full cursor-pointer rounded-lg p-4 text-white transition hover:bg-opacity-90 bg-[#139F9B] mb-5"
+                            >{isSubmitting ? "Submitting..." : "Submit"}</button>
+                            {/* </div> */}
 
-                            <div className="mt-6 text-center">
+                            <div className="mt-3 text-center">
                                 <p>
                                     Don’t have any account?{" "}
                                     <Link href="/portal/signup" className="text-[#139F9B] ">
@@ -257,10 +305,12 @@ export const SignIn = () => {
                                     </Link>
                                 </p>
                             </div>
+                            {errors.root && <div className="text-red-500">{errors.root.message}</div>}
                         </form>
                     </div>
                 </div>
             </div>
+
         </div>
     )
 }

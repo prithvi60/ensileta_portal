@@ -1,7 +1,7 @@
 "use client"
 
 import { SignUp } from '@/components/SignUp';
-import { SIGN_UP } from '@/constants/Queries';
+import { SIGN_UP } from '@/lib/Queries';
 import { useMutation } from '@apollo/client';
 import { useState } from 'react';
 const Page = () => {

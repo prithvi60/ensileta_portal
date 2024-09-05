@@ -1,18 +1,22 @@
 "use client"
 import DefaultLayout from '@/components/Layout/DefaultLayout'
-import { USER } from '@/constants/Queries'
-import { useQuery } from '@apollo/client'
+import { GET_USER_PROFILE, SIGN_UP } from '@/lib/Queries'
+import { useMutation, useQuery } from '@apollo/client'
+import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import React, { useState } from 'react'
 
 const Page = () => {
     const [companyName, setCompanyName] = useState("");
     const [phoneNo, setPhoneNo] = useState("");
-    const { data, loading, error } = useQuery(USER);
+    const { data: session, status } = useSession()
+    // const { data, loading, error } = useQuery(GET_USER_PROFILE);
+    const [signUp, { data, loading, error }] = useMutation(SIGN_UP);
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-
     }
+    const userName = session?.user?.name
+    // const { userProfile } = data;
     console.log(data);
 
     return (
@@ -118,8 +122,8 @@ const Page = () => {
                             </div>
                         </div>
                         <div className="mt-4">
-                            <h3 className="mb-1.5 text-2xl font-semibold text-black">
-                                Danish Heilium
+                            <h3 className="mb-1.5 text-2xl font-semibold text-black capitalize">
+                                {session ? userName : "Unknown Person"}
                             </h3>
 
                             <div className="mx-auto max-w-180">

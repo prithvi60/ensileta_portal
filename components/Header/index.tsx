@@ -5,7 +5,7 @@ import DropdownNotification from "./DropdownNotification";
 import DropdownUser from "./DropdownUser";
 import Image from "next/image";
 import { useMutation } from "@apollo/client";
-import { SIGN_UP } from "@/constants/Queries";
+import { SIGN_UP } from "@/lib/Queries";
 
 const Header = (props: {
   sidebarOpen: string | boolean | undefined;

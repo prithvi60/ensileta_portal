@@ -2,17 +2,15 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import ClickOutside from "@/components/Sidebar/ClickOutside";
-import { signOut } from "next-auth/react";
-import { useQuery } from "@apollo/client";
-import { USER } from "@/constants/Queries";
+import { signOut, useSession } from "next-auth/react";
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const { data: session, status } = useSession()
   const handleLogout = () => {
     signOut({ redirect: true, callbackUrl: "/api/auth/signin" });
   }
-  // const { data, loading, error } = useQuery(USER)
-  // console.log(data);
+  const userName = session?.user?.name
 
   return (
     <ClickOutside onClick={() => setDropdownOpen(false)} className="relative">
@@ -22,8 +20,8 @@ const DropdownUser = () => {
         href="#"
       >
         <span className="hidden text-right lg:block">
-          <span className="block text-sm font-medium text-black">
-            Thomas Anree
+          <span className="block text-sm font-medium text-black capitalize">
+            {session ? userName : "Unknown Person"}
           </span>
           {/* <span className="block text-xs">UX Designer</span> */}
         </span>
@@ -63,7 +61,7 @@ const DropdownUser = () => {
         <div
           className={`absolute -right-2 mt-4 flex w-62.5 flex-col rounded-sm border border-stroke bg-white shadow-default `}
         >
-          <ul className="flex flex-col gap-5 border-b border-stroke px-6 py-7.5 dark:border-strokedark">
+          <ul className="flex flex-col gap-5 border-b border-stroke px-6 py-7.5">
             <li>
               <Link
                 href="/portal/dashboard/customerProfile"

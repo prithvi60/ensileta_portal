@@ -1,6 +1,7 @@
 import prisma from "@/prisma/db";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { GraphQLResolveInfo } from "graphql";
 
 const JWT_SECRET = process.env.NEXTAUTH_SECRET;
 
@@ -15,9 +16,31 @@ export const resolvers = {
       console.log(userData);
       return userData;
     },
-    user: async (_: any, __: any, { userId }: { userId: number }) => {
-      if (!userId) throw new Error("Not authenticated");
-      return prisma.users.findUnique({ where: { id: userId } });
+    userProfile: async (
+      _parent: any,
+      _args: any,
+      _context: any,
+      _info: GraphQLResolveInfo
+    ) => {
+      const userId = _context.userId;
+      console.log(userId);
+
+      if (!userId) {
+        throw new Error("Not authenticated");
+      }
+      // Fetch user data from the database
+      const user = await prisma.users.findUnique({
+        where: { id: userId },
+      });
+
+      if (!user) {
+        throw new Error("User not found");
+      }
+      return {
+        username: user.username,
+        email: user.email,
+        id: user.id,
+      };
     },
   },
   Mutation: {
