@@ -1,17 +1,20 @@
 "use client"
 import DefaultLayout from '@/components/Layout/DefaultLayout'
+import { USER } from '@/constants/Queries'
+import { useQuery } from '@apollo/client'
 import Image from 'next/image'
-import Link from 'next/link'
 import React, { useState } from 'react'
 
 const Page = () => {
     const [companyName, setCompanyName] = useState("");
     const [phoneNo, setPhoneNo] = useState("");
-
+    const { data, loading, error } = useQuery(USER);
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
     }
+    console.log(data);
+
     return (
         <DefaultLayout>
             <div className="mx-auto max-w-242.5">
@@ -19,15 +22,15 @@ const Page = () => {
                 <div className="overflow-hidden rounded-sm border border-stroke bg-white shadow-default">
                     <div className="relative z-20 h-35 md:h-65">
                         <Image
-                            src={"/cover/cover-01.png"}
+                            src={"/cover/banner-img.jpg"}
                             alt="profile cover"
-                            className="h-full w-full rounded-tl-sm rounded-tr-sm object-cover object-center"
+                            className="h-full w-full rounded-tl-sm rounded-tr-sm object-cover object-bottom overflow-hidden"
                             width={970}
                             height={260}
-                            style={{
-                                width: "auto",
-                                height: "auto",
-                            }}
+                        // style={{
+                        //     width: "auto",
+                        //     height: "auto",
+                        // }}
                         />
                         {/* <div className="absolute bottom-1 right-1 z-10 xsm:bottom-4 xsm:right-4">
                             <label

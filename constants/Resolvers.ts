@@ -15,11 +15,9 @@ export const resolvers = {
       console.log(userData);
       return userData;
     },
-    user: async (_: any, { id }: { id: number }) => {
-      const user = await prisma.users.findUnique({
-        where: { id },
-      });
-      return user;
+    user: async (_: any, __: any, { userId }: { userId: number }) => {
+      if (!userId) throw new Error("Not authenticated");
+      return prisma.users.findUnique({ where: { id: userId } });
     },
   },
   Mutation: {
@@ -72,11 +70,11 @@ export const resolvers = {
         );
         console.log(token, user);
 
-        return token;
-        // return {
-        //   token,
-        //   user,
-        // };
+        // return token;
+        return {
+          ...user,
+          token,
+        };
       } catch (error) {
         console.error("Error logging in user:", error);
         throw new Error("Failed to log in");

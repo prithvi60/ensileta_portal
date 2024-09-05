@@ -1,4 +1,4 @@
-import NextAuth from "next-auth";
+import NextAuth, { User } from "next-auth";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
@@ -23,8 +23,6 @@ const handler = NextAuth({
           where: { email: credentials.email },
         });
 
-        // console.log("User password:", user?.password);
-        // console.log("Provided password:", credentials.password);
         if (
           user?.email &&
           (await bcrypt.compare(credentials.password, user.password))
@@ -47,21 +45,23 @@ const handler = NextAuth({
     strategy: "jwt",
     maxAge: 24 * 60 * 60,
   },
-  // callbacks: {
-  //   async session({ session, token }) {
-  //     if (token) {
-  //       session.user = token;
-  //     }
-  //     return session;
-  //   },
-  //   async jwt({ token, user }) {
-  //     if (user) {
-  //       token.id = user.id;
-  //       token.email = user.email;
-  //     }
-  //     return token;
-  //   },
-  // },
+  callbacks: {
+    async session({ session, token }) {
+      if (token?.sub) {
+        session.user = {
+          ...session.user,
+          id: token.sub as string,
+        } as User;
+      }
+      return session;
+    },
+    async jwt({ token, user }) {
+      if (user) {
+        token.sub = user.id;
+      }
+      return token;
+    },
+  },
 });
 
 export { handler as GET, handler as POST };

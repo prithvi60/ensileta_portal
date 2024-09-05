@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import ClickOutside from "@/components/ClickOutside";
+import ClickOutside from "@/components/Sidebar/ClickOutside";
 import { signOut } from "next-auth/react";
 import { useQuery } from "@apollo/client";
 import { USER } from "@/constants/Queries";
