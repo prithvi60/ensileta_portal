@@ -131,7 +131,10 @@ const Page = () => {
                                     fermentum, pharetra ligula sed, aliquam lacus.
                                 </p>
                             </div>
-                            <div className='w-1/2 mx-auto mt-10'>
+
+                            {/*Company  Form  */}
+
+                            <div className='w-full sm:w-1/2 mx-auto mt-10'>
                                 <form onSubmit={handleSubmit}>
                                     <div className="mb-4">
                                         <label className="mb-2.5 block font-medium text-[#0E132A]">
