@@ -68,7 +68,7 @@ const menuGroups = [
           </svg>
         ),
         label: "View 2D",
-        route: "#",
+        route: "/portal/dashboard/view2d",
       },
       {
         icon: (
@@ -90,8 +90,8 @@ const menuGroups = [
             />
           </svg>
         ),
-        label: "View 3d",
-        route: "#",
+        label: "View 3D",
+        route: "/portal/dashboard/view3d",
       },
       {
         icon: (
@@ -126,7 +126,7 @@ const menuGroups = [
           </svg>
         ),
         label: "View BOQ",
-        route: "#",
+        route: "/portal/dashboard/viewboq",
 
       },
       {

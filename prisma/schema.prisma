@@ -14,3 +14,27 @@ model users {
   email    String @unique @db.VarChar(20)
   password String
 }
+
+model view2D {
+  id        Int      @id @default(autoincrement())
+  fileName  String
+  fileURL   String
+  version   Int
+  createdAt DateTime @default(now())
+}
+
+model view3D {
+  id        Int      @id @default(autoincrement())
+  fileName  String
+  fileURL   String
+  version   Int
+  createdAt DateTime @default(now())
+}
+
+model viewBOQ {
+  id        Int      @id @default(autoincrement())
+  fileName  String
+  fileURL   String
+  version   Int
+  createdAt DateTime @default(now())
+}
