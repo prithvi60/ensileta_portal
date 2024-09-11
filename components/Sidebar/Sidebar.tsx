@@ -68,7 +68,7 @@ const menuGroups = [
           </svg>
         ),
         label: "View 2D",
-        route: "#",
+        route: "/portal/dashboard/view2d",
       },
       {
         icon: (
