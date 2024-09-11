@@ -1,16 +1,136 @@
 "use client"
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation, useQuery } from '@apollo/client';
+import { GET_USER, UPDATE_USER } from '@/lib/Queries';
+import toast from 'react-hot-toast';
+
+const schema = z.object({
+    username: z.string()
+        .min(3, { message: "Username must be at least 3 characters long" })
+        .max(30, { message: "Username must be less than 30 characters" }),
+    email: z.string()
+        .email({ message: "Invalid email address" }),
+    companyName: z.string().min(3, "Company Name is required"),
+    phoneNo: z.string().min(10, "Phone number must be at least 10 digits").max(10, "Phone number must not exceed 10 digits"),
+    address: z.string().min(10, "Address is required"),
+});
+
+type FormData = z.infer<typeof schema>;
 
 export const CustomerInfoForm = () => {
-    const [companyName, setCompanyName] = useState("");
-    const [phoneNo, setPhoneNo] = useState("");
+    const { data, loading, error } = useQuery(GET_USER);
+    const [updateUser] = useMutation(UPDATE_USER);
+    // console.log(data);
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-    }
+    const {
+        register,
+        handleSubmit,
+        setValue,
+        setError,
+        formState: { errors, isDirty },
+    } = useForm<FormData>({
+        resolver: zodResolver(schema),
+    });
+
+
+    // Pre-fill form with current user data
+    useEffect(() => {
+        if (data?.user) {
+            const { username, email, company_name, phone_number, address } = data.user;
+            setValue("username", username);
+            setValue("email", email);
+            setValue("companyName", company_name || "");
+            setValue("phoneNo", phone_number || "");
+            setValue("address", address || "");
+        }
+    }, [data, setValue]);
+
+    // Handle form submission
+    const onSubmit = async (formData: FormData) => {
+        try {
+            await updateUser({
+                variables: {
+                    id: data.user.id,
+                    username: formData.username,
+                    email: formData.email,
+                    company_name: formData.companyName,
+                    phone_number: formData.phoneNo,
+                    address: formData.address,
+                },
+            });
+            toast.success('User information updated successfully!', {
+                position: "top-right",
+                duration: 3000,
+                style: {
+                    border: '1px solid #139F9B',
+                    padding: '16px',
+                    color: '#139F9B',
+                },
+                iconTheme: {
+                    primary: '#139F9B',
+                    secondary: '#FFFAEE',
+                },
+            });
+        } catch (error) {
+            toast.error("Failed to update user information.", {
+                position: "top-right",
+                duration: 3000,
+                style: {
+                    border: '1px solid #C72422',
+                    padding: '16px',
+                    color: '#C72422',
+                },
+                iconTheme: {
+                    primary: '#C72422',
+                    secondary: '#FFFAEE',
+                },
+            });
+            console.error("Error updating user:", error);
+        }
+    };
+
+    if (loading) return <p>Loading...</p>;
+    if (error) return <p>Error loading user data: {error.message}</p>;
+
     return (
         <div className='w-full sm:w-1/2 mx-auto mt-10'>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit(onSubmit)}>
+                {/* User Name */}
+                <div className="mb-4">
+                    <label className="mb-2.5 block font-medium text-[#0E132A]">
+                        User Name
+                    </label>
+                    <div className="relative">
+                        <input
+                            type="text"
+                            placeholder="Enter your User Name"
+                            className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-[#0E132A] outline-none focus:border-primary focus-visible:shadow-none"
+                            {...register("username")} />
+                        {errors.username && (
+                            <span className="text-[#C72422] font-semibold text-center mt-2">{errors.username.message}</span>
+                        )}
+                    </div>
+                </div>
+                {/* Email ID */}
+                <div className="mb-4">
+                    <label className="mb-2.5 block font-medium text-[#0E132A]">
+                        Email Id
+                    </label>
+                    <div className="relative">
+                        <input
+                            type="email"
+                            placeholder="Enter your Email Id"
+                            className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-[#0E132A] outline-none focus:border-primary focus-visible:shadow-none"
+                            {...register("email")} />
+                        {errors.email && (
+                            <span className="text-[#C72422] font-semibold text-center mt-2">{errors.email.message}</span>
+                        )}
+                    </div>
+                </div>
+                {/* Company Name */}
                 <div className="mb-4">
                     <label className="mb-2.5 block font-medium text-[#0E132A]">
                         Company Name
@@ -20,11 +140,13 @@ export const CustomerInfoForm = () => {
                             type="text"
                             placeholder="Enter your Company Name"
                             className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-[#0E132A] outline-none focus:border-primary focus-visible:shadow-none"
-                            required value={companyName} onChange={(e) => setCompanyName(e.target.value)} />
-
+                            {...register("companyName")} />
+                        {errors.companyName && (
+                            <span className="text-[#C72422] font-semibold text-center mt-2">{errors.companyName.message}</span>
+                        )}
                     </div>
                 </div>
-
+                {/* Phone Number */}
                 <div className="mb-6">
                     <label className="mb-2.5 block font-medium text-[#0E132A]">
                         Phone Number
@@ -34,17 +156,37 @@ export const CustomerInfoForm = () => {
                             type="text"
                             placeholder="Enter Your Ph.No."
                             className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-[#0E132A] outline-none focus:border-primary focus-visible:shadow-none"
-                            required value={phoneNo} onChange={(e) => setPhoneNo(e.target.value)} />
-
+                            {...register('phoneNo')} />
+                        {errors.phoneNo && (
+                            <span className="text-[#C72422] font-semibold text-center mt-2">{errors.phoneNo.message}</span>
+                        )}
                     </div>
                 </div>
-
+                {/* Address */}
+                <div className="mb-6">
+                    <label className="mb-2.5 block font-medium text-[#0E132A]">
+                        Address
+                    </label>
+                    <div className="relative">
+                        <textarea
+                            placeholder="Enter Your address"
+                            rows={3}
+                            className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-[#0E132A] outline-none focus:border-primary focus-visible:shadow-none"
+                            {...register('address')} />
+                        {errors.address && (
+                            <span className="text-[#C72422] font-semibold text-center mt-2">{errors.address.message}</span>
+                        )}
+                    </div>
+                </div>
+                {/* Submit */}
                 <div className="mb-5 mx-auto w-1/2">
-                    <input
+                    <button
+                        disabled={!isDirty}
                         type="submit"
-                        value="Sign In"
-                        className="w-full cursor-pointer rounded-lg p-4 text-white transition hover:bg-opacity-90 bg-[#139F9B]"
-                    />
+                        className="w-full cursor-pointer rounded-lg py-2 text-white transition hover:bg-opacity-90 bg-[#139F9B] disabled:bg-opacity-40"
+                    >
+                        Update
+                    </button>
                 </div>
 
             </form>

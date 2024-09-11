@@ -30,12 +30,53 @@ export const LOGIN = gql`
   }
 `;
 
+export const GET_USER = gql`
+  query GetUser {
+    user {
+      id
+      username
+      email
+      company_name
+      phone_number
+      address
+      role
+    }
+  }
+`;
+
 export const GET_USER_PROFILE = gql`
   query GetUserProfile {
     userProfile {
       username
       email
       id
+    }
+  }
+`;
+
+export const UPDATE_USER = gql`
+  mutation UpdateUser(
+    $id: Int!
+    $username: String!
+    $email: String!
+    $company_name: String!
+    $phone_number: String!
+    $address: String!
+  ) {
+    updateUser(
+      id: $id
+      username: $username
+      email: $email
+      company_name: $company_name
+      phone_number: $phone_number
+      address: $address
+    ) {
+      id
+      username
+      email
+      company_name
+      phone_number
+      address
     }
   }
 `;

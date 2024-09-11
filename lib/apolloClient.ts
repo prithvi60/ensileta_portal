@@ -1,3 +1,4 @@
+"use client";
 import {
   ApolloClient,
   InMemoryCache,
@@ -17,11 +18,22 @@ const httpLink = new HttpLink({
 const authLink = setContext(async (_, { headers }) => {
   const session = await getSession();
   const token = session?.accessToken;
+  // console.log("AccessToken:", token);
+  // console.log("bearer", `Bearer ${token}`);
+
+  if (!token) {
+    console.error("No access token found");
+    return {
+      headers: {
+        ...headers,
+      },
+    };
+  }
 
   return {
     headers: {
       ...headers,
-      authorization: token ? `Bearer ${token}` : "",
+      authorization: `Bearer ${token}`,
     },
   };
 });

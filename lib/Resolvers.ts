@@ -11,10 +11,19 @@ if (!JWT_SECRET) {
 
 export const resolvers = {
   Query: {
-    users: async () => {
-      const userData = await prisma.users.findMany();
-      console.log(userData);
-      return userData;
+    user: async (_: any, __: any, { userId }: any) => {
+      if (!userId) {
+        throw new Error("Unauthorized");
+      }
+      try {
+        const user = await prisma.users.findUnique({
+          where: { id: userId },
+        });
+        return user;
+      } catch (error) {
+        console.error("Error fetching user:", error);
+        throw new Error("Failed to fetch user");
+      }
     },
     userProfile: async (
       _parent: any,
@@ -23,7 +32,7 @@ export const resolvers = {
       _info: GraphQLResolveInfo
     ) => {
       const userId = _context.userId;
-      console.log(userId);
+      // console.log(userId);
 
       if (!userId) {
         throw new Error("Not authenticated");
@@ -94,6 +103,7 @@ export const resolvers = {
             password: hashedPwd,
           },
         });
+
         return userData;
       } catch (error) {
         console.error("Error creating user:", error);
@@ -117,14 +127,9 @@ export const resolvers = {
           throw new Error("Invalid password");
         }
 
-        const token = jwt.sign(
-          { id: user.id.toString(), email: user.email },
-          JWT_SECRET,
-          {
-            expiresIn: "1d",
-          }
-        );
-        console.log(token, user);
+        const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
+          expiresIn: "5m",
+        });
 
         // return token;
         return {
@@ -134,6 +139,32 @@ export const resolvers = {
       } catch (error) {
         console.error("Error logging in user:", error);
         throw new Error("Failed to log in");
+      }
+    },
+    updateUser: async (
+      _: any,
+      { id, username, email, company_name, phone_number, address }: any,
+      { userId }: any
+    ) => {
+      if (!userId) {
+        throw new Error("Unauthorized");
+      }
+
+      try {
+        const updatedUser = await prisma.users.update({
+          where: { id },
+          data: {
+            username,
+            email,
+            company_name,
+            phone_number,
+            address,
+          },
+        });
+        return updatedUser;
+      } catch (error) {
+        console.error("Error updating user:", error);
+        throw new Error("Failed to update user");
       }
     },
     upload2DFile: async (_: any, { fileName }: any) => {

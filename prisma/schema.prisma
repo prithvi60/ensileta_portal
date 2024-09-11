@@ -9,10 +9,14 @@ datasource db {
 }
 
 model users {
-  id       Int    @id @default(autoincrement())
-  username String @unique @db.VarChar(50)
-  email    String @unique @db.VarChar(20)
-  password String
+  id           Int     @id @default(autoincrement())
+  username     String  @db.VarChar(50)
+  email        String  @unique @db.VarChar(20)
+  password     String
+  company_name String?
+  phone_number String?
+  address      String?
+  role         String?
 }
 
 model view2D {
@@ -38,3 +42,16 @@ model viewBOQ {
   version   Int
   createdAt DateTime @default(now())
 }
+
+model accessControl {
+  id       Int    @id @default(autoincrement())
+  email    String @unique @db.VarChar(20)
+  password String
+}
+
+// model users {
+//   id       Int    @id @default(autoincrement())
+//   username String @unique @db.VarChar(50)
+//   email    String @unique @db.VarChar(20)
+//   password String
+// }

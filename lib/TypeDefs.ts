@@ -3,6 +3,10 @@ export const typeDefs = `#graphql
     id: Int!
     username: String!
     email: String!
+    company_name: String
+    phone_number: String
+    address: String
+    role: String
   }
 
   enum SortOrder {
@@ -40,7 +44,7 @@ export const typeDefs = `#graphql
   }
 
   type Query {
-    users: [User!]!
+    user: User
     userProfile: User!
     getAll2DFiles(orderBy: ViewOrderByInput) : [View2D]!
     getAll3DFiles(orderBy: ViewOrderByInput) : [View3D]!
@@ -48,14 +52,13 @@ export const typeDefs = `#graphql
   }
 
   type Mutation {
-    signUp(username: String!, email: String!, password: String!, confirmPassword: String!): User!
+    signUp(username: String!, email: String!, password: String!, confirmPassword: String!): User
     login(email: String!, password: String!): User!,
     logout: Boolean!,
+    updateUser(id: Int!, username: String!, email: String!, company_name: String!, phone_number: String!, address: String!): User
     upload2DFile(fileName: String!) : View2D,
     upload3DFile(fileName: String!) : View2D,
     uploadBOQFile(fileName: String!) : View2D,
   }
 
 `;
-// scalar Upload
-// uploadPDF(file: Upload!): File!

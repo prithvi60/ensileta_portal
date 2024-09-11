@@ -60,7 +60,6 @@ const Page = () => {
 
         }
     }
-    console.log(inputValue);
 
     return (
         <DefaultLayout>
