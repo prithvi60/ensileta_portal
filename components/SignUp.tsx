@@ -84,10 +84,22 @@ export const SignUp = () => {
 
             }
 
-        } catch (error) {
+        } catch (error: any) {
             console.error("An unexpected error occurred:", error);
-            setError("root", { message: "An unexpected error occurred" });
-            toast.error("An unexpected error occurred");
+            setError("root", { message: error.message });
+            toast.error(error.message, {
+                position: "top-right",
+                duration: 3000,
+                style: {
+                    border: '1px solid #C72422',
+                    padding: '16px',
+                    color: '#C72422',
+                },
+                iconTheme: {
+                    primary: '#C72422',
+                    secondary: '#FFFAEE',
+                }
+            });
         }
     };
 

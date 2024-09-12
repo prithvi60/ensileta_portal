@@ -5,6 +5,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import toast from 'react-hot-toast';
+import { useMutation } from '@apollo/client';
+import { ADD_EMPLOYEE, GET_ALL_EMPLOYEE_LISTS } from '@/lib/Queries';
 
 const schema = z.object({
     email: z.string().email({ message: "Invalid email address" }),
@@ -15,6 +17,7 @@ type FormFields = z.infer<typeof schema>;
 
 const AccessControlForm = () => {
     const [showPassword, setShowPassword] = useState(false);
+    const [employeeData] = useMutation(ADD_EMPLOYEE, { refetchQueries: [{ query: GET_ALL_EMPLOYEE_LISTS }], })
     const {
         register,
         handleSubmit,
@@ -25,51 +28,58 @@ const AccessControlForm = () => {
     });
 
     const onSubmit: SubmitHandler<FormFields> = async (data) => {
-        console.log(data);
 
-        // try {
-        //     const result = await signIn("credentials", {
-        //         redirect: false,
-        //         ...data
-        //     });
+        try {
+            const result = await employeeData({ variables: { email: data.email, password: data.password } })
 
-        //     if (result?.error) {
-        //         setError("root", { message: result.error });
-        //         toast.error(result.error, {
-        //             position: "top-right",
-        //             duration: 3000,
-        //             style: {
-        //                 border: '1px solid #C72422',
-        //                 padding: '16px',
-        //                 color: '#C72422',
-        //             },
-        //             iconTheme: {
-        //                 primary: '#C72422',
-        //                 secondary: '#FFFAEE',
-        //             },
-        //         });
-        //     } else {
-        //         router.push("/portal/dashboard/customerProfile")
-        //         toast.success('Logged in successfully', {
-        //             position: "top-right",
-        //             duration: 3000,
-        //             style: {
-        //                 border: '1px solid #139F9B',
-        //                 padding: '16px',
-        //                 color: '#139F9B',
-        //             },
-        //             iconTheme: {
-        //                 primary: '#139F9B',
-        //                 secondary: '#FFFAEE',
-        //             },
-        //         });
-        //     }
+            if (!result) {
+                setError("root", { message: "unable to create a employee" });
+                toast.error("no employee list uploaded", {
+                    position: "top-right",
+                    duration: 3000,
+                    style: {
+                        border: '1px solid #C72422',
+                        padding: '16px',
+                        color: '#C72422',
+                    },
+                    iconTheme: {
+                        primary: '#C72422',
+                        secondary: '#FFFAEE',
+                    },
+                });
+            } else {
+                toast.success('Employee Uploaded successfully', {
+                    position: "top-right",
+                    duration: 3000,
+                    style: {
+                        border: '1px solid #139F9B',
+                        padding: '16px',
+                        color: '#139F9B',
+                    },
+                    iconTheme: {
+                        primary: '#139F9B',
+                        secondary: '#FFFAEE',
+                    },
+                });
+            }
 
-        // } catch (error) {
-        //     console.error("An unexpected error occurred:", error);
-        //     setError("root", { message: "An unexpected error occurred" });
-        //     toast.error("An unexpected error occurred");
-        // }
+        } catch (error: any) {
+            console.error("An unexpected error occurred:", error);
+            setError("root", { message: error.message });
+            toast.error(error.message, {
+                position: "top-right",
+                duration: 3000,
+                style: {
+                    border: '1px solid #C72422',
+                    padding: '16px',
+                    color: '#C72422',
+                },
+                iconTheme: {
+                    primary: '#C72422',
+                    secondary: '#FFFAEE',
+                }
+            });
+        }
     };
 
     return (

@@ -25,35 +25,73 @@ const handler = NextAuth({
           return null;
         }
 
+        // check if the credentials users email id exist
         const user = await prisma.users.findUnique({
           where: { email: credentials.email },
         });
 
-        if (
-          user?.email &&
-          (await bcrypt.compare(credentials.password, user.password))
-        ) {
-          // Generate a JWT token if needed
-          const accessToken = jwt.sign(
-            { id: user.id, email: user.email },
-            JWT_SECRET,
-            {
-              expiresIn: "1d", // Adjust expiration as needed
-            }
-          );
-          // console.log({
-          //   id: user.id.toString(),
-          //   name: user.username,
-          //   email: user.email,
-          //   accessToken,
-          // });
-          return {
-            id: user.id.toString(),
-            name: user.username,
-            email: user.email,
-            accessToken,
-          };
+        if (user) {
+          if (
+            user?.email &&
+            (await bcrypt.compare(credentials.password, user.password))
+          ) {
+            // Generate a JWT token if needed
+            const accessToken = jwt.sign(
+              { id: user.id, email: user.email },
+              JWT_SECRET,
+              {
+                expiresIn: "1d", // Adjust expiration as needed
+              }
+            );
+            // console.log({
+            //   // id: user.id.toString(),
+            //   // name: user.username,
+            //   // email: user.email,
+            //   // accessToken,
+            //   role: user.role,
+            // });
+            return {
+              id: user.id.toString(),
+              name: user.username,
+              email: user.email,
+              role: user.role,
+              accessToken,
+            };
+          }
         }
+
+        // check if the credentials users email id exist
+        const employeeUser = await prisma.accessControl.findUnique({
+          where: { email: credentials.email },
+        });
+
+        if (employeeUser) {
+          if (
+            employeeUser?.email &&
+            (await bcrypt.compare(credentials.password, employeeUser.password))
+          ) {
+            // Generate a JWT token if needed
+            const accessToken = jwt.sign(
+              { id: employeeUser.id, email: employeeUser.email },
+              JWT_SECRET,
+              {
+                expiresIn: "1d", // Adjust expiration as needed
+              }
+            );
+
+            // console.log({
+            //   role: employeeUser.role,
+            // });
+
+            return {
+              id: employeeUser.id.toString(),
+              email: employeeUser.email,
+              role: employeeUser.role,
+              accessToken,
+            };
+          }
+        }
+
         return null;
       },
     }),

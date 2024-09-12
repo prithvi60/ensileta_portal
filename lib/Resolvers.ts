@@ -105,6 +105,15 @@ export const resolvers = {
         throw new Error("Password do not match, Please check the password");
       }
 
+      // Check if the email already exists
+      const existingUser = await prisma.users.findUnique({
+        where: { email },
+      });
+
+      if (existingUser) {
+        throw new Error("Email already exists, please use a different one");
+      }
+
       const hashedPwd = await bcrypt.hash(password, 10);
       try {
         const userData = await prisma.users.create({
@@ -295,6 +304,24 @@ export const resolvers = {
       }
     },
     uploadAccessControlUsers: async (_: any, { email, password }: any) => {
+      if (!email && !password) {
+        throw new Error("All fields are mandatory");
+      }
+
+      // Check if the email already exists on users database
+      const existingUser = await prisma.users.findUnique({
+        where: { email },
+      });
+
+      // Check if the email already exists on access control database
+      const existingAccessUser = await prisma.accessControl.findUnique({
+        where: { email },
+      });
+
+      if (existingUser || existingAccessUser) {
+        throw new Error("Email already exists, please use a different one");
+      }
+
       const hashedPwd = await bcrypt.hash(password, 10);
       try {
         const employeeData = await prisma.accessControl.create({

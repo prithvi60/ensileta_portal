@@ -9,7 +9,7 @@ import { getUserFromToken } from "@/helper/GetUserInfo";
 const context = async (req: NextRequest) => {
   const token = req.headers.get("authorization") || "";
   const user = getUserFromToken(token);
-  // console.log("context", token);
+  console.log("context", user);
 
   return {
     userId: user?.id,

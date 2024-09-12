@@ -17,6 +17,8 @@ const httpLink = new HttpLink({
 
 const authLink = setContext(async (_, { headers }) => {
   const session = await getSession();
+  // console.log(session?.user);
+
   const token = session?.accessToken;
   // console.log("AccessToken:", token);
   // console.log("bearer", `Bearer ${token}`);
