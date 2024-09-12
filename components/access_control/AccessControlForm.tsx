@@ -88,7 +88,7 @@ const AccessControlForm = () => {
             <div className="flex justify-center flex-wrap items-center">
                 <div className="w-full p-4 sm:px-16 sm:py-0 xl:w-3/4">
                     <div className="w-full p-4 sm:p-12.5 xl:p-17.5 text-[#0E132A]">
-                        <h2 className="mb-9 text-2xl font-bold text-[#0E132A] sm:text-title-xl2">
+                        <h2 className="mb-9 text-2xl font-bold text-[#0E132A] sm:text-title-xl2 text-center">
                             Add Employees to Ensileta Portal
                         </h2>
 

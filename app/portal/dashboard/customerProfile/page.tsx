@@ -1,18 +1,20 @@
 "use client"
 import { CustomerInfoForm } from '@/components/customer_info/CustomerInfoForm'
 import DefaultLayout from '@/components/Layout/DefaultLayout'
+import { GET_USER } from '@/lib/Queries'
+import { useQuery } from '@apollo/client'
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 
 
 const Page = () => {
-    const { data: session } = useSession()
+    const { data: RoleBased, } = useQuery(GET_USER);
+
 
     return (
         <DefaultLayout>
             <div className="mx-auto max-w-242.5">
-
-                <div className="overflow-hidden rounded-sm border border-stroke bg-white shadow-default">
+                {RoleBased?.user?.role === "admin" && RoleBased?.user?.role === "super admin" ? (<div className="overflow-hidden rounded-sm border border-stroke bg-white shadow-default">
                     <div className="relative z-20 h-35 md:h-65">
                         <Image
                             src={"/cover/banner-img.jpg"}
@@ -39,10 +41,15 @@ const Page = () => {
                         </div>
                         <div className="mt-4">
                             {/*Company  Form  */}
-                            <CustomerInfoForm session={session} />
+                            <CustomerInfoForm />
                         </div>
                     </div>
-                </div>
+                </div>) : (
+                    <div className='w-full h-full shadow-md rounded-md p-5 font-medium tracking-wide text-rose-500 text-xl'>
+                        <p className='text-center'>Hey team, just a friendly reminder that employees should avoid visiting this page. Thanks for your cooperation!</p>
+                    </div>
+                )}
+
             </div>
         </DefaultLayout>
     )

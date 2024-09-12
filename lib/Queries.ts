@@ -1,5 +1,7 @@
 import { gql } from "@apollo/client";
 
+// Authentication
+
 export const SIGN_UP = gql`
   mutation sigUp(
     $username: String!
@@ -30,6 +32,8 @@ export const LOGIN = gql`
   }
 `;
 
+// users details get and update queries
+
 export const GET_USER = gql`
   query GetUser {
     user {
@@ -40,16 +44,6 @@ export const GET_USER = gql`
       phone_number
       address
       role
-    }
-  }
-`;
-
-export const GET_USER_PROFILE = gql`
-  query GetUserProfile {
-    userProfile {
-      username
-      email
-      id
     }
   }
 `;
@@ -81,16 +75,7 @@ export const UPDATE_USER = gql`
   }
 `;
 
-export const UPLOAD_FILE = gql`
-  mutation UploadPDF($file: Upload!) {
-    uploadPDF(file: $file) {
-      id
-      filename
-      fileUrl
-      createdAt
-    }
-  }
-`;
+// View 2D queries
 
 export const ADD_2D_FILENAME = gql`
   mutation Upload2DFile($fileName: String!) {
@@ -116,6 +101,8 @@ export const GET_ALL_2D_VIEW = gql`
   }
 `;
 
+// View 3D queries
+
 export const ADD_3D_FILENAME = gql`
   mutation Upload3DFile($fileName: String!) {
     upload3DFile(fileName: $fileName) {
@@ -139,6 +126,8 @@ export const GET_ALL_3D_VIEW = gql`
     }
   }
 `;
+
+// View BOQ queries
 
 export const ADD_BOQ_FILENAME = gql`
   mutation UploadBOQFile($fileName: String!) {

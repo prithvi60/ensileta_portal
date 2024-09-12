@@ -1,15 +1,16 @@
-"use client"
+"use client";
 
-import { SIGN_UP } from '@/lib/Queries';
-import { useMutation } from '@apollo/client';
-import Link from 'next/link'
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react'
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from '@apollo/client';
 import { SubmitHandler, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import toast from 'react-hot-toast';
+import { SIGN_UP } from '@/lib/Queries';
+import Link from 'next/link';
 
+// Define the validation schema using Zod
 const schema = z.object({
     username: z.string()
         .min(3, { message: "Username must be at least 3 characters long" })
@@ -33,25 +34,26 @@ type FormFields = z.infer<typeof schema>;
 
 export const SignUp = () => {
     const [showPassword, setShowPassword] = useState(false);
-    const [showCnfPassword, setCnfShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const router = useRouter();
+    const [signUp] = useMutation(SIGN_UP);
+
     const {
         register,
         handleSubmit,
         setError,
-        formState: { errors, isSubmitting },
+        formState: { errors, isSubmitting, isValid },
     } = useForm<FormFields>({
         resolver: zodResolver(schema),
+        mode: "onChange",
     });
-    const router = useRouter();
-    const [signUp] = useMutation(SIGN_UP);
 
     const onSubmit: SubmitHandler<FormFields> = async (data) => {
         try {
-            const result = await signUp({ variables: { ...data } })
+            const { data: result } = await signUp({ variables: { ...data } });
 
             if (result) {
-                // router.push("/portal/dashboard/customerProfile")
-                router.push("/api/auth/signin")
+                router.push("/api/auth/signin");
                 toast.success('Signed up successfully', {
                     position: "top-right",
                     duration: 3000,
@@ -65,7 +67,6 @@ export const SignUp = () => {
                         secondary: '#FFFAEE',
                     },
                 });
-
             } else {
                 setError("root", { message: "Invalid Sign Up" });
                 toast.error("Invalid Sign Up", {
@@ -81,9 +82,7 @@ export const SignUp = () => {
                         secondary: '#FFFAEE',
                     },
                 });
-
             }
-
         } catch (error: any) {
             console.error("An unexpected error occurred:", error);
             setError("root", { message: error.message });
@@ -98,7 +97,7 @@ export const SignUp = () => {
                 iconTheme: {
                     primary: '#C72422',
                     secondary: '#FFFAEE',
-                }
+                },
             });
         }
     };
@@ -109,9 +108,9 @@ export const SignUp = () => {
                 <div className="hidden w-full xl:block xl:w-1/2">
                     <div className="p-4 sm:px-12 sm:py-0 space-y-5 text-center">
                         <div className='mb-10'>
-                            <Link className="mb-5.5 inline-block tracking-wider font-sans font-bold text-[#139F9B] text-lg md:text-2xl" href="/">
+                            <h3 className="mb-5.5 inline-block tracking-wider font-sans font-bold text-[#139F9B] text-lg md:text-2xl">
                                 Welcome To Ensileta Portal
-                            </Link>
+                            </h3>
 
                             <p className="2xl:px-20 text-[#0E132A]">
                                 The home should be the treasure chest of living
@@ -366,13 +365,13 @@ export const SignUp = () => {
                                     </label>
                                     <div className="relative">
                                         <input
-                                            type={showCnfPassword ? "text" : "password"}
+                                            type={showConfirmPassword ? "text" : "password"}
                                             placeholder="Re-enter your password"
                                             className="w-full rounded-lg border border-stroke bg-transparent py-2 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none"
                                             {...register('confirmPassword')} />
 
-                                        <span className="absolute right-4 top-2 cursor-pointer" onClick={() => setCnfShowPassword(!showCnfPassword)}>
-                                            {showCnfPassword ? (<svg
+                                        <span className="absolute right-4 top-2 cursor-pointer" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                                            {showConfirmPassword ? (<svg
                                                 width="22"
                                                 height="22"
                                                 viewBox="0 0 22 22"
@@ -393,11 +392,10 @@ export const SignUp = () => {
 
                             <div>
                                 <button
-                                    disabled={isSubmitting}
+                                    disabled={!isValid || isSubmitting}
                                     type="submit"
-                                    className="w-full cursor-pointer rounded-lg p-4 text-white transition hover:bg-opacity-90 bg-[#139F9B]"
-                                >
-                                    {isSubmitting ? "Submitting..." : "Sign Up"}
+                                    className={`w-full cursor-pointer rounded-lg p-4 text-white transition  bg-[#139F9B] mb-5 ${!isValid || isSubmitting ? "bg-opacity-40 cursor-not-allowed" : "hover:bg-opacity-90"}`}
+                                >{isSubmitting ? "Submitting..." : "Submit"}
                                 </button>
                             </div>
 

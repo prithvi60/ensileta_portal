@@ -7,23 +7,27 @@ import prisma from "@/prisma/db";
 import { getUserFromToken } from "@/helper/GetUserInfo";
 
 const context = async (req: NextRequest) => {
-  const token = req.headers.get("authorization") || "";
-  const user = getUserFromToken(token);
-  console.log("context", user);
+  try {
+    const token = req.headers.get("authorization") || "";
+    const user = getUserFromToken(token);
 
-  return {
-    userId: user?.id,
-    prisma,
-  };
+    return {
+      userId: user?.id || null,
+      prisma,
+    };
+  } catch (error) {
+    console.error("Error creating context:", error);
+    return { userId: null, prisma };
+  }
 };
 
-// Initialize Apollo Server with the typeDefs and resolvers
+// Initialize Apollo Server
 const server = new ApolloServer({
   typeDefs,
   resolvers,
 });
 
-// Create the Next.js handler for Apollo Server
+// Create Next.js handler for Apollo Server
 const handler = startServerAndCreateNextHandler<NextRequest>(server, {
   context,
 });

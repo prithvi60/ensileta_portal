@@ -1,16 +1,17 @@
-"use client"
+"use client";
+
 import { signIn } from 'next-auth/react';
-import Link from 'next/link'
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import toast from 'react-hot-toast';
 
 const schema = z.object({
-    email: z.string().email({ message: "Invalid email address" }),
-    password: z.string().min(6),
+    email: z.string().email("Invalid email address"),
+    password: z.string().min(6, "Password must be at least 6 characters long"),
 });
 
 type FormFields = z.infer<typeof schema>;
@@ -22,16 +23,17 @@ export const SignIn = () => {
         register,
         handleSubmit,
         setError,
-        formState: { errors, isSubmitting },
+        formState: { errors, isSubmitting, isValid },
     } = useForm<FormFields>({
         resolver: zodResolver(schema),
+        mode: "onChange",
     });
 
     const onSubmit: SubmitHandler<FormFields> = async (data) => {
         try {
             const result = await signIn("credentials", {
                 redirect: false,
-                ...data
+                ...data,
             });
 
             if (result?.error) {
@@ -50,7 +52,7 @@ export const SignIn = () => {
                     },
                 });
             } else {
-                router.push("/portal/dashboard/customerProfile")
+                router.push("/portal/dashboard/customerProfile");
                 toast.success('Logged in successfully', {
                     position: "top-right",
                     duration: 3000,
@@ -65,11 +67,10 @@ export const SignIn = () => {
                     },
                 });
             }
-
-        } catch (error) {
+        } catch (error: any) {
             console.error("An unexpected error occurred:", error);
-            setError("root", { message: "An unexpected error occurred" });
-            toast.error("An unexpected error occurred");
+            setError("root", { message: error.message });
+            toast.error(error.message);
         }
     };
 
@@ -78,9 +79,9 @@ export const SignIn = () => {
             <div className="flex flex-wrap items-center">
                 <div className="hidden w-full xl:block xl:w-1/2">
                     <div className="p-4 sm:px-16 sm:py-0 space-y-5 text-center">
-                        <Link className="mb-5.5 inline-block tracking-wider font-sans font-bold text-[#139F9B] text-lg md:text-2xl" href="/">
+                        <h3 className="mb-5.5 inline-block tracking-wider font-sans font-bold text-[#139F9B] text-lg md:text-2xl">
                             Welcome To Ensileta Portal
-                        </Link>
+                        </h3>
 
                         <p className="2xl:px-20 text-[#0E132A]">
                             We shape our homes and then our homes shape us
@@ -218,6 +219,8 @@ export const SignIn = () => {
                             Sign In to Ensileta Portal
                         </h2>
 
+                        {/* Form with validation */}
+
                         <form onSubmit={handleSubmit(onSubmit)}>
                             <div className="mb-4">
                                 <label className="mb-2.5 block font-medium text-[#0E132A]">
@@ -283,13 +286,13 @@ export const SignIn = () => {
                                 )}
                             </div>
 
-                            {/* <div className=""> */}
                             <button
-                                disabled={isSubmitting}
+                                disabled={!isValid || isSubmitting}
                                 type="submit"
-                                className="w-full cursor-pointer rounded-lg p-4 text-white transition hover:bg-opacity-90 bg-[#139F9B] mb-5"
-                            >{isSubmitting ? "Submitting..." : "Submit"}</button>
-                            {/* </div> */}
+                                className={`w-full cursor-pointer rounded-lg p-4 text-white transition  bg-[#139F9B] mb-5 ${!isValid || isSubmitting ? "bg-opacity-40 cursor-not-allowed" : "hover:bg-opacity-90"}`}
+                            >{isSubmitting ? "Submitting..." : "Submit"}
+                            </button>
+
 
                             <div className="mt-3 text-center">
                                 <p>

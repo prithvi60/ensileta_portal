@@ -223,9 +223,7 @@ const config: Config = {
         "4/3": "4 / 3",
         "21/9": "21 / 9",
       },
-      backgroundImage: {
-        video: "url('../images/video/video.png')",
-      },
+      backgroundImage: {},
       content: {
         "icon-copy": 'url("../images/icon/icon-copy-alt.svg")',
       },

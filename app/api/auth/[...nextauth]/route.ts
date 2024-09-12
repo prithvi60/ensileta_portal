@@ -11,6 +11,55 @@ if (!JWT_SECRET) {
   throw new Error("NEXTAUTH_SECRET is not defined in environment variables");
 }
 
+const generateToken = (user: { id: number; email: string; role?: string }) => {
+  return jwt.sign(
+    { id: user.id, email: user.email, role: user.role || "" },
+    JWT_SECRET,
+    {
+      expiresIn: "1d",
+    }
+  );
+};
+
+const authenticateUser = async (email: string, password: string) => {
+  // Check user in 'users' table
+  const user = await prisma.users.findUnique({ where: { email } });
+
+  if (user && (await bcrypt.compare(password, user.password))) {
+    return {
+      id: user.id.toString(),
+      name: user.username,
+      email: user.email,
+      role: user.role || "",
+      accessToken: generateToken({
+        id: user.id,
+        email: user.email,
+        role: user.role || "",
+      }),
+    };
+  }
+
+  // Check user in 'accessControl' table
+  const employeeUser = await prisma.accessControl.findUnique({
+    where: { email },
+  });
+
+  if (employeeUser && (await bcrypt.compare(password, employeeUser.password))) {
+    return {
+      id: employeeUser.id.toString(),
+      email: employeeUser.email,
+      role: employeeUser.role || "",
+      accessToken: generateToken({
+        id: employeeUser.id,
+        email: employeeUser.email,
+        role: employeeUser.role,
+      }),
+    };
+  }
+
+  return null;
+};
+
 const handler = NextAuth({
   providers: [
     CredentialsProvider({
@@ -20,79 +69,20 @@ const handler = NextAuth({
         password: { label: "Password", type: "password" },
       },
       authorize: async (credentials) => {
-        // console.log("credentials", credentials);
-        if (!credentials) {
+        if (!credentials?.email || !credentials?.password) {
           return null;
         }
 
-        // check if the credentials users email id exist
-        const user = await prisma.users.findUnique({
-          where: { email: credentials.email },
-        });
+        const user = await authenticateUser(
+          credentials.email,
+          credentials.password
+        );
 
-        if (user) {
-          if (
-            user?.email &&
-            (await bcrypt.compare(credentials.password, user.password))
-          ) {
-            // Generate a JWT token if needed
-            const accessToken = jwt.sign(
-              { id: user.id, email: user.email },
-              JWT_SECRET,
-              {
-                expiresIn: "1d", // Adjust expiration as needed
-              }
-            );
-            // console.log({
-            //   // id: user.id.toString(),
-            //   // name: user.username,
-            //   // email: user.email,
-            //   // accessToken,
-            //   role: user.role,
-            // });
-            return {
-              id: user.id.toString(),
-              name: user.username,
-              email: user.email,
-              role: user.role,
-              accessToken,
-            };
-          }
+        if (!user) {
+          throw new Error("Invalid email or password");
         }
 
-        // check if the credentials users email id exist
-        const employeeUser = await prisma.accessControl.findUnique({
-          where: { email: credentials.email },
-        });
-
-        if (employeeUser) {
-          if (
-            employeeUser?.email &&
-            (await bcrypt.compare(credentials.password, employeeUser.password))
-          ) {
-            // Generate a JWT token if needed
-            const accessToken = jwt.sign(
-              { id: employeeUser.id, email: employeeUser.email },
-              JWT_SECRET,
-              {
-                expiresIn: "1d", // Adjust expiration as needed
-              }
-            );
-
-            // console.log({
-            //   role: employeeUser.role,
-            // });
-
-            return {
-              id: employeeUser.id.toString(),
-              email: employeeUser.email,
-              role: employeeUser.role,
-              accessToken,
-            };
-          }
-        }
-
-        return null;
+        return user;
       },
     }),
   ],
@@ -102,7 +92,7 @@ const handler = NextAuth({
   adapter: PrismaAdapter(prisma),
   session: {
     strategy: "jwt",
-    maxAge: 24 * 60 * 60,
+    maxAge: 24 * 60 * 60, // 1 day
   },
   callbacks: {
     async jwt({ token, user }) {

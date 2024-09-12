@@ -1,6 +1,5 @@
 "use client"
 import { SignIn } from '@/components/SignIn'
-import { div, main } from 'framer-motion/client'
 import React from 'react'
 
 const page = () => {

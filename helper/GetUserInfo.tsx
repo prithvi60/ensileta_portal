@@ -8,26 +8,29 @@ if (!JWT_SECRET) {
 
 export const getUserFromToken = (token: string) => {
     try {
-        // Ensure token is in the form of "Bearer <token>"
-        const tokenWithoutBearer = token.startsWith("Bearer ") ? token.slice(7) : token;
+        // Check if token exists and is prefixed with "Bearer "
+        const tokenWithoutBearer = token?.startsWith("Bearer ")
+            ? token.slice(7)
+            : token;
 
         if (!tokenWithoutBearer) {
+            console.warn("Token is empty or improperly formatted.");
             return null;
         }
 
         // Verify and decode the token
         const decoded = jwt.verify(tokenWithoutBearer, JWT_SECRET) as JwtPayload;
-        // console.log("decoded", decoded);
 
-        // Ensure decoded token contains required properties
-        if (typeof decoded === 'object' && decoded.id) {
+        // Ensure decoded token contains an ID property
+        if (decoded && typeof decoded === 'object' && decoded.id) {
             return decoded;
         }
 
+        console.warn("Decoded token does not contain a valid ID.");
         return null;
 
-    } catch (error) {
-        console.error("Invalid Token:", error);
+    } catch (error: any) {
+        console.error("Error verifying token:", error.message || error);
         return null;
     }
 };

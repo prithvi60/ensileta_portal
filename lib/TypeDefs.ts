@@ -9,21 +9,11 @@ export const typeDefs = `#graphql
     role: String
   }
 
-  enum SortOrder {
-    asc
-    desc
-  }
-
-  input ViewOrderByInput {
-  fileName: SortOrder
-  createdAt: SortOrder
-  }
-
   type View2D {
     id: Int!
     fileName: String!
     fileURL: String!
-    version:   Int!
+    version: Int!
     createdAt: String!
   }
 
@@ -31,7 +21,7 @@ export const typeDefs = `#graphql
     id: Int!
     fileName: String!
     fileURL: String!
-    version:   Int!
+    version: Int!
     createdAt: String!
   }
 
@@ -39,7 +29,7 @@ export const typeDefs = `#graphql
     id: Int!
     fileName: String!
     fileURL: String!
-    version:   Int!
+    version: Int!
     createdAt: String!
   }
 
@@ -49,24 +39,52 @@ export const typeDefs = `#graphql
     role: String
   }
 
+  enum SortOrder {
+    asc
+    desc
+  }
+
+  input ViewOrderByInput {
+    fileName: SortOrder
+    createdAt: SortOrder
+  }
+
   type Query {
     user: User
     userProfile: User!
-    getAll2DFiles(orderBy: ViewOrderByInput) : [View2D]!
-    getAll3DFiles(orderBy: ViewOrderByInput) : [View3D]!
-    getAllBOQFiles(orderBy: ViewOrderByInput) : [ViewBOQ]!
-    getAllAccessControlUsers : [AccessControl]!
+    getAll2DFiles(orderBy: ViewOrderByInput): [View2D]!
+    getAll3DFiles(orderBy: ViewOrderByInput): [View3D]!
+    getAllBOQFiles(orderBy: ViewOrderByInput): [ViewBOQ]!
+    getAllAccessControlUsers: [AccessControl]!
   }
 
   type Mutation {
-    signUp(username: String!, email: String!, password: String!, confirmPassword: String!): User
-    login(email: String!, password: String!): User!,
-    logout: Boolean!,
-    updateUser(id: Int!, username: String!, email: String!, company_name: String!, phone_number: String!, address: String!): User
-    upload2DFile(fileName: String!) : View2D,
-    upload3DFile(fileName: String!) : View3D,
-    uploadBOQFile(fileName: String!) : ViewBOQ,
-    uploadAccessControlUsers(email: String!, password: String!) : AccessControl
-  }
+    signUp(
+      username: String!,
+      email: String!,
+      password: String!,
+      confirmPassword: String!
+    ): User
 
+    login(email: String!, password: String!): User!
+    logout: Boolean!
+
+    updateUser(
+      id: Int!,
+      username: String!,
+      email: String!,
+      company_name: String!,
+      phone_number: String!,
+      address: String!
+    ): User
+
+    upload2DFile(fileName: String!): View2D
+    upload3DFile(fileName: String!): View3D
+    uploadBOQFile(fileName: String!): ViewBOQ
+
+    uploadAccessControlUsers(
+      email: String!,
+      password: String!
+    ): AccessControl
+  }
 `;
