@@ -5,8 +5,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import toast from 'react-hot-toast';
-import { useMutation } from '@apollo/client';
-import { ADD_EMPLOYEE, GET_ALL_EMPLOYEE_LISTS } from '@/lib/Queries';
+import { useMutation, useQuery } from '@apollo/client';
+import { ADD_EMPLOYEE, GET_ALL_EMPLOYEE_LISTS, GET_USER } from '@/lib/Queries';
 
 const schema = z.object({
     email: z.string().email({ message: "Invalid email address" }),
@@ -18,6 +18,7 @@ type FormFields = z.infer<typeof schema>;
 const AccessControlForm = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [employeeData] = useMutation(ADD_EMPLOYEE, { refetchQueries: [{ query: GET_ALL_EMPLOYEE_LISTS }], })
+    const { data: RoleBased, loading } = useQuery(GET_USER);
     const {
         register,
         handleSubmit,
@@ -85,7 +86,7 @@ const AccessControlForm = () => {
     return (
 
         <div className="bg-white shadow-xl m-4">
-            <div className="flex justify-center flex-wrap items-center">
+            {RoleBased?.user?.role === "admin" && (<div className="flex justify-center flex-wrap items-center">
                 <div className="w-full p-4 sm:px-16 sm:py-0 xl:w-3/4">
                     <div className="w-full p-4 sm:p-12.5 xl:p-17.5 text-[#0E132A]">
                         <h2 className="mb-9 text-2xl font-bold text-[#0E132A] sm:text-title-xl2 text-center">
@@ -170,7 +171,8 @@ const AccessControlForm = () => {
                         </form>
                     </div>
                 </div>
-            </div>
+            </div>)}
+
         </div>
 
     )

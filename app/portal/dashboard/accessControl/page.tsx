@@ -7,7 +7,6 @@ import { EmployeeLists } from '@/components/access_control/EmployeeLists';
 
 const Page = () => {
 
-
     return (
         <DefaultLayout>
             <section className='h-screen w-full space-y-10'>

@@ -8,47 +8,50 @@ import Image from 'next/image'
 
 
 const Page = () => {
-    const { data: RoleBased, } = useQuery(GET_USER);
+    const { data: RoleBased, loading } = useQuery(GET_USER);
 
 
     return (
         <DefaultLayout>
             <div className="mx-auto max-w-242.5">
-                {RoleBased?.user?.role === "admin" && RoleBased?.user?.role === "super admin" ? (<div className="overflow-hidden rounded-sm border border-stroke bg-white shadow-default">
-                    <div className="relative z-20 h-35 md:h-65">
-                        <Image
-                            src={"/cover/banner-img.jpg"}
-                            alt="profile cover"
-                            className="h-full w-full rounded-tl-sm rounded-tr-sm object-cover object-bottom overflow-hidden"
-                            width={970}
-                            height={260}
-                        />
-                    </div>
-                    <div className="px-4 pb-6 text-center lg:pb-8 xl:pb-11.5">
-                        <div className="relative z-30 mx-auto -mt-22 h-30 w-full max-w-30 rounded-full bg-white/20 p-1 backdrop-blur sm:h-44 sm:max-w-44 sm:p-3">
-                            <div className="relative drop-shadow-2">
-                                <Image
-                                    src={"/user/user-06.png"}
-                                    width={160}
-                                    height={160}
-                                    style={{
-                                        width: "auto",
-                                        height: "auto",
-                                    }}
-                                    alt="profile"
-                                />
+                {loading ? (<div className='text-rose-500 text-xl w-full h-full text-center'>Loading ....</div>) : (<>
+                    {RoleBased?.user?.role === "admin" || RoleBased?.user?.role === "super admin" ? (<div className="overflow-hidden rounded-sm border border-stroke bg-white shadow-default">
+                        <div className="relative z-20 h-35 md:h-65">
+                            <Image
+                                src={"/cover/banner-img.jpg"}
+                                alt="profile cover"
+                                className="h-full w-full rounded-tl-sm rounded-tr-sm object-cover object-bottom overflow-hidden"
+                                width={970}
+                                height={260}
+                            />
+                        </div>
+                        <div className="px-4 pb-6 text-center lg:pb-8 xl:pb-11.5">
+                            <div className="relative z-30 mx-auto -mt-22 h-30 w-full max-w-30 rounded-full bg-white/20 p-1 backdrop-blur sm:h-44 sm:max-w-44 sm:p-3">
+                                <div className="relative drop-shadow-2">
+                                    <Image
+                                        src={"/user/user-06.png"}
+                                        width={160}
+                                        height={160}
+                                        style={{
+                                            width: "auto",
+                                            height: "auto",
+                                        }}
+                                        alt="profile"
+                                    />
+                                </div>
+                            </div>
+                            <div className="mt-4">
+                                {/*Company  Form  */}
+                                <CustomerInfoForm />
                             </div>
                         </div>
-                        <div className="mt-4">
-                            {/*Company  Form  */}
-                            <CustomerInfoForm />
+                    </div>) : (
+                        <div className='w-full h-full shadow-md rounded-md p-5 font-medium tracking-wide text-rose-500 text-xl'>
+                            <p className='text-center'>Hey team, just a friendly reminder that employees should avoid visiting this page. Thanks for your cooperation!</p>
                         </div>
-                    </div>
-                </div>) : (
-                    <div className='w-full h-full shadow-md rounded-md p-5 font-medium tracking-wide text-rose-500 text-xl'>
-                        <p className='text-center'>Hey team, just a friendly reminder that employees should avoid visiting this page. Thanks for your cooperation!</p>
-                    </div>
-                )}
+                    )}
+                </>)}
+
 
             </div>
         </DefaultLayout>
