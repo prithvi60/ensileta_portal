@@ -163,3 +163,25 @@ export const GET_ALL_BOQ_VIEW = gql`
     }
   }
 `;
+
+// Access Control
+
+export const ADD_EMPLOYEE = gql`
+  mutation UploadAccessControlUsers($email: String!, $password: String!) {
+    uploadAccessControlUsers(email: $email, password: $password) {
+      id
+      email
+      role
+    }
+  }
+`;
+
+export const GET_ALL_EMPLOYEE_LISTS = gql`
+  query getAllEmployeeLists {
+    getAllAccessControlUsers {
+      id
+      email
+      role
+    }
+  }
+`;

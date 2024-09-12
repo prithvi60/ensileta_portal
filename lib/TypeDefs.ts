@@ -43,12 +43,19 @@ export const typeDefs = `#graphql
     createdAt: String!
   }
 
+  type AccessControl {
+    id: Int!
+    email: String!
+    role: String
+  }
+
   type Query {
     user: User
     userProfile: User!
     getAll2DFiles(orderBy: ViewOrderByInput) : [View2D]!
     getAll3DFiles(orderBy: ViewOrderByInput) : [View3D]!
     getAllBOQFiles(orderBy: ViewOrderByInput) : [ViewBOQ]!
+    getAllAccessControlUsers : [AccessControl]!
   }
 
   type Mutation {
@@ -57,8 +64,9 @@ export const typeDefs = `#graphql
     logout: Boolean!,
     updateUser(id: Int!, username: String!, email: String!, company_name: String!, phone_number: String!, address: String!): User
     upload2DFile(fileName: String!) : View2D,
-    upload3DFile(fileName: String!) : View2D,
-    uploadBOQFile(fileName: String!) : View2D,
+    upload3DFile(fileName: String!) : View3D,
+    uploadBOQFile(fileName: String!) : ViewBOQ,
+    uploadAccessControlUsers(email: String!, password: String!) : AccessControl
   }
 
 `;

@@ -84,6 +84,17 @@ export const resolvers = {
         throw new Error("Failed to fetch files");
       }
     },
+    getAllAccessControlUsers: async (_: any, args: { orderBy?: any }) => {
+      try {
+        const employees = await prisma.accessControl.findMany({
+          orderBy: args.orderBy || {},
+        });
+        return employees;
+      } catch (error) {
+        console.error(error);
+        throw new Error("Failed to employees lists");
+      }
+    },
   },
   Mutation: {
     signUp: async (
@@ -115,27 +126,68 @@ export const resolvers = {
       { email, password }: { email: string; password: string }
     ) => {
       try {
-        const user = await prisma.users.findUnique({ where: { email } });
+        // First, check if the user exists in the 'users' table (role: "admin")
+        let user = await prisma.users.findUnique({ where: { email } });
 
-        if (!user) {
-          throw new Error("Invalid Email");
+        if (user) {
+          if (user.role !== "admin") {
+            throw new Error(
+              "Unauthorized: Only admin users are allowed to login here"
+            );
+          }
+
+          // Compare password with the one in 'users' (admin)
+          const pwdMatch = await bcrypt.compare(password, user.password);
+          if (!pwdMatch) {
+            throw new Error("Invalid password");
+          }
+
+          // Generate JWT for admin user
+          const token = jwt.sign(
+            { id: user.id, email: user.email, role: user.role },
+            JWT_SECRET,
+            { expiresIn: "5m" }
+          );
+
+          return {
+            ...user,
+            token,
+          };
         }
 
-        const pwd = await bcrypt.compare(password, user.password);
-
-        if (!pwd) {
-          throw new Error("Invalid password");
-        }
-
-        const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
-          expiresIn: "5m",
+        // If the user is not found in 'users', check in 'accessControl' (role: "employee")
+        const employee = await prisma.accessControl.findUnique({
+          where: { email },
         });
 
-        // return token;
-        return {
-          ...user,
-          token,
-        };
+        if (employee) {
+          if (employee.role !== "employee") {
+            throw new Error(
+              "Unauthorized: Only employee users are allowed to login here"
+            );
+          }
+
+          // Compare password with the one in 'accessControl' (employee)
+          const pwdMatch = await bcrypt.compare(password, employee.password);
+          if (!pwdMatch) {
+            throw new Error("Invalid password");
+          }
+
+          // Generate JWT for employee user
+          const token = jwt.sign(
+            { id: employee.id, email: employee.email, role: employee.role },
+            JWT_SECRET,
+            { expiresIn: "5m" }
+          );
+
+          return {
+            ...employee,
+            token,
+          };
+        }
+
+        // If no user is found, throw an error
+        throw new Error("Invalid email or password");
       } catch (error) {
         console.error("Error logging in user:", error);
         throw new Error("Failed to log in");
@@ -242,6 +294,22 @@ export const resolvers = {
         throw new Error("Failed to create name");
       }
     },
+    uploadAccessControlUsers: async (_: any, { email, password }: any) => {
+      const hashedPwd = await bcrypt.hash(password, 10);
+      try {
+        const employeeData = await prisma.accessControl.create({
+          data: {
+            email,
+            password: hashedPwd,
+          },
+        });
+
+        return employeeData;
+      } catch (error) {
+        console.error("Error creating employee:", error);
+        throw new Error("Failed to create employee");
+      }
+    },
     // uploadPDF: async (_: any, { file }: any) => {
     //   try {
     //     const { createReadStream, filename } = await file;
@@ -264,3 +332,35 @@ export const resolvers = {
     // },
   },
 };
+
+// login: async (
+//   _: any,
+//   { email, password }: { email: string; password: string }
+// ) => {
+//   try {
+//     const user = await prisma.users.findUnique({ where: { email } });
+
+//     if (!user) {
+//       throw new Error("Invalid Email");
+//     }
+
+//     const pwd = await bcrypt.compare(password, user.password);
+
+//     if (!pwd) {
+//       throw new Error("Invalid password");
+//     }
+
+//     const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
+//       expiresIn: "5m",
+//     });
+
+//     // return token;
+//     return {
+//       ...user,
+//       token,
+//     };
+//   } catch (error) {
+//     console.error("Error logging in user:", error);
+//     throw new Error("Failed to log in");
+//   }
+// },
