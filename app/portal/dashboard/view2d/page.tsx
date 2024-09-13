@@ -1,12 +1,9 @@
 "use client";
-import { GetAll2dView } from '@/components/GetAll2dView';
-import { InputForm } from '@/components/InputForm';
 import DefaultLayout from '@/components/Layout/DefaultLayout';
-import { ADD_2D_FILENAME, GET_ALL_2D_VIEW, GET_USER } from '@/lib/Queries';
-import { useMutation, useQuery } from '@apollo/client';
-import { div } from 'framer-motion/client';
-import React, { ChangeEvent, FormEvent, useState } from 'react'
-import toast from 'react-hot-toast';
+import { SwipeCarousel } from '@/components/SwiperCarousal';
+import Image from 'next/image';
+import { useEffect, useState } from 'react'
+
 
 interface GetAll2DViewResponse {
     getAll2DFiles: Array<{
@@ -19,80 +16,31 @@ interface GetAll2DViewResponse {
 }
 
 const Page = () => {
-    const [inputValue, setInputValue] = useState<string>("");
-    const [view2dFileName] = useMutation(ADD_2D_FILENAME, {
-        refetchQueries: [{ query: GET_ALL_2D_VIEW }]
-    })
-    const { data, loading, error } = useQuery<GetAll2DViewResponse>(GET_ALL_2D_VIEW)
-    const { data: RoleBased, } = useQuery(GET_USER);
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        if (e.target.value) {
-            setInputValue(e.target.value || '')
-        }
-    }
+    const [files, setFiles] = useState([]);
 
-    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        if (!inputValue) {
-            alert("please enter file name")
-            return
-        } else {
-            try {
-                const result = await view2dFileName({ variables: { fileName: inputValue } })
-                if (result) {
-                    toast.success('successfully Created', {
-                        position: "top-right",
-                        duration: 3000,
-                        style: {
-                            border: '1px solid #139F9B',
-                            padding: '16px',
-                            color: '#139F9B',
-                        },
-                        iconTheme: {
-                            primary: '#139F9B',
-                            secondary: '#FFFAEE',
-                        },
-                    })
-                    setInputValue('');
-                }
-            } catch (error) {
-                console.error(error)
+    const fetchFiles = async () => {
+        try {
+            const response = await fetch('/api/fetchFiles');
+            // console.log('Fetching from:');
+            if (response.ok) {
+                const data = await response.json();
+                setFiles(data);
+            } else {
+                console.error('Failed to fetch files:', response.statusText);
             }
-
+        } catch (error) {
+            console.error('Error fetching files:', error);
         }
-    }
-    // const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    //     if (e.target.files && e.target.files.length > 0) {
-    //         setFile(e.target.files[0]);
-    //         setFileName(e.target.files[0].name)
-    //     }
+    };
 
-    // };
+    useEffect(() => {
+        fetchFiles(); // Fetch files when the component mounts
+    }, []);
 
-    // const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    //     e.preventDefault();
-
-    //     if (!file) {
-    //         alert("No file selected");
-    //         return;
-    //     }
-
-    //     console.log(file);
-
-    //     const response = await uploadFile({
-    //         variables: { file },
-    //     });
-
-    //     if (response.data) {
-    //         alert(`File uploaded: ${response.data.uploadFile.filename}`);
-    //     } else {
-    //         alert('File upload failed');
-    //     }
-    // };
 
     return (
         <DefaultLayout>
-            <section className='h-[500px] w-full space-y-10'>
+            {/* <section className='h-[500px] w-full space-y-10'>
                 {RoleBased?.user?.role === "super admin" ? (
                     <InputForm handleChange={handleChange} handleSubmit={handleSubmit} inputValue={inputValue} />
                 ) : (
@@ -102,23 +50,25 @@ const Page = () => {
                 )}
 
                 <GetAll2dView loading={loading} error={error} data={data?.getAll2DFiles} />
-            </section>
-            {/* <section className='h-[500px] w-full flex justify-center items-center'>
-                <form onSubmit={handleSubmit} className='flex justify-center items-center flex-col gap-5 w-full text-center'>
-                    <div className='flex justify-center items-center gap-5'>
-                        <input
-                            id='fileUpload'
-                            type="file"
-                            accept="application/pdf"
-                            onChange={handleFileChange}
-                            className='hidden'
-                        />
-                        <label htmlFor="fileUpload" className='cursor-pointer py-1.5 px-2.5 shadow-md select-none bg-primary text-white rounded-full '>Choose PDF File</label>
-                        {fileName && (<p className='text-lg tracking-wide'>{fileName}</p>)}
-                    </div>
-                    <button type="submit" className='cursor-pointer p-3 shadow-md select-none bg-[#139F9B] text-white rounded-md '>Upload PDF</button>
-                </form>
             </section> */}
+            <div className='w-full h-full relative flex flex-col gap-10 '>
+                {/* <h2 className='text-5xl font-semibold tracking-wide uppercase'>DashBoard</h2>
+                <p className='text-lg text-center font-medium tracking-normal font-satoshi '>Our home should tell the story of who you are, and be a collection of what you love 🛋️</p>
+                <Image src={"/cover/bg-cover.jpg"} width={450} height={450} alt='bg-image' /> */}
+                <div>
+                    <h3 className='text-2xl'>Files in Folder:</h3>
+                    <ul>
+                        {files.map(file => {
+                            console.log("file", file);
+                            // @ts-ignore
+                            return <li key={file.id}>{file.name}</li>
+                        })}
+                    </ul>
+                </div>
+                {/* Add the SwipeCarousel component here */}
+                {/* @ts-ignore */}
+                <SwipeCarousel pdf={files.length > 0 ? files[0].webContentLink : ""} />
+            </div>
         </DefaultLayout>
     );
 };
