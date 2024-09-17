@@ -5,12 +5,54 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("NEXTAUTH_DATABASE_URL")
 }
 
 model users {
+  id           Int     @id @default(autoincrement())
+  username     String  @db.VarChar(50)
+  email        String  @unique @db.VarChar(20)
+  password     String
+  company_name String?
+  phone_number String?
+  address      String?
+  role         String?
+}
+
+model view2D {
+  id        Int      @id @default(autoincrement())
+  fileName  String
+  fileURL   String
+  version   Int
+  createdAt DateTime @default(now())
+}
+
+model view3D {
+  id        Int      @id @default(autoincrement())
+  fileName  String
+  fileURL   String
+  version   Int
+  createdAt DateTime @default(now())
+}
+
+model viewBOQ {
+  id        Int      @id @default(autoincrement())
+  fileName  String
+  fileURL   String
+  version   Int
+  createdAt DateTime @default(now())
+}
+
+model accessControl {
   id       Int    @id @default(autoincrement())
-  username String @unique @db.VarChar(50)
   email    String @unique @db.VarChar(20)
   password String
+  role     String @default("employee")
 }
+
+// model users {
+//   id       Int    @id @default(autoincrement())
+//   username String @unique @db.VarChar(50)
+//   email    String @unique @db.VarChar(20)
+//   password String
+// }
