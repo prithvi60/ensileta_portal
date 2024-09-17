@@ -12,6 +12,7 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
+    "types": ["node", "graphql-upload"],
     "plugins": [
       {
         "name": "next"

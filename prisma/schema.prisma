@@ -17,6 +17,7 @@ model users {
   phone_number String?
   address      String?
   role         String?
+  files        File[]
 }
 
 model view2D {
@@ -48,6 +49,14 @@ model accessControl {
   email    String @unique @db.VarChar(20)
   password String
   role     String @default("employee")
+}
+
+model File {
+  id       Int    @id @default(autoincrement())
+  filename String
+  fileUrl  String
+  userId   Int
+  user     users  @relation(fields: [userId], references: [id])
 }
 
 // model users {

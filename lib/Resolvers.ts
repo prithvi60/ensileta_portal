@@ -1,6 +1,8 @@
 import prisma from "@/prisma/db";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { GraphQLUpload, FileUpload } from "graphql-upload";
+import { uploadFileToS3 } from "./s3";
 
 const JWT_SECRET = process.env.NEXTAUTH_SECRET;
 
@@ -27,6 +29,7 @@ const comparePassword = async (
 };
 
 export const resolvers = {
+  Upload: GraphQLUpload,
   Query: {
     user: async (_: any, __: any, { userId }: any) => {
       if (!userId) {
@@ -327,6 +330,38 @@ export const resolvers = {
       } catch (error) {
         console.error("Error while creating employee", error);
         throw new Error("Failed to create employee");
+      }
+    },
+    uploadFile: async (
+      _: any,
+      { file, userId }: { file: FileUpload; userId: number }
+    ) => {
+      try {
+        const { createReadStream, filename } = await file;
+        const fileStream = createReadStream();
+
+        // const chunks: Buffer[] = [];
+        // for await (const chunk of fileStream) {
+        //   chunks.push(chunk);
+        // }
+        // const fileBuffer = Buffer.concat(chunks);
+
+        // Upload the file to S3
+        const fileUrl = await uploadFileToS3(fileStream, filename, userId);
+
+        // Save the file metadata in PostgreSQL
+        const savedFile = await prisma.file.create({
+          data: {
+            filename,
+            fileUrl,
+            userId,
+          },
+        });
+
+        return savedFile;
+      } catch (error) {
+        console.error("Error uploading file:", error);
+        throw new Error("File upload failed. Please try again.");
       }
     },
   },

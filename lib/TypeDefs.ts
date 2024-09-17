@@ -49,6 +49,15 @@ export const typeDefs = `#graphql
     createdAt: SortOrder
   }
 
+  scalar Upload
+
+  type File {
+    id: ID!
+    filename: String!
+    fileUrl: String!
+    userId: String!
+  }
+
   type Query {
     user: User
     userProfile: User!
@@ -86,5 +95,6 @@ export const typeDefs = `#graphql
       email: String!,
       password: String!
     ): AccessControl
+    uploadFile(file: Upload!, userId: String!): File!
   }
 `;
