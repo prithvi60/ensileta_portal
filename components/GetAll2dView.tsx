@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import React, { useState } from 'react';
+import { SwipeCarousel } from './SwipeCarousal';
 
 interface FileData {
     id: number;
@@ -68,7 +69,8 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({ data, loading, error
                     </ul>)
                     }
                 </>)}
-
+                {/* dynamically send pdf links */}
+                <SwipeCarousel pdf={"https://ensiletadrawings.s3.ap-south-1.amazonaws.com/2dview-dummy.pdf"}/>
             {/* )} */}
 
         </div>
