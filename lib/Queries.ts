@@ -141,6 +141,19 @@ export const ADD_BOQ_FILENAME = gql`
   }
 `;
 
+export const GET_YOUR_BOQ = gql`
+  query Files {
+    files {
+      id
+      filename
+      fileUrl
+      userId
+      version
+      createdAt
+    }
+  }
+`;
+
 export const GET_ALL_BOQ_VIEW = gql`
   query GetAllBOQFiles {
     getAllBOQFiles(orderBy: { createdAt: desc }) {
@@ -171,6 +184,19 @@ export const GET_ALL_EMPLOYEE_LISTS = gql`
       id
       email
       role
+    }
+  }
+`;
+
+export const UPLOAD_FILE_MUTATION = gql`
+  mutation CreateFile($fileUrl: String!, $filename: String!) {
+    createFile(fileUrl: $fileUrl, filename: $filename) {
+      id
+      filename
+      fileUrl
+      userId
+      version
+      createdAt
     }
   }
 `;

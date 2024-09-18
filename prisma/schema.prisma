@@ -52,16 +52,11 @@ model accessControl {
 }
 
 model File {
-  id       Int    @id @default(autoincrement())
-  filename String
-  fileUrl  String
-  userId   Int
-  user     users  @relation(fields: [userId], references: [id])
+  id        Int      @id @default(autoincrement())
+  filename  String
+  fileUrl   String
+  version   Int
+  createdAt DateTime @default(now())
+  userId    Int
+  user      users    @relation(fields: [userId], references: [id])
 }
-
-// model users {
-//   id       Int    @id @default(autoincrement())
-//   username String @unique @db.VarChar(50)
-//   email    String @unique @db.VarChar(20)
-//   password String
-// }

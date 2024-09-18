@@ -2,3 +2,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+::-webkit-file-upload-button {
+  background-color: #139f9b;
+  padding: 10px;
+  border-radius: 50px;
+  color: whitesmoke;
+  border: none;
+}

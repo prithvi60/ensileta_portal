@@ -2,7 +2,7 @@ import { ApolloServer } from "@apollo/server";
 import { startServerAndCreateNextHandler } from "@as-integrations/next";
 import { typeDefs } from "@/lib/TypeDefs";
 import { resolvers } from "@/lib/Resolvers";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/prisma/db";
 import { getUserFromToken } from "@/helper/GetUserInfo";
 

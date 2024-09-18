@@ -64,7 +64,7 @@ const Page = () => {
     return (
         <DefaultLayout>
             <section className='h-[500px] w-full space-y-10'>
-            {RoleBased?.user?.role === "super admin" ? (
+                {RoleBased?.user?.role === "super admin" ? (
                     <InputForm handleChange={handleChange} handleSubmit={handleSubmit} inputValue={inputValue} />
                 ) : (
                     <div className='w-full h-auto flex justify-center items-center'>
@@ -72,7 +72,7 @@ const Page = () => {
                     </div>
                 )}
 
-                <GetAll2dView loading={loading} error={error} data={data?.getAll3DFiles} />
+                {/* <GetAll2dView loading={loading} error={error} data={data?.getAll3DFiles} /> */}
             </section>
         </DefaultLayout>
     );

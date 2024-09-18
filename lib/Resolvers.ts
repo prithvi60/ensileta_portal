@@ -1,8 +1,7 @@
 import prisma from "@/prisma/db";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { GraphQLUpload, FileUpload } from "graphql-upload";
-import { uploadFileToS3 } from "./s3";
+import GraphQLUpload from "graphql-upload/GraphQLUpload.mjs";
 
 const JWT_SECRET = process.env.NEXTAUTH_SECRET;
 
@@ -38,6 +37,22 @@ export const resolvers = {
       try {
         const user = await prisma.users.findUnique({
           where: { id: userId },
+        });
+        return user;
+      } catch (error) {
+        console.error("Error while fetching user:", error);
+        throw new Error("Failed to fetch user");
+      }
+    },
+    files: async (_: any, __: any, { userId }: any) => {
+      if (!userId) {
+        throw new Error("Unauthorized");
+      }
+      try {
+        const user = await prisma.file.findMany({
+          where: {
+            userId: userId,
+          },
         });
         return user;
       } catch (error) {
@@ -332,37 +347,86 @@ export const resolvers = {
         throw new Error("Failed to create employee");
       }
     },
-    uploadFile: async (
+    createFile: async (
       _: any,
-      { file, userId }: { file: FileUpload; userId: number }
+      { fileUrl, filename }: { fileUrl: string; filename: string },
+      { userId }: any
     ) => {
-      try {
-        const { createReadStream, filename } = await file;
-        const fileStream = createReadStream();
+      // const existingUser = await prisma.users.findUnique({
+      //   where: { id: userId },
+      // });
 
-        // const chunks: Buffer[] = [];
-        // for await (const chunk of fileStream) {
-        //   chunks.push(chunk);
-        // }
-        // const fileBuffer = Buffer.concat(chunks);
+      // if (!existingUser) {
+      //   throw new Error("user does not exist");
+      // }
 
-        // Upload the file to S3
-        const fileUrl = await uploadFileToS3(fileStream, filename, userId);
-
-        // Save the file metadata in PostgreSQL
-        const savedFile = await prisma.file.create({
-          data: {
-            filename,
-            fileUrl,
-            userId,
-          },
-        });
-
-        return savedFile;
-      } catch (error) {
-        console.error("Error uploading file:", error);
-        throw new Error("File upload failed. Please try again.");
+      if (!userId) {
+        throw new Error("user does not exist");
       }
+
+      // Find the latest version of the file with the same filename for the user
+      const existingFile = await prisma.file.findMany({
+        where: {
+          userId: userId,
+          filename: filename,
+        },
+        orderBy: {
+          version: "desc",
+        },
+        take: 1, // We only need the latest version of this file
+      });
+
+      // Determine the new version number
+      const newVersion =
+        existingFile.length > 0 ? existingFile[0].version + 1 : 1;
+
+      const createdFile = await prisma.file.create({
+        data: {
+          filename,
+          fileUrl,
+          version: newVersion,
+          createdAt: new Date(),
+          userId,
+        },
+      });
+      return createdFile;
     },
+    // uploadFile: async (_: any, { file }: any, { userId }: any) => {
+    //   console.log({ file, userId });
+
+    //   try {
+    //     // const { createReadStream, filename } = await file;
+    //     const { createReadStream, filename } = await file;
+    //     const fileStream = createReadStream();
+
+    //     // const chunks: Buffer[] = [];
+    //     // for await (const chunk of fileStream) {
+    //     //   chunks.push(chunk);
+    //     // }
+    //     // const fileBuffer = Buffer.concat(chunks);
+
+    //     // Upload the file to S3
+    //     const fileUrl = await uploadFileToS3(
+    //       fileStream,
+    //       filename,
+    //       userId
+    //       // mimetype
+    //     );
+
+    //     // Save the file metadata in PostgreSQL
+    //     const savedFile = await prisma.file.create({
+    //       data: {
+    //         filename,
+    //         fileUrl,
+    //         userId,
+    //       },
+    //     });
+
+    //     return savedFile;
+    //   } catch (error) {
+    //     console.error("Error uploading file:", error);
+    //     throw new Error("File upload failed. Please try again.");
+    //   }
+    // },
   },
 };

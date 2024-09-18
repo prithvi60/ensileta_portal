@@ -1,4 +1,7 @@
 export const typeDefs = `#graphql
+
+  scalar Upload
+
   type User {
     id: Int!
     username: String!
@@ -49,13 +52,13 @@ export const typeDefs = `#graphql
     createdAt: SortOrder
   }
 
-  scalar Upload
-
   type File {
     id: ID!
     filename: String!
     fileUrl: String!
     userId: String!
+    version:   Int
+    createdAt: String!
   }
 
   type Query {
@@ -65,6 +68,7 @@ export const typeDefs = `#graphql
     getAll3DFiles(orderBy: ViewOrderByInput): [View3D]!
     getAllBOQFiles(orderBy: ViewOrderByInput): [ViewBOQ]!
     getAllAccessControlUsers: [AccessControl]!
+    files: [File!]!
   }
 
   type Mutation {
@@ -90,11 +94,11 @@ export const typeDefs = `#graphql
     upload2DFile(fileName: String!): View2D
     upload3DFile(fileName: String!): View3D
     uploadBOQFile(fileName: String!): ViewBOQ
-
     uploadAccessControlUsers(
       email: String!,
       password: String!
     ): AccessControl
-    uploadFile(file: Upload!, userId: String!): File!
+    createFile(fileUrl: String!, filename: String!) : File! 
+    # uploadFile(file: Upload!): File!
   }
 `;
