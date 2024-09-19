@@ -1,6 +1,7 @@
 import prisma from "@/prisma/db";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import GraphQLUpload from "graphql-upload/GraphQLUpload.mjs";
 
 const JWT_SECRET = process.env.NEXTAUTH_SECRET;
 
@@ -27,6 +28,7 @@ const comparePassword = async (
 };
 
 export const resolvers = {
+  Upload: GraphQLUpload,
   Query: {
     user: async (_: any, __: any, { userId }: any) => {
       if (!userId) {
@@ -35,44 +37,91 @@ export const resolvers = {
       try {
         const user = await prisma.users.findUnique({
           where: { id: userId },
+          include: {
+            drawing2Dfiles: true,
+            drawing3Dfiles: true,
+            drawingBOQfiles: true,
+          },
         });
+
+        console.log(user);
+
         return user;
       } catch (error) {
         console.error("Error while fetching user:", error);
         throw new Error("Failed to fetch user");
       }
     },
-    getAll2DFiles: async (_: any, args: { orderBy?: any }) => {
+    users: async () => {
       try {
-        const files = await prisma.view2D.findMany({
-          orderBy: args.orderBy || {},
+        const users = await prisma.users.findMany({
+          include: {
+            drawing2Dfiles: true,
+            drawing3Dfiles: true,
+            drawingBOQfiles: true,
+          },
         });
-        return files;
+        console.log(users);
+
+        return users.filter((user) => user.id !== null);
+        // return users;
       } catch (error) {
-        console.error(error);
-        throw new Error("Failed to fetch files");
+        console.error("Error while fetching users:", error);
+        throw new Error("Failed to fetch users");
       }
     },
-    getAll3DFiles: async (_: any, args: { orderBy?: any }) => {
+    getAll2DFiles: async (_: any, __: any, { userId }: any) => {
+      if (!userId) {
+        throw new Error("Unauthorized");
+      }
       try {
-        const files = await prisma.view3D.findMany({
-          orderBy: args.orderBy || {},
+        const user = await prisma.drawing_2D.findMany({
+          where: {
+            userId: userId,
+          },
         });
-        return files;
+        // console.log(user);
+
+        return user;
       } catch (error) {
-        console.error(error);
-        throw new Error("Failed to fetch files");
+        console.error("Error while fetching user:", error);
+        throw new Error("Failed to fetch user");
       }
     },
-    getAllBOQFiles: async (_: any, args: { orderBy?: any }) => {
+    getAll3DFiles: async (_: any, __: any, { userId }: any) => {
+      if (!userId) {
+        throw new Error("Unauthorized");
+      }
       try {
-        const files = await prisma.viewBOQ.findMany({
-          orderBy: args.orderBy || {},
+        const user = await prisma.drawing_3D.findMany({
+          where: {
+            userId: userId,
+          },
         });
-        return files;
+        // console.log(user);
+
+        return user;
       } catch (error) {
-        console.error(error);
-        throw new Error("Failed to fetch files");
+        console.error("Error while fetching user:", error);
+        throw new Error("Failed to fetch user");
+      }
+    },
+    getAllBOQFiles: async (_: any, __: any, { userId }: any) => {
+      if (!userId) {
+        throw new Error("Unauthorized");
+      }
+      try {
+        const user = await prisma.drawing_BOQ.findMany({
+          where: {
+            userId: userId,
+          },
+        });
+        // console.log(user);
+
+        return user;
+      } catch (error) {
+        console.error("Error while fetching user:", error);
+        throw new Error("Failed to fetch user");
       }
     },
     getAllAccessControlUsers: async (_: any, args: { orderBy?: any }) => {
@@ -220,81 +269,6 @@ export const resolvers = {
         throw new Error("Failed to update user");
       }
     },
-    upload2DFile: async (_: any, { fileName }: any) => {
-      if (!fileName) {
-        throw new Error("Please Update your file name");
-      }
-      try {
-        const existingFiles = await prisma.view2D.findMany({
-          where: { fileName },
-        });
-
-        const newVersion = existingFiles.length + 1;
-
-        const view2dFile = await prisma.view2D.create({
-          data: {
-            fileName,
-            fileURL: "https://drive.google.com/drive/u/1/home",
-            version: existingFiles.length > 0 ? newVersion : 1,
-            createdAt: new Date().toISOString(),
-          },
-        });
-        return view2dFile;
-      } catch (error) {
-        console.error(error);
-        throw new Error("Failed to create name");
-      }
-    },
-    upload3DFile: async (_: any, { fileName }: any) => {
-      if (!fileName) {
-        throw new Error("Please Update your file name");
-      }
-      try {
-        const existingFiles = await prisma.view3D.findMany({
-          where: { fileName },
-        });
-
-        const newVersion = existingFiles.length + 1;
-
-        const view3dFile = await prisma.view3D.create({
-          data: {
-            fileName,
-            fileURL: "https://drive.google.com/drive/u/1/home",
-            version: existingFiles.length > 0 ? newVersion : 1,
-            createdAt: new Date().toISOString(),
-          },
-        });
-        return view3dFile;
-      } catch (error) {
-        console.error(error);
-        throw new Error("Failed to create name");
-      }
-    },
-    uploadBOQFile: async (_: any, { fileName }: any) => {
-      if (!fileName) {
-        throw new Error("Please Update your file name");
-      }
-      try {
-        const existingFiles = await prisma.viewBOQ.findMany({
-          where: { fileName },
-        });
-
-        const newVersion = existingFiles.length + 1;
-
-        const viewBOQFile = await prisma.viewBOQ.create({
-          data: {
-            fileName,
-            fileURL: "https://drive.google.com/drive/u/1/home",
-            version: existingFiles.length > 0 ? newVersion : 1,
-            createdAt: new Date().toISOString(),
-          },
-        });
-        return viewBOQFile;
-      } catch (error) {
-        console.error(error);
-        throw new Error("Failed to create name");
-      }
-    },
     uploadAccessControlUsers: async (_: any, { email, password }: any) => {
       if (!email && !password) {
         throw new Error("All fields are mandatory");
@@ -328,6 +302,84 @@ export const resolvers = {
         console.error("Error while creating employee", error);
         throw new Error("Failed to create employee");
       }
+    },
+    upload2DFile: async (
+      _: any,
+      { fileUrl, filename }: { fileUrl: string; filename: string },
+      { userId }: any
+    ) => {
+      if (!userId) {
+        throw new Error("user does not exist");
+      }
+
+      // Find the latest version of the file with the same filename for the user
+      const existingFile = await prisma.drawing_2D.findMany();
+
+      // Determine the new version number
+      const newVersion = existingFile.length;
+
+      const createdFile = await prisma.drawing_2D.create({
+        data: {
+          filename,
+          fileUrl,
+          version: newVersion,
+          createdAt: new Date(),
+          userId,
+        },
+      });
+      return createdFile;
+    },
+    upload3DFile: async (
+      _: any,
+      { fileUrl, filename }: { fileUrl: string; filename: string },
+      { userId }: any
+    ) => {
+      if (!userId) {
+        throw new Error("user does not exist");
+      }
+
+      // Find the latest version of the file with the same filename for the user
+      const existingFile = await prisma.drawing_3D.findMany();
+
+      // Determine the new version number
+      const newVersion = existingFile.length;
+
+      const createdFile = await prisma.drawing_3D.create({
+        data: {
+          filename,
+          fileUrl,
+          version: newVersion,
+          createdAt: new Date(),
+          userId,
+        },
+      });
+      return createdFile;
+    },
+    uploadBOQFile: async (
+      _: any,
+      { fileUrl, filename }: { fileUrl: string; filename: string },
+      { userId }: any
+    ) => {
+      if (!userId) {
+        throw new Error("user does not exist");
+      }
+
+      // Find the latest version of the file with the same filename for the user
+      const existingFile = await prisma.drawing_BOQ.findMany();
+
+      // Determine the new version number
+      const newVersion = existingFile.length;
+
+      const createdFile = await prisma.drawing_BOQ.create({
+        data: {
+          filename,
+          fileUrl,
+          version: newVersion,
+          createdAt: new Date(),
+          userId,
+        },
+      });
+      return createdFile;
     },
   },
 };

@@ -1,4 +1,15 @@
-@import url("https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+::-webkit-file-upload-button {
+  background-color: #139f9b;
+  padding: 10px;
+  border-radius: 50px;
+  color: whitesmoke;
+  border: none;
+}
+
+::-webkit-file-upload-button:hover {
+  background-color: #0e122b;
+}

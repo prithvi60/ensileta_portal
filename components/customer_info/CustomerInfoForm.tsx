@@ -92,6 +92,7 @@ export const CustomerInfoForm = () => {
         }
     };
 
+
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error loading user data: {error.message}</p>;
 
@@ -179,11 +180,11 @@ export const CustomerInfoForm = () => {
                     </div>
                 </div>
                 {/* Submit */}
-                <div className="mb-5 mx-auto w-1/2">
+                <div className="mb-5 mx-auto ">
                     <button
                         disabled={!isDirty}
                         type="submit"
-                        className="w-full cursor-pointer rounded-lg py-2 text-white transition hover:bg-opacity-90 bg-[#139F9B] disabled:bg-opacity-40"
+                        className="w-full cursor-pointer py-4 text-white transition hover:bg-opacity-90 bg-[#139F9B] disabled:bg-opacity-40"
                     >
                         Update
                     </button>

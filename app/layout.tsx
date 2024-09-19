@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Rubik } from "next/font/google";
+import { Rubik, Roboto_Slab } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./Providers";
 import { Toaster } from "react-hot-toast";
 
 
-const rubik = Rubik({ subsets: ["latin"] });
+const roboto = Roboto_Slab({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Ensileta Customer Portal",
@@ -19,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={rubik.className}>
+      <body className={roboto.className}>
         <Providers>
           {children}
           <Toaster />
@@ -28,3 +28,5 @@ export default function RootLayout({
     </html>
   );
 }
+
+// #0E122B

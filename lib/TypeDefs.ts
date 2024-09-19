@@ -1,4 +1,7 @@
 export const typeDefs = `#graphql
+
+  scalar Upload
+
   type User {
     id: Int!
     username: String!
@@ -7,30 +10,9 @@ export const typeDefs = `#graphql
     phone_number: String
     address: String
     role: String
-  }
-
-  type View2D {
-    id: Int!
-    fileName: String!
-    fileURL: String!
-    version: Int!
-    createdAt: String!
-  }
-
-  type View3D {
-    id: Int!
-    fileName: String!
-    fileURL: String!
-    version: Int!
-    createdAt: String!
-  }
-
-  type ViewBOQ {
-    id: Int!
-    fileName: String!
-    fileURL: String!
-    version: Int!
-    createdAt: String!
+    drawing2Dfiles: [File!]
+    drawing3Dfiles: [File!]
+    drawingBOQfiles: [File!]
   }
 
   type AccessControl {
@@ -49,13 +31,22 @@ export const typeDefs = `#graphql
     createdAt: SortOrder
   }
 
+  type File {
+    id: ID!
+    filename: String!
+    fileUrl: String!
+    userId: String!
+    version:   Int
+    createdAt: String!
+  }
+
   type Query {
     user: User
-    userProfile: User!
-    getAll2DFiles(orderBy: ViewOrderByInput): [View2D]!
-    getAll3DFiles(orderBy: ViewOrderByInput): [View3D]!
-    getAllBOQFiles(orderBy: ViewOrderByInput): [ViewBOQ]!
+    users: User
     getAllAccessControlUsers: [AccessControl]!
+    getAll2DFiles: [File!]!
+    getAll3DFiles: [File!]!
+    getAllBOQFiles: [File!]!
   }
 
   type Mutation {
@@ -77,14 +68,13 @@ export const typeDefs = `#graphql
       phone_number: String!,
       address: String!
     ): User
-
-    upload2DFile(fileName: String!): View2D
-    upload3DFile(fileName: String!): View3D
-    uploadBOQFile(fileName: String!): ViewBOQ
-
+    upload2DFile(fileUrl: String!, filename: String!) : File!
+    upload3DFile(fileUrl: String!, filename: String!) : File!
+    uploadBOQFile(fileUrl: String!, filename: String!) : File! 
     uploadAccessControlUsers(
       email: String!,
       password: String!
     ): AccessControl
+    
   }
 `;

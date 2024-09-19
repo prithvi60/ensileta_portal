@@ -258,7 +258,7 @@ export const SignUp = () => {
                                         <input
                                             type="text"
                                             placeholder="Enter your full name"
-                                            className="w-full rounded-lg border border-stroke bg-transparent py-2 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none"
+                                            className="w-full  border border-stroke bg-transparent py-2 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none"
                                             {...register('username')} />
 
                                         <span className="absolute right-4 top-2">
@@ -298,7 +298,7 @@ export const SignUp = () => {
                                         <input
                                             type="email"
                                             placeholder="Enter your email"
-                                            className="w-full rounded-lg border border-stroke bg-transparent py-2 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none"
+                                            className="w-full  border border-stroke bg-transparent py-2 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none"
                                             {...register('email')}
                                         />
 
@@ -335,7 +335,7 @@ export const SignUp = () => {
                                         <input
                                             type={showPassword ? "text" : "password"}
                                             placeholder="6+ Characters, 1 Capital letter"
-                                            className="w-full rounded-lg border border-stroke bg-transparent py-2 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none"
+                                            className="w-full  border border-stroke bg-transparent py-2 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none"
                                             {...register('password')} />
 
                                         <span className="absolute right-4 top-2 cursor-pointer" onClick={() => setShowPassword(!showPassword)}>
@@ -367,7 +367,7 @@ export const SignUp = () => {
                                         <input
                                             type={showConfirmPassword ? "text" : "password"}
                                             placeholder="Re-enter your password"
-                                            className="w-full rounded-lg border border-stroke bg-transparent py-2 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none"
+                                            className="w-full  border border-stroke bg-transparent py-2 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none"
                                             {...register('confirmPassword')} />
 
                                         <span className="absolute right-4 top-2 cursor-pointer" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
@@ -394,7 +394,7 @@ export const SignUp = () => {
                                 <button
                                     disabled={!isValid || isSubmitting}
                                     type="submit"
-                                    className={`w-full cursor-pointer rounded-lg p-4 text-white transition  bg-[#139F9B] mb-5 ${!isValid || isSubmitting ? "bg-opacity-40 cursor-not-allowed" : "hover:bg-opacity-90"}`}
+                                    className={`w-full cursor-pointer  p-4 text-white transition  bg-[#139F9B] mb-5 ${!isValid || isSubmitting ? "bg-opacity-40 cursor-not-allowed" : "hover:bg-opacity-90"}`}
                                 >{isSubmitting ? "Submitting..." : "Submit"}
                                 </button>
                             </div>
