@@ -17,11 +17,14 @@ interface GetAll2DViewProps {
     data?: Array<FileData>
     loading?: boolean;
     error?: Error;
+    uploadFile: any
+    title: string
 }
 
-export const GetAll2dView: React.FC<GetAll2DViewProps> = ({ data, loading, error }) => {
+export const GetAll2dView: React.FC<GetAll2DViewProps> = ({ data, loading, error, uploadFile, title }) => {
     // const [val, setVal] = useState(false)
     // const [pdfURL, setPdfURL] = useState("")
+
 
     if (loading) {
         return (<p>Loading ....</p>)
@@ -32,7 +35,13 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({ data, loading, error
         return <p>An error occurred while fetching data.</p>;
     }
     const lastItem = data?.[data?.length - 1] || null;
-    console.log(lastItem?.filename);
+
+    // console.log(lastItem?.createdAt);
+    // const time: string | undefined = lastItem?.createdAt
+
+    // const date = new Date(time ?? Date.now());
+    // console.log(date.toLocaleDateString());
+
 
     // const latestFiles = data?.reduce((acc: { [key: string]: FileData }, current) => {
     //     const existingFile = acc[current.fileName];
@@ -44,7 +53,7 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({ data, loading, error
 
     return (
         <div className='w-full h-full p-10 space-y-5'>
-            <h2 className='text-3xl w-full text-center font-semibold caption-bottom tracking-wide mb-10'>Your BOQ</h2>
+            <h2 className='text-3xl w-full text-center font-semibold caption-bottom tracking-wide mb-10'>{title}</h2>
             {/* <div className='w-full text-end'>
                 <button className='text-sm bg-green-700 p-1.5 text-white rounded-full text-end' onClick={() => setVal(!val)}>All versions</button>
             </div> */}
@@ -75,13 +84,13 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({ data, loading, error
                     }
                 </>)} */}
             {/* dynamically send pdf links */}
-            <SwipeCarousel pdf={lastItem?.fileUrl || ""} fileName={lastItem?.filename || ""} />
-            <div className='w-full h-full flex
+            <SwipeCarousel pdf={lastItem?.fileUrl || ""} version={data?.length || 0} />
+            {/* <div className='w-full h-full flex
              justify-center items-center gap-10'>
                 <h3 className='text-xl font-medium tracking-wide capitalize'>{`file : Your_BOQ_${lastItem?.filename.replace(".pdf", "").toLowerCase()}`}</h3>
                 <h3 className='text-xl font-medium tracking-wide'>{`version : ${lastItem?.version}`}</h3>
-            </div>
-            <UploadFile />
+            </div> */}
+            <UploadFile uploadFile={uploadFile} />
         </div>
     )
 }

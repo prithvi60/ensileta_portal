@@ -44,6 +44,40 @@ export const GET_USER = gql`
       phone_number
       address
       role
+      drawing2Dfiles {
+        id
+        filename
+        fileUrl
+      }
+      drawing3Dfiles {
+        id
+        filename
+        fileUrl
+      }
+      drawingBOQfiles {
+        id
+        filename
+        fileUrl
+      }
+    }
+  }
+`;
+
+export const GET_USERS = gql`
+  query GetUsers {
+    users {
+      id
+      username
+      email
+      company_name
+      phone_number
+      address
+      role
+      files {
+        id
+        filename
+        fileUrl
+      }
     }
   }
 `;
@@ -78,11 +112,12 @@ export const UPDATE_USER = gql`
 // View 2D queries
 
 export const ADD_2D_FILENAME = gql`
-  mutation Upload2DFile($fileName: String!) {
-    upload2DFile(fileName: $fileName) {
+  mutation Upload2DFile($fileUrl: String!, $filename: String!) {
+    upload2DFile(fileUrl: $fileUrl, filename: $filename) {
       id
-      fileName
-      fileURL
+      filename
+      fileUrl
+      userId
       version
       createdAt
     }
@@ -91,10 +126,11 @@ export const ADD_2D_FILENAME = gql`
 
 export const GET_ALL_2D_VIEW = gql`
   query GetAll2DFiles {
-    getAll2DFiles(orderBy: { createdAt: desc }) {
+    getAll2DFiles {
       id
-      fileName
-      fileURL
+      filename
+      fileUrl
+      userId
       version
       createdAt
     }
@@ -104,11 +140,12 @@ export const GET_ALL_2D_VIEW = gql`
 // View 3D queries
 
 export const ADD_3D_FILENAME = gql`
-  mutation Upload3DFile($fileName: String!) {
-    upload3DFile(fileName: $fileName) {
+  mutation Upload3DFile($fileUrl: String!, $filename: String!) {
+    upload3DFile(fileUrl: $fileUrl, filename: $filename) {
       id
-      fileName
-      fileURL
+      filename
+      fileUrl
+      userId
       version
       createdAt
     }
@@ -117,10 +154,11 @@ export const ADD_3D_FILENAME = gql`
 
 export const GET_ALL_3D_VIEW = gql`
   query GetAll3DFiles {
-    getAll3DFiles(orderBy: { createdAt: desc }) {
+    getAll3DFiles {
       id
-      fileName
-      fileURL
+      filename
+      fileUrl
+      userId
       version
       createdAt
     }
@@ -130,20 +168,8 @@ export const GET_ALL_3D_VIEW = gql`
 // View BOQ queries
 
 export const ADD_BOQ_FILENAME = gql`
-  mutation UploadBOQFile($fileName: String!) {
-    uploadBOQFile(fileName: $fileName) {
-      id
-      fileName
-      fileURL
-      version
-      createdAt
-    }
-  }
-`;
-
-export const GET_YOUR_BOQ = gql`
-  query Files {
-    files {
+  mutation UploadBOQFile($fileUrl: String!, $filename: String!) {
+    uploadBOQFile(fileUrl: $fileUrl, filename: $filename) {
       id
       filename
       fileUrl
@@ -156,10 +182,11 @@ export const GET_YOUR_BOQ = gql`
 
 export const GET_ALL_BOQ_VIEW = gql`
   query GetAllBOQFiles {
-    getAllBOQFiles(orderBy: { createdAt: desc }) {
+    getAllBOQFiles {
       id
-      fileName
-      fileURL
+      filename
+      fileUrl
+      userId
       version
       createdAt
     }
@@ -188,15 +215,15 @@ export const GET_ALL_EMPLOYEE_LISTS = gql`
   }
 `;
 
-export const UPLOAD_FILE_MUTATION = gql`
-  mutation CreateFile($fileUrl: String!, $filename: String!) {
-    createFile(fileUrl: $fileUrl, filename: $filename) {
-      id
-      filename
-      fileUrl
-      userId
-      version
-      createdAt
-    }
-  }
-`;
+// export const UPLOAD_FILE_MUTATION = gql`
+//   mutation createFileForBOQ($fileUrl: String!, $filename: String!) {
+//     createFileForBOQ(fileUrl: $fileUrl, filename: $filename) {
+//       id
+//       filename
+//       fileUrl
+//       userId
+//       version
+//       createdAt
+//     }
+//   }
+// `;

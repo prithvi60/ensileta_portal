@@ -3,19 +3,17 @@ import { CustomerInfoForm } from '@/components/customer_info/CustomerInfoForm'
 import DefaultLayout from '@/components/Layout/DefaultLayout'
 import { GET_USER } from '@/lib/Queries'
 import { useQuery } from '@apollo/client'
-import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 
 
 const Page = () => {
-    const { data: RoleBased, loading } = useQuery(GET_USER);
-
+    const { data, loading } = useQuery(GET_USER);
 
     return (
         <DefaultLayout>
             <div className="mx-auto max-w-242.5">
                 {loading ? (<div className='text-rose-500 text-xl w-full h-full text-center'>Loading ....</div>) : (<>
-                    {RoleBased?.user?.role === "admin" || RoleBased?.user?.role === "super admin" ? (<div className="overflow-hidden rounded-sm border border-stroke bg-white shadow-default">
+                    {data?.user?.role === "admin" || data?.user?.role === "super admin" ? (<div className="overflow-hidden rounded-sm border border-stroke bg-white shadow-default">
                         <div className="relative z-20 h-35 md:h-65">
                             <Image
                                 src={"/cover/banner-img.jpg"}

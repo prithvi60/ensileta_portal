@@ -1,6 +1,8 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { motion, useMotionValue } from "framer-motion";
 import { usePDFJS } from "@/hooks/usePdfJS";
+import dynamic from "next/dynamic";
+import FsLightbox from "fslightbox-react";
 // import * as pdfjsLib from 'pdfjs-dist';
 // import { GlobalWorkerOptions } from 'pdfjs-dist/build/pdf.worker'; 
 // import {PDFtoIMG} from 'react-pdf-to-image';
@@ -17,11 +19,26 @@ const SPRING_OPTIONS = {
 
 const ImgData = ["/cover/banner-img.jpg", "/cover/bg-cover.jpg", "/cover/cover-01.png"]
 
+// const FsLightbox = dynamic(() => import("fslightbox-react"), { ssr: false });
 
-export const SwipeCarousel = ({ pdf, fileName }: { pdf: string, fileName: string }) => {
+export const SwipeCarousel = ({ pdf, version }: { pdf: string, version: number }) => {
     const [imgIndex, setImgIndex] = useState(0);
     const [imgs, setImgs] = useState<string[]>([]);
     const dragX = useMotionValue(0);
+    const [toggle, setToggle] = useState(false)
+    const [selectedItem, setSelectedItem] = useState(0);
+    const [lightboxController, setLightboxController] = useState({
+        toggler: toggle,
+        slide: selectedItem + 1,
+    });
+
+    function openLightboxOnSlide(number: number) {
+        setLightboxController({
+            toggler: !lightboxController.toggler,
+            slide: number + 1,
+        });
+        setToggle(true)
+    }
 
     usePDFJS(async (pdfjs) => {
         try {
@@ -72,6 +89,7 @@ export const SwipeCarousel = ({ pdf, fileName }: { pdf: string, fileName: string
             setImgIndex((pv) => pv - 1);
         }
     };
+
     return (
         <>
             <div className="relative w-full overflow-hidden bg-neutral-950 py-1.5 rounded-lg">
@@ -84,17 +102,27 @@ export const SwipeCarousel = ({ pdf, fileName }: { pdf: string, fileName: string
                     onDragEnd={onDragEnd}
                     className="flex cursor-grab items-center active:cursor-grabbing"
                 >
-                    <Images imgIndex={imgIndex} imgs={imgs} />
+                    <Images imgIndex={imgIndex} imgs={imgs} openLightboxOnSlide={openLightboxOnSlide} />
                 </motion.div>
                 <Dots imgIndex={imgIndex} setImgIndex={setImgIndex} imgs={imgs.length > 0 ? imgs : [""]} />
                 <GradientEdges />
             </div>
-            <h4 className="text-2xl font-medium text-center w-full capitalize">{fileName.replace(".pdf", "").toLowerCase()}</h4>
+            {/* <h4 className="text-2xl font-medium text-center w-full capitalize">{fileName.replace(".pdf", "").toLowerCase()}</h4> */}
+            <h4 className='w-full text-center text-2xl font-medium tracking-wide'>{`version : ${version}`}</h4>
+            <FsLightbox
+                exitFullscreenOnClose={true}
+                toggler={lightboxController.toggler}
+                sources={imgs}
+                type="image"
+                slide={lightboxController.slide}
+                onClose={() => setToggle(false)}
+
+            />
         </>
     );
 };
 
-const Images = ({ imgIndex, imgs }: { imgIndex: number; imgs: string[] }) => {
+const Images = ({ imgIndex, imgs, openLightboxOnSlide }: { imgIndex: number; imgs: string[], openLightboxOnSlide: any }) => {
     return (
         <>
             {imgs.map((imgSrc, idx) => (
@@ -105,6 +133,7 @@ const Images = ({ imgIndex, imgs }: { imgIndex: number; imgs: string[] }) => {
                         backgroundSize: "cover",
                         backgroundPosition: "center",
                     }}
+                    onClick={() => openLightboxOnSlide(idx)}
                     animate={{ scale: imgIndex === idx ? 0.95 : 0.85 }}
                     transition={SPRING_OPTIONS}
                     className="aspect-[4/2] lg:aspect-[4/1.5] w-full shrink-0 rounded-xl bg-neutral-800 object-cover"

@@ -3,8 +3,6 @@
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { uploadFileToS3 } from "@/lib/s3";
-import { useMutation } from "@apollo/client";
-import { UPLOAD_FILE_MUTATION } from "@/lib/Queries";
 import toast from "react-hot-toast";
 
 // const s3Client = new S3Client({
@@ -19,9 +17,9 @@ import toast from "react-hot-toast";
 //     setPdfURL: (url: string) => void;
 // }
 
-export default function UploadFile() {
+export default function UploadFile({ uploadFile }: { uploadFile: any }) {
     const [file, setFile] = useState<File | null>(null);
-    const [uploadFile] = useMutation(UPLOAD_FILE_MUTATION);
+    const [size, setSize] = useState<boolean>(false);
     const { data: session } = useSession()
 
     const userName = session?.user?.name || 'anonymous';
@@ -35,6 +33,12 @@ export default function UploadFile() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!file) return;
+
+        if (file && file.size > 10 * 1024 * 1024) { // 10 MB in bytes
+            alert('File size exceeds 10 MB');
+            setSize(true)
+            return;
+        }
 
         try {
             const response = await uploadFileToS3(file, file.name, userName)
@@ -63,10 +67,13 @@ export default function UploadFile() {
     };
 
     return (
-        <form onSubmit={handleSubmit} className='flex justify-center items-center flex-col gap-5 w-full text-center'>
+        <form onSubmit={handleSubmit} className='space-y-5 w-full sm:w-1/2 lg:w-2/5 mx-auto'>
             {/* <div className='block'> */}
-            <input type="file" onChange={handleFileChange} className="p-1.5 outline-none shadow-card shadow-green-500 rounded-full cursor-pointer" />
-            <button type="submit" className='cursor-pointer p-3 shadow-md select-none bg-[#139F9B] text-white rounded-md '>Upload File</button>
+            <input type="file" onChange={handleFileChange} className="p-1.5 outline-none shadow-card shadow-green-500 rounded-full cursor-pointer w-full" />
+            {size && (
+                <p className="text-sm -mt-3.5 text-red font-medium tracking-wide">File size exceeds 10 MB</p>
+            )}
+            <button type="submit" className='cursor-pointer w-full p-4 shadow-md select-none bg-[#139F9B] text-white hover:bg-[#0E122B]'>Upload File</button>
         </form>
     );
 }

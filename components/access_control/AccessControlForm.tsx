@@ -162,7 +162,7 @@ const AccessControlForm = () => {
                             <button
                                 disabled={isSubmitting}
                                 type="submit"
-                                className="w-full cursor-pointer rounded-lg p-4 text-white transition hover:bg-opacity-90 bg-[#139F9B] mb-5"
+                                className="w-full cursor-pointer p-4 text-white transition hover:bg-opacity-90 bg-[#139F9B] mb-5"
                             >{isSubmitting ? "Submitting..." : "Submit"}</button>
                             {/* </div> */}
 
