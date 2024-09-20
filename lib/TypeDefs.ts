@@ -40,6 +40,12 @@ export const typeDefs = `#graphql
     createdAt: String!
   }
 
+  type UploadS3{
+    file: String!
+    filename: String!
+    userName: String!
+  }
+
   type Query {
     user: User
     users: User
@@ -59,7 +65,6 @@ export const typeDefs = `#graphql
 
     login(email: String!, password: String!): User!
     logout: Boolean!
-
     updateUser(
       id: Int!,
       username: String!,
@@ -68,6 +73,7 @@ export const typeDefs = `#graphql
       phone_number: String!,
       address: String!
     ): User
+    uploadFileToS3Storage(file: String!, filename: String!, userName: String!) : File!
     upload2DFile(fileUrl: String!, filename: String!) : File!
     upload3DFile(fileUrl: String!, filename: String!) : File!
     uploadBOQFile(fileUrl: String!, filename: String!) : File! 

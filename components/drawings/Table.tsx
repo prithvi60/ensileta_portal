@@ -1,18 +1,24 @@
 import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
-import UploadFile from "./Upload";
-import ModalWrapper from "./Modal";
-// import { FiAward, FiChevronDown, FiChevronUp } from "react-icons/fi";
+import ModalWrapper, { ViewModalWrapper } from "./Modal";
 
-const ShuffleSortTable = ({ uploadFile, version }: { uploadFile: any, version: number }) => {
+interface Data {
+    uploadFile: any
+    version: number
+    pdf: string
+    id: number
+
+}
+
+const ShuffleSortTable = ({ uploadFile, version, pdf, id }: Data) => {
     return (
         <div className="p-8 w-full bg-primary">
-            <Table uploadFile={uploadFile} version={version} />
+            <Table uploadFile={uploadFile} version={version} pdf={pdf} id={id} />
         </div>
     );
 };
 
-const Table = ({ uploadFile, version }: { uploadFile: any, version: number }) => {
+const Table = ({ uploadFile, version, pdf, id }: Data) => {
     const { data: session } = useSession()
     // console.log(session);
     const user: User = {
@@ -29,6 +35,7 @@ const Table = ({ uploadFile, version }: { uploadFile: any, version: number }) =>
                         <th className="text-start p-4 font-medium">Team Member</th>
                         <th className="text-start p-4 font-medium">Version</th>
                         <th className="text-start p-4 font-medium">File Upload</th>
+                        <th className="text-start p-4 font-medium">View File</th>
                     </tr>
                 </thead>
 
@@ -39,6 +46,8 @@ const Table = ({ uploadFile, version }: { uploadFile: any, version: number }) =>
                         user={user}
                         uploadFile={uploadFile}
                         version={version}
+                        pdf={pdf}
+                        id={id}
                     />
                     {/* ); */}
                     {/* })} */}
@@ -52,9 +61,11 @@ interface TableRowsProps {
     user: User;
     uploadFile: any
     version: number
+    pdf: string
+    id: number
 }
 
-const TableRows = ({ user, uploadFile, version }: TableRowsProps) => {
+const TableRows = ({ user, uploadFile, version, pdf, id }: TableRowsProps) => {
 
     return (
         <motion.tr
@@ -73,13 +84,10 @@ const TableRows = ({ user, uploadFile, version }: TableRowsProps) => {
                 <span className="block mb-1 font-medium ml-7">{version}</span>
             </td>
             <td className="p-4 ">
-                {/* <UploadFile uploadFile={uploadFile} /> */}
-                {/* <button
-                    type="submit"
-                    className={`w-max cursor-pointer py-4 px-10 text-white transition  bg-secondary mb-5 hover:bg-[#0E122B]`}
-                >upload
-                </button> */}
                 <ModalWrapper uploadFile={uploadFile} />
+            </td>
+            <td className="p-4 ">
+                <ViewModalWrapper version={version} pdf={pdf} id={id} />
             </td>
         </motion.tr>
     );

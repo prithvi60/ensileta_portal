@@ -235,7 +235,7 @@ export default function ModernCarousel({ pdf, version, id }: { pdf: string, vers
     const imageIndex = Math.abs(idx % imgs.length);
 
     return (
-        <div className="h-[30vw] min-h-[200px] max-h-[400px] bg-black relative overflow-hidden">
+        <div className="h-[30vw] min-h-[200px] max-h-[400px] 3xl:h-[60vw] 3xl:min-h-[550px] 3xl:max-h-[800px] bg-black relative overflow-hidden">
             <button
                 onClick={() => {
                     setPrevIdx(idx);

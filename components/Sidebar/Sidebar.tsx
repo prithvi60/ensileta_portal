@@ -5,12 +5,12 @@ import ClickOutside from "./ClickOutside";
 import SidebarItem from "./SidebarItem";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { useSession } from "next-auth/react";
-import { Md3dRotation } from "react-icons/md";
-import { PiHandWithdrawFill } from "react-icons/pi";
+import { GiCardDraw } from "react-icons/gi";
 import { IoPeopleSharp } from "react-icons/io5";
 import { GoOrganization } from "react-icons/go";
-import { FaQ } from "react-icons/fa6";
-import { RxDrawingPin } from "react-icons/rx";
+import { FaFileInvoice, FaQ } from "react-icons/fa6";
+import { SiLibreofficedraw } from "react-icons/si";
+import { MdAddIcCall } from "react-icons/md";
 
 
 interface SidebarProps {
@@ -25,7 +25,7 @@ const menuGroups = [
       {
         icon: (
           <div className="p-1 rounded-md bg-blue-500">
-            <RxDrawingPin className="text-4xl sm:text-5xl text-white" />
+            <SiLibreofficedraw className="text-4xl sm:text-5xl text-white" />
           </div>
           // <svg
           //   className="fill-current"
@@ -47,7 +47,7 @@ const menuGroups = [
       {
         icon: (
           <div className="p-1 rounded-md bg-blue-500">
-            <Md3dRotation className="text-4xl sm:text-5xl text-white" />
+            <GiCardDraw className="text-4xl sm:text-5xl text-white" />
           </div>
           // <svg
           //   className="fill-current"
@@ -73,7 +73,7 @@ const menuGroups = [
       {
         icon: (
           <div className="p-1 rounded-md bg-blue-500">
-            <PiHandWithdrawFill className="text-4xl sm:text-5xl text-white" />
+            <FaFileInvoice className="text-4xl sm:text-5xl text-white" />
           </div>
           // <svg
           //   className="fill-current"
@@ -184,7 +184,7 @@ const menuGroups = [
       {
         icon: (
           <div className="p-1 rounded-md bg-blue-500">
-            <FaQ className="text-4xl sm:text-5xl text-white" />
+            <MdAddIcCall className="text-4xl sm:text-5xl text-white" />
           </div>
           // <svg
           //   className="fill-current"
@@ -216,7 +216,7 @@ const menuGroups = [
           //   </defs>
           // </svg>
         ),
-        label: "FAQ",
+        label: "Support",
         route: "/portal/dashboard/faq",
       },
 

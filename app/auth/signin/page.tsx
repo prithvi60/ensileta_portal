@@ -4,7 +4,7 @@ import React from 'react'
 
 const page = () => {
     return (
-        <main className='flex justify-center items-center h-screen w-full bg-[#0E132A]'>
+        <main className='flex justify-center items-center h-screen w-full bg-primary'>
             <SignIn />
         </main>
     )
