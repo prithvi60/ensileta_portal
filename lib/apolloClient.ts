@@ -14,9 +14,9 @@ const getGraphqlUri = () =>
     ? "https://ensileta-portal.vercel.app/api/graphql"
     : "http://localhost:3000/api/graphql";
 
-const httpLink = new HttpLink({
-  uri: getGraphqlUri(),
-});
+// const httpLink = new HttpLink({
+//   uri: getGraphqlUri(),
+// });
 
 const uploadLink = createUploadLink({
   uri: getGraphqlUri(),
@@ -45,10 +45,9 @@ const authLink = setContext(async (_, { headers }) => {
 });
 
 const client = new ApolloClient({
-  link: ApolloLink.from([authLink, httpLink, uploadLink]),
-  // link: createUploadLink({ uri: '/api/graphql' }),
+  link: ApolloLink.from([authLink, uploadLink]),
   cache: new InMemoryCache(),
-  // credentials: "same-origin",
+  credentials: "same-origin",
 });
 
 export default client;

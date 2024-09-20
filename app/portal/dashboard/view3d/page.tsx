@@ -1,5 +1,6 @@
 "use client";
-import { GetAll2dView } from '@/components/GetAll2dView';
+
+import { GetAll2dView } from '@/components/drawings/GetAll2dView';
 import DefaultLayout from '@/components/Layout/DefaultLayout';
 import { ADD_3D_FILENAME, GET_ALL_3D_VIEW } from '@/lib/Queries';
 import { useMutation, useQuery } from '@apollo/client';
@@ -81,12 +82,12 @@ export default Page;
 //                         position: "top-right",
 //                         duration: 3000,
 //                         style: {
-//                             border: '1px solid #139F9B',
+//                             border: '1px solid #63b6b3',
 //                             padding: '16px',
-//                             color: '#139F9B',
+//                             color: '#63b6b3',
 //                         },
 //                         iconTheme: {
-//                             primary: '#139F9B',
+//                             primary: '#63b6b3',
 //                             secondary: '#FFFAEE',
 //                         },
 //                     })
@@ -106,7 +107,7 @@ export default Page;
 //                     <InputForm handleChange={handleChange} handleSubmit={handleSubmit} inputValue={inputValue} />
 //                 ) : (
 //                     <div className='w-full h-auto flex justify-center items-center'>
-//                         <button type="submit" className='cursor-pointer p-1.5 shadow-md select-none bg-[#139F9B] text-white rounded-md'>Approval</button>
+//                         <button type="submit" className='cursor-pointer p-1.5 shadow-md select-none bg-secondary text-white rounded-md'>Approval</button>
 //                     </div>
 //                 )}
 

@@ -1,11 +1,6 @@
-import Link from "next/link";
-import DarkModeSwitcher from "./DarkModeSwitcher";
-import DropdownMessage from "./DropdownMessage";
+
 import DropdownNotification from "./DropdownNotification";
-import DropdownUser from "./DropdownUser";
 import Image from "next/image";
-import { useMutation } from "@apollo/client";
-import { SIGN_UP } from "@/lib/Queries";
 import { Marquee } from "./Marquee";
 
 const Header = (props: {
@@ -16,9 +11,9 @@ const Header = (props: {
   // console.log(data);
 
   return (
-    <header className="sticky top-0 z-999 flex w-full bg-white drop-shadow-1">
+    <header className="sticky top-0 z-[1000] flex w-full bg-white drop-shadow-1">
       <div className="flex flex-grow items-center justify-between px-4 py-4 shadow-2 md:px-6 2xl:px-11">
-        <div className="flex items-center w-[70%] lg:w-[60%] overflow-hidden gap-3 md:gap-5">
+        <div className="flex items-center  sm:w-[70%] lg:w-[60%] overflow-hidden gap-3 md:gap-5">
           {/* <!-- Hamburger Toggle BTN --> */}
           <button
             aria-controls="sidebar"
@@ -26,7 +21,7 @@ const Header = (props: {
               e.stopPropagation();
               props.setSidebarOpen(!props.sidebarOpen);
             }}
-            className="z-99999 block rounded-sm border border-stroke bg-white p-1.5 shadow-sm dark:border-strokedark dark:bg-boxdark lg:hidden"
+            className="z-9999 block rounded-sm border border-stroke p-1.5 shadow-sm bg-primary lg:hidden"
           >
             <span className="relative block h-5.5 w-5.5 cursor-pointer">
               <span className="du-block absolute right-0 h-full w-full">
@@ -58,11 +53,13 @@ const Header = (props: {
           {/* <!-- Hamburger Toggle BTN --> */}
           {/* </div> */}
           {/* <div > */}
-          <div className="w-54 h-6 relative">
+          <div className="w-54 h-6 relative hidden sm:block">
             <Image alt="logo" src={"/logo/logo.svg"} fill />
           </div>
           {/* <div className=""> */}
-          <Marquee />
+          <div className="hidden sm:block">
+            <Marquee />
+          </div>
           {/* </div> */}
         </div>
         {/* <div className="w-full h-full flex items-center gap-5 mx-5">

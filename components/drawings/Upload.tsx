@@ -50,12 +50,12 @@ export default function UploadFile({ uploadFile }: { uploadFile: any }) {
                     position: "top-right",
                     duration: 3000,
                     style: {
-                        border: '1px solid #139F9B',
+                        border: '1px solid #63b6b3',
                         padding: '16px',
-                        color: '#139F9B',
+                        color: '#63b6b3',
                     },
                     iconTheme: {
-                        primary: '#139F9B',
+                        primary: '#63b6b3',
                         secondary: '#FFFAEE',
                     },
                 })
@@ -67,13 +67,13 @@ export default function UploadFile({ uploadFile }: { uploadFile: any }) {
     };
 
     return (
-        <form onSubmit={handleSubmit} className='space-y-5 w-full sm:w-1/2 lg:w-2/5 mx-auto'>
+        <form onSubmit={handleSubmit} className='space-y-5 w-full sm:w-1/2  mx-auto'>
             {/* <div className='block'> */}
             <input type="file" onChange={handleFileChange} className="p-1.5 outline-none shadow-card shadow-green-500 rounded-full cursor-pointer w-full" />
             {size && (
-                <p className="text-sm -mt-3.5 text-red font-medium tracking-wide">File size exceeds 10 MB</p>
+                <p className="text-sm -mt-3.5 text-warning text-center font-bold tracking-wide">File size exceeds 10 MB</p>
             )}
-            <button type="submit" className='cursor-pointer w-full p-4 shadow-md select-none bg-[#139F9B] text-white hover:bg-[#0E122B]'>Upload File</button>
+            <button type="submit" className='cursor-pointer w-full p-4 shadow-md select-none bg-secondary text-white hover:bg-[#0E122B]'>Upload File</button>
         </form>
     );
 }

@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 ::-webkit-file-upload-button {
-  background-color: #139f9b;
+  background-color: #63b6b3;
   padding: 10px;
   border-radius: 50px;
   color: whitesmoke;
@@ -12,4 +12,8 @@
 
 ::-webkit-file-upload-button:hover {
   background-color: #0e122b;
+}
+
+.scrollbar::-webkit-scrollbar {
+  display: none;
 }

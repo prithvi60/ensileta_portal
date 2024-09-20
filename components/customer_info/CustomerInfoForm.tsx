@@ -65,12 +65,12 @@ export const CustomerInfoForm = () => {
                 position: "top-right",
                 duration: 3000,
                 style: {
-                    border: '1px solid #139F9B',
+                    border: '1px solid #63b6b3',
                     padding: '16px',
-                    color: '#139F9B',
+                    color: '#63b6b3',
                 },
                 iconTheme: {
-                    primary: '#139F9B',
+                    primary: '#63b6b3',
                     secondary: '#FFFAEE',
                 },
             });
@@ -79,12 +79,12 @@ export const CustomerInfoForm = () => {
                 position: "top-right",
                 duration: 3000,
                 style: {
-                    border: '1px solid #C72422',
+                    border: '1px solid #9d4949',
                     padding: '16px',
-                    color: '#C72422',
+                    color: '#9d4949',
                 },
                 iconTheme: {
-                    primary: '#C72422',
+                    primary: '#9d4949',
                     secondary: '#FFFAEE',
                 },
             });
@@ -111,7 +111,7 @@ export const CustomerInfoForm = () => {
                             className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-[#0E132A] outline-none focus:border-primary focus-visible:shadow-none"
                             {...register("username")} />
                         {errors.username && (
-                            <span className="text-[#C72422] font-semibold text-center mt-2">{errors.username.message}</span>
+                            <span className="text-warning font-semibold text-center mt-2">{errors.username.message}</span>
                         )}
                     </div>
                 </div>
@@ -127,7 +127,7 @@ export const CustomerInfoForm = () => {
                             className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-[#0E132A] outline-none focus:border-primary focus-visible:shadow-none"
                             {...register("email")} />
                         {errors.email && (
-                            <span className="text-[#C72422] font-semibold text-center mt-2">{errors.email.message}</span>
+                            <span className="text-warning font-semibold text-center mt-2">{errors.email.message}</span>
                         )}
                     </div>
                 </div>
@@ -143,7 +143,7 @@ export const CustomerInfoForm = () => {
                             className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-[#0E132A] outline-none focus:border-primary focus-visible:shadow-none"
                             {...register("companyName")} />
                         {errors.companyName && (
-                            <span className="text-[#C72422] font-semibold text-center mt-2">{errors.companyName.message}</span>
+                            <span className="text-warning font-semibold text-center mt-2">{errors.companyName.message}</span>
                         )}
                     </div>
                 </div>
@@ -159,7 +159,7 @@ export const CustomerInfoForm = () => {
                             className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-[#0E132A] outline-none focus:border-primary focus-visible:shadow-none"
                             {...register('phoneNo')} />
                         {errors.phoneNo && (
-                            <span className="text-[#C72422] font-semibold text-center mt-2">{errors.phoneNo.message}</span>
+                            <span className="text-warning font-semibold text-center mt-2">{errors.phoneNo.message}</span>
                         )}
                     </div>
                 </div>
@@ -175,7 +175,7 @@ export const CustomerInfoForm = () => {
                             className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-[#0E132A] outline-none focus:border-primary focus-visible:shadow-none"
                             {...register('address')} />
                         {errors.address && (
-                            <span className="text-[#C72422] font-semibold text-center mt-2">{errors.address.message}</span>
+                            <span className="text-warning font-semibold text-center mt-2">{errors.address.message}</span>
                         )}
                     </div>
                 </div>
@@ -184,7 +184,7 @@ export const CustomerInfoForm = () => {
                     <button
                         disabled={!isDirty}
                         type="submit"
-                        className="w-full cursor-pointer py-4 text-white transition hover:bg-opacity-90 bg-[#139F9B] disabled:bg-opacity-40"
+                        className="w-full cursor-pointer py-4 text-white transition hover:bg-opacity-90 bg-secondary disabled:bg-opacity-40"
                     >
                         Update
                     </button>
