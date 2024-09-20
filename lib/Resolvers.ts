@@ -2,6 +2,7 @@ import prisma from "@/prisma/db";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import GraphQLUpload from "graphql-upload/GraphQLUpload.mjs";
+import { uploadFileToS3 } from "./s3";
 
 const JWT_SECRET = process.env.NEXTAUTH_SECRET;
 
@@ -264,6 +265,18 @@ export const resolvers = {
         });
 
         return updatedUser;
+      } catch (error: any) {
+        console.error("Error updating user:", error.message || error);
+        throw new Error("Failed to update user");
+      }
+    },
+    uploadFileToS3Storage: async (
+      _: any,
+      { file, fileName, userName }: any
+    ) => {
+      try {
+        const response = await uploadFileToS3(file, fileName, userName);
+        console.log(response);
       } catch (error: any) {
         console.error("Error updating user:", error.message || error);
         throw new Error("Failed to update user");

@@ -4,23 +4,15 @@ import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { uploadFileToS3 } from "@/lib/s3";
 import toast from "react-hot-toast";
+import { useMutation } from "@apollo/client";
+import { UPLOAD_S3_STORAGE } from "@/lib/Queries";
 
-// const s3Client = new S3Client({
-//     region: process.env.NEXT_PUBLIC_AWS_REGION,
-//     credentials: {
-//         accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID!,
-//         secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY!,
-//     },
-// });
-
-// interface UploadFileProps {
-//     setPdfURL: (url: string) => void;
-// }
 
 export default function UploadFile({ uploadFile }: { uploadFile: any }) {
     const [file, setFile] = useState<File | null>(null);
     const [size, setSize] = useState<boolean>(false);
     const { data: session } = useSession()
+    const [uploadS3] = useMutation(UPLOAD_S3_STORAGE)
 
     const userName = session?.user?.name || 'anonymous';
 
@@ -29,6 +21,8 @@ export default function UploadFile({ uploadFile }: { uploadFile: any }) {
         setFile(uploadedFile);
 
     };
+
+    // console.log(file);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -41,10 +35,13 @@ export default function UploadFile({ uploadFile }: { uploadFile: any }) {
         }
 
         try {
+            // const res = await uploadS3({ variables: { file: file, filename: file.name, userName } })
+            // console.log(res);
+
             const response = await uploadFileToS3(file, file.name, userName)
             const result = await uploadFile({ variables: { fileUrl: response, filename: file.name } })
-            // setPdfURL(response)
-            // console.log('File uploaded successfully:', response);
+
+            console.log('File uploaded successfully:', response);
             if (response && result) {
                 toast.success('successfully Created', {
                     position: "top-right",

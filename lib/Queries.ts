@@ -227,3 +227,26 @@ export const GET_ALL_EMPLOYEE_LISTS = gql`
 //     }
 //   }
 // `;
+
+// S3 Bucket
+
+export const UPLOAD_S3_STORAGE = gql`
+  mutation UploadFileToS3Storage(
+    $file: String!
+    $filename: String!
+    $userName: String!
+  ) {
+    uploadFileToS3Storage(
+      file: $file
+      filename: $filename
+      userName: $userName
+    ) {
+      id
+      filename
+      fileUrl
+      userId
+      version
+      createdAt
+    }
+  }
+`;
