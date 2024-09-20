@@ -12,7 +12,7 @@ const Page = () => {
     return (
         <DefaultLayout>
             <div className="mx-auto max-w-242.5">
-                {loading ? (<div className='text-rose-500 text-xl w-full h-full text-center'>Loading ....</div>) : (<>
+                {loading ? (<div className='text-warning text-xl w-full h-screen flex justify-center items-center'>Loading ....</div>) : (<>
                     {data?.user?.role === "admin" || data?.user?.role === "super admin" ? (<div className="overflow-hidden rounded-sm border border-stroke bg-white shadow-default">
                         <div className="relative z-20 h-35 md:h-65">
                             <Image

@@ -44,7 +44,7 @@ export const resolvers = {
           },
         });
 
-        console.log(user);
+        // console.log(user);
 
         return user;
       } catch (error) {

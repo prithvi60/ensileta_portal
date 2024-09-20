@@ -2,8 +2,8 @@ import React from 'react'
 
 export const FaqForm = () => {
     return (
-        <div className='w-full sm:w-1/2 mx-auto mt-10 bg-primary p-10'>
-            <h3 className='text-xl font-semibold text-white text-center w-full'>Get Free Consultation</h3>
+        <div className='w-full sm:w-1/2 mx-auto mt-10 bg-primary p-10 space-y-6'>
+            <h3 className='text-xl font-semibold text-white text-center w-full capitalize'>Need any help?</h3>
             <form >
                 {/* User Name */}
                 <div className="mb-4">
