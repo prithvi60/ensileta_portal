@@ -39,12 +39,12 @@ const AccessControlForm = () => {
                     position: "top-right",
                     duration: 3000,
                     style: {
-                        border: '1px solid #C72422',
+                        border: '1px solid #9d4949',
                         padding: '16px',
-                        color: '#C72422',
+                        color: '#9d4949',
                     },
                     iconTheme: {
-                        primary: '#C72422',
+                        primary: '#9d4949',
                         secondary: '#FFFAEE',
                     },
                 });
@@ -53,12 +53,12 @@ const AccessControlForm = () => {
                     position: "top-right",
                     duration: 3000,
                     style: {
-                        border: '1px solid #139F9B',
+                        border: '1px solid #63b6b3',
                         padding: '16px',
-                        color: '#139F9B',
+                        color: '#63b6b3',
                     },
                     iconTheme: {
-                        primary: '#139F9B',
+                        primary: '#63b6b3',
                         secondary: '#FFFAEE',
                     },
                 });
@@ -71,12 +71,12 @@ const AccessControlForm = () => {
                 position: "top-right",
                 duration: 3000,
                 style: {
-                    border: '1px solid #C72422',
+                    border: '1px solid #9d4949',
                     padding: '16px',
-                    color: '#C72422',
+                    color: '#9d4949',
                 },
                 iconTheme: {
-                    primary: '#C72422',
+                    primary: '#9d4949',
                     secondary: '#FFFAEE',
                 }
             });
@@ -124,7 +124,7 @@ const AccessControlForm = () => {
                                     </span>
                                 </div>
                                 {errors.email && (
-                                    <div className="text-[#C72422] font-semibold text-center mt-1">{errors.email.message}</div>
+                                    <div className="text-warning font-semibold text-center mt-1">{errors.email.message}</div>
                                 )}
                             </div>
 
@@ -154,7 +154,7 @@ const AccessControlForm = () => {
                                     </span>
                                 </div>
                                 {errors.password && (
-                                    <div className="text-[#C72422] font-semibold text-center mt-1">{errors.password.message}</div>
+                                    <div className="text-warning font-semibold text-center mt-1">{errors.password.message}</div>
                                 )}
                             </div>
 
@@ -162,12 +162,12 @@ const AccessControlForm = () => {
                             <button
                                 disabled={isSubmitting}
                                 type="submit"
-                                className="w-full cursor-pointer p-4 text-white transition hover:bg-opacity-90 bg-[#139F9B] mb-5"
+                                className="w-full cursor-pointer p-4 text-white transition hover:bg-opacity-90 bg-secondary mb-5"
                             >{isSubmitting ? "Submitting..." : "Submit"}</button>
                             {/* </div> */}
 
 
-                            {errors.root && <div className="text-[#C72422] font-semibold text-center mt-5">{errors.root.message}</div>}
+                            {errors.root && <div className="text-warning font-semibold text-center mt-5">{errors.root.message}</div>}
                         </form>
                     </div>
                 </div>

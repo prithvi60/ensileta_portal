@@ -21,7 +21,7 @@ export const InputForm: React.FC<InputFormProps> = ({ handleChange, handleSubmit
                 onChange={handleChange}
                 className='border-2 rounded-full p-3'
             />
-            <button type="submit" className='cursor-pointer p-3 shadow-md select-none bg-[#139F9B] text-white rounded-md '>Upload File Name</button>
+            <button type="submit" className='cursor-pointer p-3 shadow-md select-none bg-secondary text-white rounded-md '>Upload File Name</button>
         </form>
     )
 }

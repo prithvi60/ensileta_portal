@@ -50,7 +50,10 @@ const LogoItem = ({ img }: { img: string }) => {
         //     {/* <Image alt="logo" src={img} fill  /> */}
         //     <Image alt="logo" src={img} width={60} height={60} />
         // </div>
-        <Image alt="logo" src={img} width={60} height={60} className="flex justify-center items-center" />
+        // <Image alt="logo" src={img} width={60} height={60} className="flex justify-center items-center" />
+
+        <img alt="logo" src={img} className="w-12 md:w-16 h-12 md:h-16 flex justify-center items-center" />
+
     );
 };
 

@@ -1,5 +1,6 @@
 "use client";
-import { GetAll2dView } from '@/components/GetAll2dView';
+
+import { GetAll2dView } from '@/components/drawings/GetAll2dView';
 import DefaultLayout from '@/components/Layout/DefaultLayout';
 import { ADD_2D_FILENAME, GET_ALL_2D_VIEW } from '@/lib/Queries';
 import { useMutation, useQuery } from '@apollo/client';

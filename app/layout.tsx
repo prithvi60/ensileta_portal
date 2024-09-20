@@ -1,11 +1,16 @@
 import type { Metadata } from "next";
-import { Rubik, Roboto_Slab } from "next/font/google";
+import { Poppins } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./Providers";
 import { Toaster } from "react-hot-toast";
 
 
-const roboto = Roboto_Slab({ subsets: ["latin"] });
+const poppins = Poppins({
+  subsets: ["latin"],
+  display: "swap",
+  // variable: "--font-poppins",
+  weight: "400",
+});
 
 export const metadata: Metadata = {
   title: "Ensileta Customer Portal",
@@ -19,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={roboto.className}>
+      <body className={poppins.className}>
         <Providers>
           {children}
           <Toaster />

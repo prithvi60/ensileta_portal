@@ -20,10 +20,10 @@ const DropdownMessage = () => {
           href="#"
         >
           <span
-            className={`absolute -right-0.5 -top-0.5 z-1 h-2 w-2 rounded-full bg-[#139F9B] ${notifying === false ? "hidden" : "inline"
+            className={`absolute -right-0.5 -top-0.5 z-1 h-2 w-2 rounded-full bg-secondary ${notifying === false ? "hidden" : "inline"
               }`}
           >
-            <span className="absolute -z-1 inline-flex h-full w-full animate-ping rounded-full bg-[#139F9B] opacity-75"></span>
+            <span className="absolute -z-1 inline-flex h-full w-full animate-ping rounded-full bg-secondary opacity-75"></span>
           </span>
 
           <svg
