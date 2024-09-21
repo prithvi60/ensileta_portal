@@ -2,7 +2,6 @@ import prisma from "@/prisma/db";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import GraphQLUpload from "graphql-upload/GraphQLUpload.mjs";
-import { uploadFileToS3 } from "./s3";
 
 const JWT_SECRET = process.env.NEXTAUTH_SECRET;
 
@@ -270,18 +269,33 @@ export const resolvers = {
         throw new Error("Failed to update user");
       }
     },
-    uploadFileToS3Storage: async (
-      _: any,
-      { file, fileName, userName }: any
-    ) => {
-      try {
-        const response = await uploadFileToS3(file, fileName, userName);
-        console.log(response);
-      } catch (error: any) {
-        console.error("Error updating user:", error.message || error);
-        throw new Error("Failed to update user");
-      }
-    },
+    // uploadFileToS3Storage: async (
+    //   _: any,
+    //   { file, fileName, userName }: any
+    // ) => {
+    //   try {
+    //     console.log("resolver working");
+
+    //     const response = await fetch('/api/uploadS3', {
+    //       method: 'POST',
+    //       headers: {
+    //         'Content-Type': 'application/json',
+    //       },
+    //       body: JSON.stringify({ file, filename: fileName, userName }),
+    //     });
+  
+    //     if (!response.ok) {
+    //       throw new Error('Failed to upload file');
+    //     }
+  
+    //     const data = await response.json();
+    //     console.log("returned data",data.fileUrl);
+    //     return data.fileUrl; // Return the file URL
+    //   } catch (error: any) {
+    //     console.error("Error uploading file:", error.message || error);
+    //     throw new Error("Failed to upload file");
+    //   }
+    // },
     uploadAccessControlUsers: async (_: any, { email, password }: any) => {
       if (!email && !password) {
         throw new Error("All fields are mandatory");

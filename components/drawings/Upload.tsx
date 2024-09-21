@@ -2,17 +2,13 @@
 
 import { useState } from "react";
 import { useSession } from "next-auth/react";
-import { uploadFileToS3 } from "@/lib/s3";
 import toast from "react-hot-toast";
-import { useMutation } from "@apollo/client";
-import { UPLOAD_S3_STORAGE } from "@/lib/Queries";
 
-
-export default function UploadFile({ uploadFile }: { uploadFile: any }) {
+export default function UploadFile({ uploadFile,setIsOpen }: { uploadFile: any,setIsOpen:any }) {
     const [file, setFile] = useState<File | null>(null);
     const [size, setSize] = useState<boolean>(false);
     const { data: session } = useSession()
-    const [uploadS3] = useMutation(UPLOAD_S3_STORAGE)
+    // const [uploadS3] = useMutation(UPLOAD_S3_STORAGE)
 
     const userName = session?.user?.name || 'anonymous';
 
@@ -35,13 +31,26 @@ export default function UploadFile({ uploadFile }: { uploadFile: any }) {
         }
 
         try {
-            // const res = await uploadS3({ variables: { file: file, filename: file.name, userName } })
-            // console.log(res);
+            const formData = new FormData();
+        formData.append('file', file);
+        formData.append('filename', file.name);
+        formData.append('userName', userName);
 
-            const response = await uploadFileToS3(file, file.name, userName)
-            const result = await uploadFile({ variables: { fileUrl: response, filename: file.name } })
+        const response = await fetch('/api/uploadS3', {
+            method: 'POST',
+            body: formData,
+        });
 
-            console.log('File uploaded successfully:', response);
+        if (!response.ok) {
+            throw new Error('Failed to upload file');
+        }
+
+        const data = await response.json();
+        const fileUrl = data.fileUrl;
+            const result = await uploadFile({ variables: { fileUrl, filename: file.name } })
+
+            // console.log('File uploaded successfully:', response);
+            // call query for new files
             if (response && result) {
                 toast.success('successfully Created', {
                     position: "top-right",
@@ -56,6 +65,7 @@ export default function UploadFile({ uploadFile }: { uploadFile: any }) {
                         secondary: '#FFFAEE',
                     },
                 })
+                setIsOpen(false)
             }
         } catch (error) {
             console.error("Error uploading file:", error);
