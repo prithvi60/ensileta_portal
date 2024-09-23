@@ -6,7 +6,7 @@ import SidebarItem from "./SidebarItem";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { useSession } from "next-auth/react";
 import { GiCardDraw } from "react-icons/gi";
-import { IoPeopleSharp } from "react-icons/io5";
+import { IoCallSharp, IoPeopleSharp } from "react-icons/io5";
 import { GoOrganization } from "react-icons/go";
 import { FaFileInvoice, FaQ } from "react-icons/fa6";
 import { SiLibreofficedraw } from "react-icons/si";
@@ -20,11 +20,11 @@ interface SidebarProps {
 
 const menuGroups = [
   {
-    name: "Ensileta Drawings",
+    name: "Ensileta Info",
     menuItems: [
       {
         icon: (
-          <div className="p-1 rounded-md bg-blue-500">
+          <div className="p-1 rounded-md bg-secondary">
             <SiLibreofficedraw className="text-4xl sm:text-5xl text-white" />
           </div>
           // <svg
@@ -46,7 +46,7 @@ const menuGroups = [
       },
       {
         icon: (
-          <div className="p-1 rounded-md bg-blue-500">
+          <div className="p-1 rounded-md bg-secondary">
             <GiCardDraw className="text-4xl sm:text-5xl text-white" />
           </div>
           // <svg
@@ -72,7 +72,7 @@ const menuGroups = [
       },
       {
         icon: (
-          <div className="p-1 rounded-md bg-blue-500">
+          <div className="p-1 rounded-md bg-secondary">
             <FaFileInvoice className="text-4xl sm:text-5xl text-white" />
           </div>
           // <svg
@@ -111,7 +111,7 @@ const menuGroups = [
       },
       {
         icon: (
-          <div className="p-1 rounded-md bg-blue-500">
+          <div className="p-1 rounded-md bg-secondary">
             <IoPeopleSharp className="text-4xl sm:text-5xl text-white" />
           </div>
           // <svg
@@ -145,7 +145,7 @@ const menuGroups = [
       },
       {
         icon: (
-          <div className="p-1 rounded-md bg-blue-500">
+          <div className="p-1 rounded-md bg-secondary">
             <GoOrganization className="text-4xl sm:text-5xl text-white" />
           </div>
           // <svg
@@ -183,8 +183,8 @@ const menuGroups = [
       },
       {
         icon: (
-          <div className="p-1 rounded-md bg-blue-500">
-            <MdAddIcCall className="text-4xl sm:text-5xl text-white" />
+          <div className="p-1 rounded-md bg-secondary">
+            <IoCallSharp className="text-4xl sm:text-5xl text-white" />
           </div>
           // <svg
           //   className="fill-current"

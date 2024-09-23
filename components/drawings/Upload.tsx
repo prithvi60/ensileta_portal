@@ -76,7 +76,8 @@ export default function UploadFile({ uploadFile,setIsOpen }: { uploadFile: any,s
     return (
         <form onSubmit={handleSubmit} className='space-y-5 w-full sm:w-1/2  mx-auto'>
             {/* <div className='block'> */}
-            <input type="file" onChange={handleFileChange} className="p-1.5 outline-none shadow-card shadow-green-500 rounded-full cursor-pointer w-full" />
+            <input type="file" onChange={handleFileChange} className="p-1.5 outline-none shadow-card shadow-secondary rounded-full cursor-pointer w-full" 
+           />
             {size && (
                 <p className="text-sm -mt-3.5 text-warning text-center font-bold tracking-wide">File size exceeds 10 MB</p>
             )}
