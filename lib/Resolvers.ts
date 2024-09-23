@@ -2,7 +2,6 @@ import prisma from "@/prisma/db";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import GraphQLUpload from "graphql-upload/GraphQLUpload.mjs";
-import { sendEmailNotification } from "./SMTPServer";
 
 const JWT_SECRET = process.env.NEXTAUTH_SECRET;
 
@@ -264,12 +263,12 @@ export const resolvers = {
           data: updateData,
         });
 
-        // Send email notification to the user
-        await sendEmailNotification(
-          "prithvi@webibee.com",
-          "User Profile Submission Notification",
-          "User Profile Submission Successful"
-        );
+        // // Send email notification to the user
+        // await sendEmailNotification(
+        //   "prithvi@webibee.com",
+        //   "User Profile Submission Notification",
+        //   "User Profile Submission Successful"
+        // );
 
         return updatedUser;
       } catch (error: any) {
@@ -304,13 +303,24 @@ export const resolvers = {
             password: hashedPwd,
           },
         });
-
-        // Send email notification to the user
-        await sendEmailNotification(
-          "prithvi@webibee.com",
-          "User Details Submission Notification",
-          "User Details Submission Successful"
-        );
+// we can refactor to call from API
+        // // Send email notification to the user
+        // await sendEmailNotification(
+        //   "prithvi@webibee.com",
+        //   "User Details Submission Notification",
+        //   "User Details Submission Successful"
+        // );
+        await fetch("/api/sendMail", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            to: "prithvi@webibee.com",
+            subject: "User Details Submission Notification",
+            message: "User Details Submission Successful",
+          }),
+        });
 
         return employeeData;
       } catch (error) {
@@ -343,12 +353,23 @@ export const resolvers = {
         },
       });
 
-      // Send email notification to the user
-      await sendEmailNotification(
-        "prithvi@webibee.com",
-        "2D Drawing File Upload Notification",
-        "2D Drawing File Uploaded Successfully"
-      );
+      // // Send email notification to the user
+      // await sendEmailNotification(
+      //   "prithvi@webibee.com",
+      //   "2D Drawing File Upload Notification",
+      //   "2D Drawing File Uploaded Successfully"
+      // );
+      await fetch("/api/sendMail", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          to: "prithvi@webibee.com",
+          subject: "2D Drawing File Upload Notification",
+          message: "2D Drawing File Uploaded  Successful",
+        }),
+      });
 
       return createdFile;
     },
@@ -376,13 +397,23 @@ export const resolvers = {
           userId,
         },
       });
-      // Send email notification to the user
-      await sendEmailNotification(
-        "prithvi@webibee.com",
-        "3D Drawing File Upload Submission Notification",
-        "3D Drawing File Uploaded Successfully"
-      );
-
+      // // Send email notification to the user
+      // await sendEmailNotification(
+      //   "prithvi@webibee.com",
+      //   "3D Drawing File Upload Submission Notification",
+      //   "3D Drawing File Uploaded Successfully"
+      // );
+      await fetch("/api/sendMail", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          to: "prithvi@webibee.com",
+          subject: "3D Drawing File Upload Notification",
+          message: "3D Drawing File Uploaded  Successful",
+        }),
+      });
       return createdFile;
     },
     uploadBOQFile: async (
@@ -410,13 +441,23 @@ export const resolvers = {
         },
       });
 
-      // Send email notification to the user
-      await sendEmailNotification(
-        "prithvi@webibee.com",
-        "BOQ Drawing File Upload Submission Notification",
-        "BOQ Drawing File Uploaded Successfully"
-      );
-
+      // // Send email notification to the user
+      // await sendEmailNotification(
+      //   "prithvi@webibee.com",
+      //   "BOQ Drawing File Upload Submission Notification",
+      //   "BOQ Drawing File Uploaded Successfully"
+      // );
+      await fetch("/api/sendMail", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          to: "prithvi@webibee.com",
+          subject: "BOQ  Drawing File Upload Notification",
+          message: "BOQ  Drawing File Uploaded  Successful",
+        }),
+      });
       return createdFile;
     },
   },
