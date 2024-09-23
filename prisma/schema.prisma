@@ -5,12 +5,66 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("NEXTAUTH_DATABASE_URL")
 }
 
 model users {
+  id              Int           @id @default(autoincrement())
+  username        String        @db.VarChar(50)
+  email           String        @unique @db.VarChar(20)
+  password        String
+  company_name    String?
+  phone_number    String?
+  address         String?
+  role            String?
+  drawing2Dfiles  Drawing_2D[]
+  drawing3Dfiles  Drawing_3D[]
+  drawingBOQfiles Drawing_BOQ[]
+}
+
+model Drawing_2D {
+  id        Int      @id @default(autoincrement())
+  filename  String
+  fileUrl   String
+  version   Int
+  createdAt DateTime @default(now())
+  userId    Int
+  user      users    @relation(fields: [userId], references: [id])
+}
+
+model Drawing_3D {
+  id        Int      @id @default(autoincrement())
+  filename  String
+  fileUrl   String
+  version   Int
+  createdAt DateTime @default(now())
+  userId    Int
+  user      users    @relation(fields: [userId], references: [id])
+}
+
+model Drawing_BOQ {
+  id        Int      @id @default(autoincrement())
+  filename  String
+  fileUrl   String
+  version   Int
+  createdAt DateTime @default(now())
+  userId    Int
+  user      users    @relation(fields: [userId], references: [id])
+}
+
+model accessControl {
   id       Int    @id @default(autoincrement())
-  username String @unique @db.VarChar(50)
   email    String @unique @db.VarChar(20)
   password String
+  role     String @default("employee")
 }
+
+// model File {
+//   id        Int      @id @default(autoincrement())
+//   filename  String
+//   fileUrl   String
+//   version   Int
+//   createdAt DateTime @default(now())
+//   userId    Int
+//   user      users    @relation(fields: [userId], references: [id])
+// }

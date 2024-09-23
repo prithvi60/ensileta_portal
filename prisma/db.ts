@@ -16,7 +16,7 @@ import { Pool, neonConfig } from "@neondatabase/serverless";
 
 const prismaClientSingleton = () => {
   neonConfig.webSocketConstructor = ws;
-  const connectionString = `${process.env.DATABASE_URL}`;
+  const connectionString = `${process.env.NEXTAUTH_DATABASE_URL}`;
 
   const pool = new Pool({ connectionString });
   const adapter = new PrismaNeon(pool);

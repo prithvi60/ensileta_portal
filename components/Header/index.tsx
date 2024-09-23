@@ -1,11 +1,7 @@
-import Link from "next/link";
-import DarkModeSwitcher from "./DarkModeSwitcher";
-import DropdownMessage from "./DropdownMessage";
+
 import DropdownNotification from "./DropdownNotification";
-import DropdownUser from "./DropdownUser";
 import Image from "next/image";
-import { useMutation } from "@apollo/client";
-import { SIGN_UP } from "@/lib/Queries";
+import { Marquee } from "./Marquee";
 
 const Header = (props: {
   sidebarOpen: string | boolean | undefined;
@@ -15,9 +11,9 @@ const Header = (props: {
   // console.log(data);
 
   return (
-    <header className="sticky top-0 z-999 flex w-full bg-white drop-shadow-1">
-      <div className="flex flex-grow items-center lg:justify-end justify-between px-4 py-4 shadow-2 md:px-6 2xl:px-11">
-        <div className="flex items-center gap-2 sm:gap-4 lg:hidden">
+    <header className="sticky top-0 z-[1000] flex w-full bg-white drop-shadow-1">
+      <div className="flex flex-grow items-center justify-between px-4 py-4 shadow-2 md:px-6 2xl:px-11">
+        <div className="flex items-center  sm:w-[70%] lg:w-[60%] overflow-hidden gap-3 md:gap-5">
           {/* <!-- Hamburger Toggle BTN --> */}
           <button
             aria-controls="sidebar"
@@ -25,7 +21,7 @@ const Header = (props: {
               e.stopPropagation();
               props.setSidebarOpen(!props.sidebarOpen);
             }}
-            className="z-99999 block rounded-sm border border-stroke bg-white p-1.5 shadow-sm dark:border-strokedark dark:bg-boxdark lg:hidden"
+            className="z-9999 block rounded-sm border border-stroke p-1.5 shadow-sm bg-primary lg:hidden"
           >
             <span className="relative block h-5.5 w-5.5 cursor-pointer">
               <span className="du-block absolute right-0 h-full w-full">
@@ -55,17 +51,34 @@ const Header = (props: {
             </span>
           </button>
           {/* <!-- Hamburger Toggle BTN --> */}
-
-          {/* <Link className="block flex-shrink-0 lg:hidden" href="/">
-            <Image
-              width={32}
-              height={32}
-              src={"/images/logo/logo-icon.svg"}
-              alt="Logo"
-            />
-          </Link> */}
+          {/* </div> */}
+          {/* <div > */}
+          <div className="w-54 h-6 relative hidden sm:block">
+            <Image alt="logo" src={"/logo/logo.svg"} fill />
+          </div>
+          {/* <div className=""> */}
+          <div className="hidden sm:block">
+            <Marquee />
+          </div>
+          {/* </div> */}
         </div>
-
+        {/* <div className="w-full h-full flex items-center gap-5 mx-5">
+          <div className="w-16 h-16 relative">
+            <Image alt="logo" src={"/logo/tcl.svg"} fill />
+          </div>
+          <div className="w-16 h-16 relative">
+            <Image alt="logo" src={"/logo/kfc.svg"} fill />
+          </div>
+          <div className="w-16 h-16 relative">
+            <Image alt="logo" src={"/logo/hyundai.svg"} fill />
+          </div>
+          <div className="w-16 h-16 relative">
+            <Image alt="logo" src={"/logo/valeo.svg"} fill />
+          </div>
+          <div className="w-16 h-16 relative">
+            <Image alt="logo" src={"/logo/british-airways.svg"} fill />
+          </div>
+        </div> */}
         {/* <div className="hidden sm:block">
           <form action="https://formbold.com/s/unique_form_id" method="POST">
             <div className="relative">
@@ -113,13 +126,14 @@ const Header = (props: {
             {/* <!-- Notification Menu Area --> */}
 
             {/* <!-- Chat Notification Area --> */}
-            <DropdownMessage />
+            {/* <DropdownMessage /> */}
             {/* <!-- Chat Notification Area --> */}
           </ul>
 
           {/* <!-- User Area --> */}
-          <DropdownUser />
+          {/* <DropdownUser /> */}
           {/* <!-- User Area --> */}
+
         </div>
       </div>
     </header>

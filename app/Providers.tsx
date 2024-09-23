@@ -1,22 +1,20 @@
-"use client"
+"use client";
 
-import client from '@/lib/apolloClient';
-import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
+import { ApolloProvider } from '@apollo/client';
 import { SessionProvider } from 'next-auth/react';
+import client from '@/lib/apolloClient';
 
+interface ProvidersProps {
+    children: React.ReactNode;
+}
 
-export function Providers({ children }: { children: React.ReactNode }) {
-    // const client = new ApolloClient({
-    //     uri: process.env.NODE_ENV === "production" ? "https://ensileta-portal.vercel.app/api/graphql" : "http://localhost:3000/api/graphql",
-    //     // uri: 'https://ensileta-portal.vercel.app/'http://localhost:3000/api/graphql',
-    //     cache: new InMemoryCache(),
-    // });
+export function Providers({ children }: ProvidersProps) {
     return (
         <SessionProvider>
-            <ApolloProvider client={client} >
+            <ApolloProvider client={client}>
                 {children}
             </ApolloProvider>
         </SessionProvider>
-    )
+    );
 }
 

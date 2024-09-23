@@ -6,11 +6,12 @@ import { signOut, useSession } from "next-auth/react";
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const { data: session, status } = useSession()
+  const { data: session } = useSession()
   const handleLogout = () => {
     signOut({ redirect: true, callbackUrl: "/api/auth/signin" });
   }
   const userName = session?.user?.name
+
 
   return (
     <ClickOutside onClick={() => setDropdownOpen(false)} className="relative">

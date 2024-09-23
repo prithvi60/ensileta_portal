@@ -19,9 +19,14 @@ const config: Config = {
     },
     extend: {
       colors: {
+        primary: "#394b7a",
+        secondary: "#63b6b3",
+        success: "#499d49",
+        warning: "#9d4949", //upto this
+        danger: "#D34053",
         current: "currentColor",
         transparent: "transparent",
-        white: "#FFFFFF",
+        white: "#fafafa",
         black: "#1C2434",
         red: "#FB5454",
         "black-2": "#010101",
@@ -29,8 +34,6 @@ const config: Config = {
         bodydark: "#AEB7C0",
         bodydark1: "#DEE4EE",
         bodydark2: "#8A99AF",
-        primary: "#3C50E0",
-        secondary: "#80CAEE",
         stroke: "#E2E8F0",
         gray: "#EFF4FB",
         graydark: "#333A48",
@@ -53,9 +56,6 @@ const config: Config = {
         "meta-8": "#F0950C",
         "meta-9": "#E5E7EB",
         "meta-10": "#0FADCF",
-        success: "#219653",
-        danger: "#D34053",
-        warning: "#FFA70B",
       },
       fontSize: {
         "title-xxl": ["44px", "55px"],
@@ -223,9 +223,7 @@ const config: Config = {
         "4/3": "4 / 3",
         "21/9": "21 / 9",
       },
-      backgroundImage: {
-        video: "url('../images/video/video.png')",
-      },
+      backgroundImage: {},
       content: {
         "icon-copy": 'url("../images/icon/icon-copy-alt.svg")',
       },
