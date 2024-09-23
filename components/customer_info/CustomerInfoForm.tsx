@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery } from '@apollo/client';
 import { GET_USER, UPDATE_USER } from '@/lib/Queries';
 import toast from 'react-hot-toast';
+import { Loader } from '../Loader';
 
 const schema = z.object({
     username: z.string()
@@ -92,8 +93,7 @@ export const CustomerInfoForm = () => {
         }
     };
 
-
-    if (loading) return <p>Loading...</p>;
+    if (loading) return <Loader />;
     if (error) return <p>Error loading user data: {error.message}</p>;
 
     return (

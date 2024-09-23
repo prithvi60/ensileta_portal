@@ -2,12 +2,13 @@
 
 import { useQuery } from '@apollo/client';
 import { GET_ALL_EMPLOYEE_LISTS } from '@/lib/Queries';
+import { Loader } from '../Loader';
 
 export const EmployeeLists = () => {
     const { data, loading, error } = useQuery(GET_ALL_EMPLOYEE_LISTS)
 
     if (loading) {
-        return (<p>Loading ....</p>)
+        return (<Loader />)
     }
 
     if (error) {
