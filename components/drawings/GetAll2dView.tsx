@@ -1,10 +1,10 @@
 "use client"
 
 import ModernCarousel from './SwipeCarousal';
-import UploadFile from './Upload';
 import ShuffleSortTable from './Table';
 import { GET_USER } from '@/lib/Queries';
 import { useQuery } from '@apollo/client';
+import { Loader } from '../Loader';
 
 
 interface FileData {
@@ -28,7 +28,7 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({ data, loading, error
     const { data: RoleBased } = useQuery(GET_USER);
 
     if (loading) {
-        return (<div className='text-warning text-xl w-full h-screen flex justify-center items-center'>Loading ....</div>)
+        return (<Loader />)
     }
 
     if (error) {
@@ -39,7 +39,7 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({ data, loading, error
     // console.log(lastItem?.id);
 
     return (
-        <div className='w-full h-screen p-10 space-y-5'>
+        <div className='h-full w-full p-10 space-y-5'>
             <h2 className='text-3xl w-full text-center font-semibold caption-bottom tracking-wide mb-10'>{title}</h2>
             {RoleBased?.user?.role === "super admin" ? (
                 // Table format User Details for super admin

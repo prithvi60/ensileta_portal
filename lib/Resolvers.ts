@@ -2,6 +2,7 @@ import prisma from "@/prisma/db";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import GraphQLUpload from "graphql-upload/GraphQLUpload.mjs";
+import { sendEmailNotification } from "./SMTPServer";
 
 const JWT_SECRET = process.env.NEXTAUTH_SECRET;
 
@@ -263,39 +264,19 @@ export const resolvers = {
           data: updateData,
         });
 
+        // Send email notification to the user
+        await sendEmailNotification(
+          "prithvi@webibee.com",
+          "User Profile Submission Notification",
+          "User Profile Submission Successful"
+        );
+
         return updatedUser;
       } catch (error: any) {
         console.error("Error updating user:", error.message || error);
         throw new Error("Failed to update user");
       }
     },
-    // uploadFileToS3Storage: async (
-    //   _: any,
-    //   { file, fileName, userName }: any
-    // ) => {
-    //   try {
-    //     console.log("resolver working");
-
-    //     const response = await fetch('/api/uploadS3', {
-    //       method: 'POST',
-    //       headers: {
-    //         'Content-Type': 'application/json',
-    //       },
-    //       body: JSON.stringify({ file, filename: fileName, userName }),
-    //     });
-  
-    //     if (!response.ok) {
-    //       throw new Error('Failed to upload file');
-    //     }
-  
-    //     const data = await response.json();
-    //     console.log("returned data",data.fileUrl);
-    //     return data.fileUrl; // Return the file URL
-    //   } catch (error: any) {
-    //     console.error("Error uploading file:", error.message || error);
-    //     throw new Error("Failed to upload file");
-    //   }
-    // },
     uploadAccessControlUsers: async (_: any, { email, password }: any) => {
       if (!email && !password) {
         throw new Error("All fields are mandatory");
@@ -323,6 +304,13 @@ export const resolvers = {
             password: hashedPwd,
           },
         });
+
+        // Send email notification to the user
+        await sendEmailNotification(
+          "prithvi@webibee.com",
+          "User Details Submission Notification",
+          "User Details Submission Successful"
+        );
 
         return employeeData;
       } catch (error) {
@@ -354,6 +342,14 @@ export const resolvers = {
           userId,
         },
       });
+
+      // Send email notification to the user
+      await sendEmailNotification(
+        "prithvi@webibee.com",
+        "2D Drawing File Upload Notification",
+        "2D Drawing File Uploaded Successfully"
+      );
+
       return createdFile;
     },
     upload3DFile: async (
@@ -380,6 +376,13 @@ export const resolvers = {
           userId,
         },
       });
+      // Send email notification to the user
+      await sendEmailNotification(
+        "prithvi@webibee.com",
+        "3D Drawing File Upload Submission Notification",
+        "3D Drawing File Uploaded Successfully"
+      );
+
       return createdFile;
     },
     uploadBOQFile: async (
@@ -406,6 +409,14 @@ export const resolvers = {
           userId,
         },
       });
+
+      // Send email notification to the user
+      await sendEmailNotification(
+        "prithvi@webibee.com",
+        "BOQ Drawing File Upload Submission Notification",
+        "BOQ Drawing File Uploaded Successfully"
+      );
+
       return createdFile;
     },
   },

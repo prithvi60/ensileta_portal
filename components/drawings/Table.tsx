@@ -12,9 +12,9 @@ interface Data {
 
 const ShuffleSortTable = ({ uploadFile, version, pdf, id }: Data) => {
     return (
-        <div className="p-8 w-full bg-primary">
-            <Table uploadFile={uploadFile} version={version} pdf={pdf} id={id} />
-        </div>
+        // <div className=" w-full bg-primary">
+        <Table uploadFile={uploadFile} version={version} pdf={pdf} id={id} />
+        // </div >/
     );
 };
 
@@ -24,24 +24,22 @@ const Table = ({ uploadFile, version, pdf, id }: Data) => {
     const user: User = {
         userName: session?.user?.name ?? 'Unknown',
         email: session?.user?.email ?? 'No email',
-
     }
 
+
     return (
-        <div className="w-full bg-white shadow-lg rounded-lg overflow-x-scroll max-w-4xl mx-auto">
-            <table className="w-full">
+        <div className="w-full bg-white shadow-lg rounded-lg overflow-x-hidden">
+            <table className="w-full min-w-[500px]">
                 <thead>
                     <tr className="border-b-[1px] border-slate-200 text-slate-400 text-sm uppercase">
-                        <th className="text-start p-4 font-medium">Team Member</th>
-                        <th className="text-start p-4 font-medium">Version</th>
-                        <th className="text-start p-4 font-medium">File Upload</th>
-                        <th className="text-start p-4 font-medium">View File</th>
+                        <th className="text-start p-2 sm:p-4 font-medium">Team Member</th>
+                        <th className="text-start p-2 sm:p-4 font-medium">Version</th>
+                        <th className="text-start p-2 sm:p-4 font-medium">File Upload</th>
+                        <th className="text-start p-2 sm:p-4 font-medium">View File</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                    {/* {users.map((user, index) => { */}
-                    {/* return ( */}
                     <TableRows
                         user={user}
                         uploadFile={uploadFile}
@@ -49,8 +47,6 @@ const Table = ({ uploadFile, version, pdf, id }: Data) => {
                         pdf={pdf}
                         id={id}
                     />
-                    {/* ); */}
-                    {/* })} */}
                 </tbody>
             </table>
         </div>
@@ -66,28 +62,22 @@ interface TableRowsProps {
 }
 
 const TableRows = ({ user, uploadFile, version, pdf, id }: TableRowsProps) => {
-
     return (
-        <motion.tr
-            // layoutId={`row-${user.id}`}
-            // className={`text-sm ${user.id % 2 ? "bg-slate-100" : "bg-white"}`}
-            className="text-sm"
-        >
-            <td className="p-4 flex items-center gap-3 overflow-hidden">
+        <motion.tr className="text-xs sm:text-sm">
+            <td className="p-2 sm:p-4 flex items-center gap-3 overflow-hidden">
                 <div>
                     <span className="block mb-1 font-medium">{user.userName}</span>
                     <span className="block text-xs text-slate-500">{user.email}</span>
                 </div>
             </td>
-            <td className="p-4">
-
-                <span className="block mb-1 font-medium ml-7">{version}</span>
+            <td className="p-2 sm:p-4">
+                <span className="block mb-1 font-medium">{version}</span>
             </td>
-            <td className="p-4 ">
+            <td className="p-2 sm:p-4">
                 <ModalWrapper uploadFile={uploadFile} />
             </td>
-            <td className="p-4 ">
-                <ViewModalWrapper version={version} pdf={pdf} id={id} />
+            <td className="p-2 sm:p-4">
+                <ViewModalWrapper pdf={pdf} />
             </td>
         </motion.tr>
     );
