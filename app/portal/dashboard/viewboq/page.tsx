@@ -2,8 +2,10 @@
 
 import { GetAll2dView } from '@/components/drawings/GetAll2dView';
 import DefaultLayout from '@/components/Layout/DefaultLayout';
-import { ADD_BOQ_FILENAME, GET_ALL_BOQ_VIEW } from '@/lib/Queries';
+import { Loader } from '@/components/Loader';
+import { ADD_BOQ_FILENAME, GET_ALL_BOQ_VIEW, GET_USERS } from '@/lib/Queries';
 import { useMutation, useQuery } from '@apollo/client';
+import { usePathname } from 'next/navigation';
 
 
 interface GetAllBOQViewResponse {
@@ -19,7 +21,11 @@ interface GetAllBOQViewResponse {
 
 const Page = () => {
     const [uploadFile] = useMutation(ADD_BOQ_FILENAME);
-    const { data, loading, error } = useQuery<GetAllBOQViewResponse>(GET_ALL_BOQ_VIEW)
+    const { data } = useQuery<GetAllBOQViewResponse>(GET_ALL_BOQ_VIEW)
+    const { data: AllUsers, loading } = useQuery(GET_USERS);
+    const pathname = usePathname();
+    const fileType = pathname.split('/').pop();
+
 
     // const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     //     e.preventDefault();
@@ -58,14 +64,9 @@ const Page = () => {
     return (
         <DefaultLayout>
             <section className='h-full w-full'>
-                <GetAll2dView loading={loading} error={error} data={data?.getAllBOQFiles} uploadFile={uploadFile} title={"Your BOQ Drawings"} />
-                {/* {RoleBased?.user?.role === "super admin" ? (
-                    <InputForm handleChange={handleChange} handleSubmit={handleSubmit} inputValue={inputValue} />
-                ) : (
-                    <div className='w-full h-auto flex justify-center items-center'>
-                        <button type="submit" className='cursor-pointer p-1.5 shadow-md select-none bg-secondary text-white rounded-md'>Approval</button>
-                    </div>
-                )} */}
+                {loading ? (<Loader />) : (
+                    <GetAll2dView data={data?.getAllBOQFiles} allUsers={AllUsers} uploadFile={uploadFile} fileType={fileType || ''} title={"Your BOQ Drawings"} />
+                )}
             </section>
         </DefaultLayout>
     );

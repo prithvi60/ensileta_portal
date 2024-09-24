@@ -61,10 +61,9 @@ export const resolvers = {
             drawingBOQfiles: true,
           },
         });
-        console.log(users);
+        // console.log(users);
 
-        return users.filter((user) => user.id !== null);
-        // return users;
+        return users;
       } catch (error) {
         console.error("Error while fetching users:", error);
         throw new Error("Failed to fetch users");
@@ -80,7 +79,6 @@ export const resolvers = {
             userId: userId,
           },
         });
-        // console.log(user);
 
         return user;
       } catch (error) {
@@ -98,7 +96,6 @@ export const resolvers = {
             userId: userId,
           },
         });
-        // console.log(user);
 
         return user;
       } catch (error) {
@@ -303,7 +300,7 @@ export const resolvers = {
             password: hashedPwd,
           },
         });
-// we can refactor to call from API
+        // we can refactor to call from API
         // // Send email notification to the user
         // await sendEmailNotification(
         //   "prithvi@webibee.com",
@@ -330,13 +327,12 @@ export const resolvers = {
     },
     upload2DFile: async (
       _: any,
-      { fileUrl, filename }: { fileUrl: string; filename: string },
-      { userId }: any
+      {
+        fileUrl,
+        filename,
+        userId,
+      }: { fileUrl: string; filename: string; userId: number }
     ) => {
-      if (!userId) {
-        throw new Error("user does not exist");
-      }
-
       // Find the latest version of the file with the same filename for the user
       const existingFile = await prisma.drawing_2D.findMany();
 
@@ -353,13 +349,7 @@ export const resolvers = {
         },
       });
 
-      // // Send email notification to the user
-      // await sendEmailNotification(
-      //   "prithvi@webibee.com",
-      //   "2D Drawing File Upload Notification",
-      //   "2D Drawing File Uploaded Successfully"
-      // );
-      await fetch("/api/sendMail", {
+      await fetch(`${process.env.NEXTAUTH_URL}/api/sendMail`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -370,18 +360,17 @@ export const resolvers = {
           message: "2D Drawing File Uploaded  Successful",
         }),
       });
-
+      console.log("after");
       return createdFile;
     },
     upload3DFile: async (
       _: any,
-      { fileUrl, filename }: { fileUrl: string; filename: string },
-      { userId }: any
+      {
+        fileUrl,
+        filename,
+        userId,
+      }: { fileUrl: string; filename: string; userId: number }
     ) => {
-      if (!userId) {
-        throw new Error("user does not exist");
-      }
-
       // Find the latest version of the file with the same filename for the user
       const existingFile = await prisma.drawing_3D.findMany();
 
@@ -397,13 +386,8 @@ export const resolvers = {
           userId,
         },
       });
-      // // Send email notification to the user
-      // await sendEmailNotification(
-      //   "prithvi@webibee.com",
-      //   "3D Drawing File Upload Submission Notification",
-      //   "3D Drawing File Uploaded Successfully"
-      // );
-      await fetch("/api/sendMail", {
+
+      await fetch(`${process.env.NEXTAUTH_URL}/api/sendMail`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -418,13 +402,12 @@ export const resolvers = {
     },
     uploadBOQFile: async (
       _: any,
-      { fileUrl, filename }: { fileUrl: string; filename: string },
-      { userId }: any
+      {
+        fileUrl,
+        filename,
+        userId,
+      }: { fileUrl: string; filename: string; userId: number }
     ) => {
-      if (!userId) {
-        throw new Error("user does not exist");
-      }
-
       // Find the latest version of the file with the same filename for the user
       const existingFile = await prisma.drawing_BOQ.findMany();
 
@@ -441,13 +424,7 @@ export const resolvers = {
         },
       });
 
-      // // Send email notification to the user
-      // await sendEmailNotification(
-      //   "prithvi@webibee.com",
-      //   "BOQ Drawing File Upload Submission Notification",
-      //   "BOQ Drawing File Uploaded Successfully"
-      // );
-      await fetch("/api/sendMail", {
+      await fetch(`${process.env.NEXTAUTH_URL}/api/sendMail`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

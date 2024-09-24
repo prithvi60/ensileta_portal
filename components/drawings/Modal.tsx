@@ -5,21 +5,21 @@ import UploadFile from "./Upload";
 import FsLightbox from "fslightbox-react";
 import { usePDFJS } from "@/hooks/usePdfJS";
 
-const ModalWrapper = ({ uploadFile }: { uploadFile: any }) => {
+const ModalWrapper = ({ uploadFile, userId }: { uploadFile: any, userId: number }) => {
     const [isOpen, setIsOpen] = useState(false);
     return (
-        <div >
+        <div>
             <button
                 onClick={() => setIsOpen(true)}
                 className={`w-max cursor-pointer py-4 px-10 text-white bg-secondary mb-5 hover:bg-[#0E122B] transition-colors`}
             >upload
             </button>
-            <SpringModal isOpen={isOpen} setIsOpen={setIsOpen} uploadFile={uploadFile} />
+            <SpringModal isOpen={isOpen} userId={userId} setIsOpen={setIsOpen} uploadFile={uploadFile} />
         </div>
     );
 };
 
-const SpringModal = ({ isOpen, setIsOpen, uploadFile }: { isOpen: boolean, setIsOpen: Function, uploadFile: any }) => {
+const SpringModal = ({ isOpen, setIsOpen, uploadFile, userId }: { isOpen: boolean, setIsOpen: Function, uploadFile: any, userId: number }) => {
     return (
         <AnimatePresence>
             {isOpen && (
@@ -42,7 +42,7 @@ const SpringModal = ({ isOpen, setIsOpen, uploadFile }: { isOpen: boolean, setIs
                             <h3 className="text-3xl font-bold text-center mb-2">
                                 Upload File
                             </h3>
-                            <UploadFile uploadFile={uploadFile} setIsOpen={setIsOpen} />
+                            <UploadFile uploadFile={uploadFile} userId={userId} setIsOpen={setIsOpen} />
                         </div>
                     </motion.div>
                 </motion.div>
@@ -59,6 +59,7 @@ export const ViewModalWrapper = ({ pdf }: { pdf: string }) => {
 
     usePDFJS(async (pdfjs) => {
         try {
+
             const url = pdf;
             const response = await fetch(url);
             const data = await response.arrayBuffer();
@@ -81,9 +82,15 @@ export const ViewModalWrapper = ({ pdf }: { pdf: string }) => {
                         viewport: viewport,
                     };
                     await page.render(renderContext).promise;
-                    imgArray.push(canvas.toDataURL());
+                    const imageUrl = canvas.toDataURL();
+                    imgArray.push(imageUrl);
                 }
             }
+
+            if (imgArray.length === 0) {
+                throw new Error("No images were generated from the PDF.");
+            }
+
             setImgs(imgArray);
 
             // }
@@ -95,13 +102,14 @@ export const ViewModalWrapper = ({ pdf }: { pdf: string }) => {
     return (
         <div>
             <button
+                disabled={imgs.length === 0 ? true : false}
                 onClick={() => setToggle(!toggle)}
-                className={`w-max cursor-pointer py-4 px-10 text-white bg-secondary mb-5 hover:bg-[#0E122B] transition-colors`}
+                className={`w-max cursor-pointer py-4 px-10 text-white bg-secondary mb-5 hover:bg-[#0E122B] transition-colors disabled:bg-opacity-70 disabled:cursor-not-allowed`}
             >View</button>
             <FsLightbox
                 exitFullscreenOnClose={true}
                 toggler={toggle}
-                sources={imgs}
+                sources={imgs.length > 0 ? imgs : []}
                 type="image"
             />
         </div>

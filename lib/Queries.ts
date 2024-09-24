@@ -63,6 +63,35 @@ export const GET_USER = gql`
   }
 `;
 
+// export const GET_USERS = gql`
+//   query GetUsers {
+//     users {
+//       id
+//       username
+//       email
+//       company_name
+//       phone_number
+//       address
+//       role
+//       drawing2Dfiles {
+//         id
+//         filename
+//         fileUrl
+//       }
+//       drawing3Dfiles {
+//         id
+//         filename
+//         fileUrl
+//       }
+//       drawingBOQfiles {
+//         id
+//         filename
+//         fileUrl
+//       }
+//     }
+//   }
+// `;
+
 export const GET_USERS = gql`
   query GetUsers {
     users {
@@ -73,10 +102,26 @@ export const GET_USERS = gql`
       phone_number
       address
       role
-      files {
+      drawing2Dfiles {
         id
         filename
         fileUrl
+        version
+        createdAt
+      }
+      drawing3Dfiles {
+        id
+        filename
+        fileUrl
+        version
+        createdAt
+      }
+      drawingBOQfiles {
+        id
+        filename
+        fileUrl
+        version
+        createdAt
       }
     }
   }
@@ -112,8 +157,8 @@ export const UPDATE_USER = gql`
 // View 2D queries
 
 export const ADD_2D_FILENAME = gql`
-  mutation Upload2DFile($fileUrl: String!, $filename: String!) {
-    upload2DFile(fileUrl: $fileUrl, filename: $filename) {
+  mutation Upload2DFile($fileUrl: String!, $filename: String!, $userId: Int!) {
+    upload2DFile(fileUrl: $fileUrl, filename: $filename, userId: $userId) {
       id
       filename
       fileUrl
@@ -140,8 +185,8 @@ export const GET_ALL_2D_VIEW = gql`
 // View 3D queries
 
 export const ADD_3D_FILENAME = gql`
-  mutation Upload3DFile($fileUrl: String!, $filename: String!) {
-    upload3DFile(fileUrl: $fileUrl, filename: $filename) {
+  mutation Upload3DFile($fileUrl: String!, $filename: String!, $userId: Int!) {
+    upload3DFile(fileUrl: $fileUrl, filename: $filename, userId: $userId) {
       id
       filename
       fileUrl
@@ -168,8 +213,8 @@ export const GET_ALL_3D_VIEW = gql`
 // View BOQ queries
 
 export const ADD_BOQ_FILENAME = gql`
-  mutation UploadBOQFile($fileUrl: String!, $filename: String!) {
-    uploadBOQFile(fileUrl: $fileUrl, filename: $filename) {
+  mutation UploadBOQFile($fileUrl: String!, $filename: String!, $userId: Int!) {
+    uploadBOQFile(fileUrl: $fileUrl, filename: $filename, userId: $userId) {
       id
       filename
       fileUrl
