@@ -107,26 +107,19 @@ export const SignUp = () => {
         <div className="rounded-md border-4 border-secondary bg-white shadow-xl m-4" >
             <div className="flex flex-wrap items-center">
                 <div className="hidden w-full xl:block xl:w-1/2">
-                    <div className="p-4 sm:px-12 sm:py-0 space-y-5 text-center">
-                        <div className='mb-10'>
-                            {/* <h3 className="mb-5.5 inline-block tracking-wider font-sans font-bold text-secondary text-lg md:text-2xl">
-                                Welcome To Ensileta Portal
-                            </h3> */}
-
-                            {/* <p className="2xl:px-20 text-[#0E132A]">
-                                The home should be the treasure chest of living
-                            </p> */}
-                        </div>
-                        <span className="mt-15 inline-block">
-                        <Image
+                <div className="p-4 sm:px-16 sm:py-0 space-y-5 text-center flex justify-center flex-col">
+                <div className="w-64 h-14 relative items-center flex justify-center">
+              <Image alt="logo" src={"/logo/newlogo.svg"} fill />
+            </div>
+            <span className="mt-15 inline-block">
+              <Image
                 src="/cover/ensiletaclients.png"
                 alt="clients"
-                width={450} 
+                width={450}
                 height={250}
-                // layout="responsive" 
-            />
-                        </span>
-                    </div>
+              />
+            </span>
+          </div>
                 </div>
 
                 <div className="w-full p-4 sm:px-6 sm:py-0 xl:w-1/2 xl:border-l-2">
