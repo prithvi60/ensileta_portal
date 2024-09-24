@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 ::-webkit-file-upload-button {
-  background-color: #63b6b3;
+  background-color: #65a34e;
   padding: 10px;
   border-radius: 50px;
   color: whitesmoke;
