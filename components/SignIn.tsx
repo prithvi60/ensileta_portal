@@ -81,7 +81,7 @@ export const SignIn = () => {
         <div className="hidden w-full xl:block xl:w-1/2">
           <div className="p-4 sm:px-16 sm:py-0 space-y-5 text-center flex justify-center flex-col">
             <div className="w-64 h-14 relative items-center flex justify-center">
-              <Image alt="logo" src={"/logo/newlogo.svg"} fill />
+              <Image alt="logo" src={"/logo/newlogo.png"} fill />
             </div>
             <span className="mt-15 inline-block">
               <Image
@@ -212,11 +212,10 @@ export const SignIn = () => {
               <button
                 disabled={!isValid || isSubmitting}
                 type="submit"
-                className={`w-full cursor-pointer p-4 text-white transition  bg-secondary mb-5 ${
-                  !isValid || isSubmitting
-                    ? "bg-opacity-40 cursor-not-allowed"
-                    : "hover:bg-opacity-90"
-                }`}
+                className={`w-full cursor-pointer p-4 text-white transition  bg-secondary mb-5 ${!isValid || isSubmitting
+                  ? "bg-opacity-40 cursor-not-allowed"
+                  : "hover:bg-opacity-90"
+                  }`}
               >
                 {isSubmitting ? "Logging in..." : "Log In"}
               </button>

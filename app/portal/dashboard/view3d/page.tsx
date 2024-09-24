@@ -2,8 +2,10 @@
 
 import { GetAll2dView } from '@/components/drawings/GetAll2dView';
 import DefaultLayout from '@/components/Layout/DefaultLayout';
-import { ADD_3D_FILENAME, GET_ALL_3D_VIEW } from '@/lib/Queries';
+import { Loader } from '@/components/Loader';
+import { ADD_3D_FILENAME, GET_ALL_3D_VIEW, GET_USERS } from '@/lib/Queries';
 import { useMutation, useQuery } from '@apollo/client';
+import { usePathname } from 'next/navigation';
 
 
 interface GetAll3DViewResponse {
@@ -19,13 +21,18 @@ interface GetAll3DViewResponse {
 
 const Page = () => {
     const [uploadFile] = useMutation(ADD_3D_FILENAME);
-    const { data, loading, error } = useQuery<GetAll3DViewResponse>(GET_ALL_3D_VIEW)
+    const { data } = useQuery<GetAll3DViewResponse>(GET_ALL_3D_VIEW)
+    const { data: AllUsers, loading } = useQuery(GET_USERS);
+    const pathname = usePathname();
+    const fileType = pathname.split('/').pop();
 
 
     return (
         <DefaultLayout>
             <section className='h-full w-full'>
-                <GetAll2dView loading={loading} error={error} data={data?.getAll3DFiles} uploadFile={uploadFile} title={"Your 3D Drawings"} />
+                {loading ? (<Loader />) : (
+                    <GetAll2dView data={data?.getAll3DFiles} allUsers={AllUsers} uploadFile={uploadFile} fileType={fileType || 'view2d'} title={"Your 3D Drawings"} />
+                )}
             </section>
         </DefaultLayout>
     );

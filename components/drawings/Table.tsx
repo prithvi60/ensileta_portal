@@ -1,31 +1,28 @@
+'use client'
 import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import ModalWrapper, { ViewModalWrapper } from "./Modal";
 
+
 interface Data {
     uploadFile: any
-    version: number
-    pdf: string
-    id: number
-
+    // version: number
+    // pdf: string
+    // id: number
+    data: any
+    fileType: string
 }
 
-const ShuffleSortTable = ({ uploadFile, version, pdf, id }: Data) => {
+const ShuffleSortTable = ({ uploadFile, data, fileType }: Data) => {
+
     return (
         // <div className=" w-full bg-primary">
-        <Table uploadFile={uploadFile} version={version} pdf={pdf} id={id} />
+        <Table uploadFile={uploadFile} fileType={fileType} data={data} />
         // </div >/
     );
 };
 
-const Table = ({ uploadFile, version, pdf, id }: Data) => {
-    const { data: session } = useSession()
-    // console.log(session);
-    const user: User = {
-        userName: session?.user?.name ?? 'Unknown',
-        email: session?.user?.email ?? 'No email',
-    }
-
+const Table = ({ uploadFile, data, fileType }: Data) => {
 
     return (
         <div className="w-full bg-white shadow-lg rounded-lg overflow-x-hidden">
@@ -41,11 +38,11 @@ const Table = ({ uploadFile, version, pdf, id }: Data) => {
 
                 <tbody>
                     <TableRows
-                        user={user}
                         uploadFile={uploadFile}
-                        version={version}
-                        pdf={pdf}
-                        id={id}
+                        // pdf={pdf}
+                        // id={id}
+                        data={data}
+                        fileType={fileType}
                     />
                 </tbody>
             </table>
@@ -54,39 +51,51 @@ const Table = ({ uploadFile, version, pdf, id }: Data) => {
 };
 
 interface TableRowsProps {
-    user: User;
     uploadFile: any
-    version: number
-    pdf: string
-    id: number
+    // pdf: string
+    // id: number
+    data: any
+    fileType: string
 }
 
-const TableRows = ({ user, uploadFile, version, pdf, id }: TableRowsProps) => {
+const TableRows = ({ uploadFile, data, fileType }: TableRowsProps) => {
+
     return (
-        <motion.tr className="text-xs sm:text-sm">
-            <td className="p-2 sm:p-4 flex items-center gap-3 overflow-hidden">
-                <div>
-                    <span className="block mb-1 font-medium">{user.userName}</span>
-                    <span className="block text-xs text-slate-500">{user.email}</span>
-                </div>
-            </td>
-            <td className="p-2 sm:p-4">
-                <span className="block mb-1 font-medium">{version}</span>
-            </td>
-            <td className="p-2 sm:p-4">
-                <ModalWrapper uploadFile={uploadFile} />
-            </td>
-            <td className="p-2 sm:p-4">
-                <ViewModalWrapper pdf={pdf} />
-            </td>
-        </motion.tr>
+        <>
+            {data && (
+                <>
+                    {data.map((user: any) => (
+                        <motion.tr className="text-xs sm:text-sm" key={user.id}>
+                            <td className="p-2 sm:p-4 flex items-center gap-3 overflow-hidden">
+                                <div>
+                                    <span className="block mb-1 font-medium">{user.username}</span>
+                                    <span className="block text-xs text-slate-500">{user.email}</span>
+                                </div>
+                            </td>
+                            <td className="p-2 sm:p-4">
+                                {fileType === "view2d" ? (<span className="block mb-1 font-medium">{user.drawing2Dfiles.length}</span>) : fileType === "view3d" ? (<span className="block mb-1 font-medium">{user.drawing3Dfiles.length}</span>) : fileType === "viewboq" ? (<span className="block mb-1 font-medium">{user.drawingBOQfiles.length}</span>) : (<span className="block mb-1 font-medium">0</span>)}
+                            </td>
+                            <td className="p-2 sm:p-4">
+                                <ModalWrapper uploadFile={uploadFile} userId={user.id} />
+                            </td>
+                            <td className="p-2 sm:p-4">
+                                {fileType === "view2d" ? (
+                                    <ViewModalWrapper pdf={user?.drawing2Dfiles[user?.drawing2Dfiles.length - 1]?.fileUrl || null} />
+                                ) : fileType === "view3d" ? (
+                                    <ViewModalWrapper pdf={user?.drawing3Dfiles[user?.drawing3Dfiles.length - 1]?.fileUrl || null} />
+                                ) : fileType === "viewboq" ? (
+                                    <ViewModalWrapper pdf={user?.drawingBOQfiles[user?.drawingBOQfiles.length - 1]?.fileUrl || null} />
+                                ) : (
+                                    <ViewModalWrapper pdf={"https://ensiletadrawings.s3.ap-south-1.amazonaws.com/Webibee/2dview.pdf"} />
+                                )}
+                                {/* <ViewModalWrapper pdf={user?.drawing2Dfiles[user?.drawing2Dfiles.length - 1]?.fileUrl || null} /> */}
+                            </td>
+                        </motion.tr>
+                    ))}
+                </>
+            )}
+        </>
     );
 };
 
 export default ShuffleSortTable;
-
-
-interface User {
-    userName: string
-    email: string
-}

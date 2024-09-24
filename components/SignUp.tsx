@@ -107,26 +107,26 @@ export const SignUp = () => {
         <div className="rounded-md border-4 border-secondary bg-white shadow-xl m-4" >
             <div className="flex flex-wrap items-center">
                 <div className="hidden w-full xl:block xl:w-1/2">
-                <div className="p-4 sm:px-16 sm:py-0 space-y-5 text-center flex justify-center flex-col">
-                <div className="w-64 h-14 relative items-center flex justify-center">
-              <Image alt="logo" src={"/logo/newlogo.svg"} fill />
-            </div>
-            <span className="mt-15 inline-block">
-              <Image
-                src="/cover/ensiletaclients.png"
-                alt="clients"
-                width={450}
-                height={250}
-              />
-            </span>
-          </div>
+                    <div className="p-4 sm:px-16 sm:py-0 space-y-5 text-center flex justify-center flex-col">
+                        <div className="w-64 h-14 relative items-center flex justify-center">
+                            <Image alt="logo" src={"/logo/newlogo.png"} fill />
+                        </div>
+                        <span className="mt-15 inline-block">
+                            <Image
+                                src="/cover/ensiletaclients.png"
+                                alt="clients"
+                                width={450}
+                                height={250}
+                            />
+                        </span>
+                    </div>
                 </div>
 
                 <div className="w-full p-4 sm:px-6 sm:py-0 xl:w-1/2 xl:border-l-2">
                     <div className="w-full p-4 sm:p-12.5 xl:p-17.5 text-[#0E132A]">
                         {/* <span className="mb-1.5 block font-medium text-sm md:text-base">Start for free</span> */}
                         <h2 className="mb-6 text-lg font-bold text-[#0E132A] md:text-2xl">
-                           Create a New Account
+                            Create a New Account
                         </h2>
 
                         <form onSubmit={handleSubmit(onSubmit)} className='space-y-4' >

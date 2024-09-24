@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery } from '@apollo/client';
-import { GET_USER, UPDATE_USER } from '@/lib/Queries';
+import { GET_USER, GET_USERS, UPDATE_USER } from '@/lib/Queries';
 import toast from 'react-hot-toast';
 import { Loader } from '../Loader';
 
@@ -24,7 +24,8 @@ type FormData = z.infer<typeof schema>;
 export const CustomerInfoForm = () => {
     const { data, loading, error } = useQuery(GET_USER);
     const [updateUser] = useMutation(UPDATE_USER);
-    // console.log(data);
+    // const { data: usersData } = useQuery(GET_USERS);
+    // console.log(usersData);
 
     const {
         register,

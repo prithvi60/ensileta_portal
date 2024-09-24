@@ -3,16 +3,16 @@ export const typeDefs = `#graphql
   scalar Upload
 
   type User {
-    id: Int!
-    username: String!
-    email: String!
+    id: Int
+    username: String
+    email: String
     company_name: String
     phone_number: String
     address: String
     role: String
-    drawing2Dfiles: [File!]
-    drawing3Dfiles: [File!]
-    drawingBOQfiles: [File!]
+    drawing2Dfiles: [Drawing2D]
+    drawing3Dfiles: [Drawing3D]
+    drawingBOQfiles: [DrawingBOQ]
   }
 
   type AccessControl {
@@ -31,6 +31,40 @@ export const typeDefs = `#graphql
     createdAt: SortOrder
   }
 
+  type Drawing2D {
+    id: Int
+    filename: String
+    fileUrl: String
+    version: Int
+    userId: String
+    createdAt: String
+  }
+
+  type Drawing3D {
+    id: Int
+    filename: String
+    fileUrl: String
+    version: Int
+    userId: String
+    createdAt: String
+  }
+
+  type DrawingBOQ {
+    id: Int
+    filename: String
+    fileUrl: String
+    version: Int
+    userId: String
+    createdAt: String
+  }
+
+
+  type UploadS3{
+    file: String!
+    filename: String!
+    userName: String!
+  }
+
   type File {
     id: ID!
     filename: String!
@@ -40,20 +74,15 @@ export const typeDefs = `#graphql
     createdAt: String!
   }
 
-  type UploadS3{
-    file: String!
-    filename: String!
-    userName: String!
-  }
-
   type Query {
     user: User
-    users: User
+    users: [User]
     getAllAccessControlUsers: [AccessControl]!
-    getAll2DFiles: [File!]!
-    getAll3DFiles: [File!]!
-    getAllBOQFiles: [File!]!
+    getAll2DFiles: [Drawing2D!]!
+    getAll3DFiles: [Drawing3D!]!
+    getAllBOQFiles: [DrawingBOQ!]!
   }
+  
 
   type Mutation {
     signUp(
@@ -74,9 +103,9 @@ export const typeDefs = `#graphql
       address: String!
     ): User
     uploadFileToS3Storage(file: String!, filename: String!, userName: String!) : File!
-    upload2DFile(fileUrl: String!, filename: String!) : File!
-    upload3DFile(fileUrl: String!, filename: String!) : File!
-    uploadBOQFile(fileUrl: String!, filename: String!) : File! 
+    upload2DFile(fileUrl: String!, filename: String!, userId: Int!) : Drawing2D!
+    upload3DFile(fileUrl: String!, filename: String!, userId: Int!) : Drawing3D!
+    uploadBOQFile(fileUrl: String!, filename: String!, userId: Int!) : DrawingBOQ! 
     uploadAccessControlUsers(
       email: String!,
       password: String!

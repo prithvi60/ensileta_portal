@@ -76,19 +76,32 @@ export default function ModernCarousel({ pdf, version, id }: { pdf: string, vers
             </button>
             <div className="absolute inset-0 z-[5] backdrop-blur-xl cursor-pointer">
                 <AnimatePresence initial={false} custom={trend}>
-                    <motion.img
-                        onClick={() => openLightboxOnSlide(imageIndex)}
-                        variants={imgVariants}
-                        custom={trend}
-                        initial="initial"
-                        animate="animate"
-                        exit="exit"
-                        key={imgs[imageIndex]}
-                        src={imgs[imageIndex]}
-                        alt={"image"}
-                        style={{ y: "-50%", x: "-50%" }}
-                        className="aspect-square max-h-[90%] max-w-[calc(100%_-_80px)] mx-auto bg-black object-cover shadow-2xl absolute left-1/2 top-1/2"
-                    />
+                    {imgs.length > 0 ? (
+                        <motion.img
+                            onClick={() => openLightboxOnSlide(imageIndex)}
+                            variants={imgVariants}
+                            custom={trend}
+                            initial="initial"
+                            animate="animate"
+                            exit="exit"
+                            key={imgs[imageIndex]}
+                            src={imgs[imageIndex]}
+                            alt={"image"}
+                            style={{ y: "-50%", x: "-50%" }}
+                            className="aspect-square max-h-[90%] max-w-[calc(100%_-_80px)] mx-auto bg-black object-cover shadow-2xl absolute left-1/2 top-1/2"
+                        />) : (<motion.img
+                            onClick={() => openLightboxOnSlide(imageIndex)}
+                            variants={imgVariants}
+                            custom={trend}
+                            initial="initial"
+                            animate="animate"
+                            exit="exit"
+                            key={imgs[imageIndex]}
+                            src={"/logo/newlogo.png"}
+                            alt={"image"}
+                            style={{ y: "-50%", x: "-50%" }}
+                            className="aspect-video max-h-[90%] max-w-[calc(100%_-_80px)] mx-auto bg-black object-contain shadow-2xl absolute left-1/2 top-1/2"
+                        />)}
                 </AnimatePresence>
             </div>
             <button
