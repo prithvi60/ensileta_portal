@@ -54,8 +54,8 @@ const Header = (props: {
           {/* <!-- Hamburger Toggle BTN --> */}
           {/* </div> */}
           {/* <div > */}
-          <div className="w-64 h-14 relative hidden sm:block">
-            <Image alt="logo" src={"/logo/newlogo.svg"} fill />
+          <div className="w-64 h-10 relative hidden sm:block">
+            <Image alt="logo" src={"/logo/newlogo.png"} fill />
           </div>
           {/* <div className=""> */}
           <div className="hidden sm:block">
