@@ -16,9 +16,9 @@ interface Data {
 const ShuffleSortTable = ({ uploadFile, data, fileType }: Data) => {
 
     return (
-        // <div className=" w-full bg-primary">
+        <div className="md:w-full w-[90vw] overflow-hidden">
         <Table uploadFile={uploadFile} fileType={fileType} data={data} />
-        // </div >/
+        </div >
     );
 };
 

@@ -130,7 +130,7 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({ data, uploadFile, ti
         }
     };
     return (
-        <div className='h-full w-full p-10 space-y-5'>
+        <div className='w-full py-10 md:p-10 space-y-5'>
             <h2 className='text-3xl w-full text-center font-semibold caption-bottom tracking-wide mb-10'>{title}</h2>
             {RoleBased?.user?.role === "super admin" ? (
                 // Table format User Details for super admin
