@@ -90,6 +90,7 @@ export default function ModernCarousel({ pdf, version, id }: { pdf: string, vers
                             alt={"image"}
                             style={{ y: "-50%", x: "-50%" }}
                             className="aspect-square max-h-[90%] max-w-[calc(100%_-_80px)] mx-auto bg-black object-cover shadow-2xl absolute left-1/2 top-1/2"
+                            onContextMenu={(e) => e.preventDefault()} // Disable right-click
                         />) : (<motion.img
                             onClick={() => openLightboxOnSlide(imageIndex)}
                             variants={imgVariants}
@@ -102,9 +103,11 @@ export default function ModernCarousel({ pdf, version, id }: { pdf: string, vers
                             alt={"image"}
                             style={{ y: "-50%", x: "-50%" }}
                             className="aspect-video max-h-[90%] max-w-[calc(100%_-_80px)] mx-auto bg-black object-contain shadow-2xl absolute left-1/2 top-1/2"
+                            onContextMenu={(e) => e.preventDefault()} // Disable right-click
                         />)}
                 </AnimatePresence>
             </div>
+            <div className="absolute inset-0 z-[10] pointer-events-none" /> {/* Transparent overlay */}
             <button
                 onClick={() => {
                     setPrevIdx(idx);
@@ -149,7 +152,15 @@ export default function ModernCarousel({ pdf, version, id }: { pdf: string, vers
             <FsLightbox
                 exitFullscreenOnClose={true}
                 toggler={lightboxController.toggler}
-                sources={imgs}
+                sources={imgs.map((img) => (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                        key={img}
+                        src={img}
+                        alt="image"
+                        onContextMenu={(e) => e.preventDefault()} // Disable right-click
+                    />
+                ))}
                 type="image"
                 slide={lightboxController.slide}
                 onClose={() => setToggle(false)}

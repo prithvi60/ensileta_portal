@@ -50,7 +50,7 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
   // console.log(fileType);
 
   const lastItem = data?.[data?.length - 1] || null;
-  console.log(data);
+//   console.log(data);
 
   // Unique localStorage key for each user and file type
   const localStorageKey = `isApproved_${userId}_${fileType}`;
