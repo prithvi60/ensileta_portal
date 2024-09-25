@@ -8,7 +8,7 @@ import {
 
 export const Loader = () => {
     return (
-        <div className="grid h-full place-content-center p-4">
+        <div className="grid h-full place-content-center p-4 mt-48">
             <ShuffleLoader />
         </div>
     );
