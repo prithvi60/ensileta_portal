@@ -10,6 +10,7 @@ import { z } from "zod";
 import toast from "react-hot-toast";
 import Image from "next/image";
 
+
 const schema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters long"),
@@ -72,6 +73,44 @@ export const SignIn = () => {
         //     (router.push("/portal/dashboard/view2d")) :
         //     (router.push("/portal/dashboard/customerProfile"))
         // }
+        // Conditional routing based on fetched role
+        // if (loading) {
+        //   toast.info("Fetching user role...", { position: "top-right" });
+        // } else if (error) {
+        //   console.error("Error fetching user role:", error);
+        //   toast.error("An error occurred while fetching your role.", {
+        //     position: "top-right",
+        //   });
+        // } else if (data.role === "super_admin") {
+        //   router.push("/portal/dashboard/view2d");
+        //   toast.success("Logged in successfully (Super Admin)", {
+        //     position: "top-right",
+        //     duration: 3000,
+        //     style: {
+        //       border: "1px solid #499d49",
+        //       padding: "16px",
+        //       color: "#499d49",
+        //     },
+        //     iconTheme: {
+        //       primary: "#499d49",
+        //       secondary: "#FFFAEE",
+        //     },
+        //   });
+        // } else if (data.role === "admin") {
+        //   router.push("/portal/dashboard/customerProfile");
+        //   toast.success("Logged in successfully (Admin)", {
+        //     position: "top-right",
+        //     duration: 3000,
+        //     style: {
+        //       border: "1px solid #499d49",
+        //       padding: "16px",
+        //       color: "#499d49",
+        //     },
+        //     iconTheme: {
+        //       primary: "#499d49",
+        //       secondary: "#FFFAEE",
+        //     },
+        //   });
         (router.push("/portal/dashboard/customerProfile"))
         toast.success("Logged in successfully", {
           position: "top-right",
