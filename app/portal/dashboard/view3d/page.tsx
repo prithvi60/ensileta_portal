@@ -26,7 +26,6 @@ const Page = () => {
     const pathname = usePathname();
     const fileType = pathname.split('/').pop();
 
-
     return (
         <DefaultLayout>
             <section className='h-full w-full'>
@@ -89,12 +88,12 @@ export default Page;
 //                         position: "top-right",
 //                         duration: 3000,
 //                         style: {
-//                             border: '1px solid #63b6b3',
+//                             border: '1px solid #65a34e',
 //                             padding: '16px',
-//                             color: '#63b6b3',
+//                             color: '#65a34e',
 //                         },
 //                         iconTheme: {
-//                             primary: '#63b6b3',
+//                             primary: '#65a34e',
 //                             secondary: '#FFFAEE',
 //                         },
 //                     })

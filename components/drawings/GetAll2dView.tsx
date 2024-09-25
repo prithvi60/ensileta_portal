@@ -31,6 +31,8 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({ data, uploadFile, ti
     const { data: session } = useSession()
     // const superAdmin = allUsers.users.filter((val: any) => val.role === "super admin")
     const filteredData = allUsers.users.filter((val: any) => val.role === "admin")
+    const SAfilteredData = allUsers.users.filter((val: any) => val.role === "super admin")
+    // console.log(SAfilteredData?.email);
 
     const lastItem = data?.[data?.length - 1] || null;
     const handleSendEmail = async () => {
@@ -43,7 +45,7 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({ data, uploadFile, ti
                 },
                 // Session info not changing based after update
                 body: JSON.stringify({
-                    recipientEmail: `${session?.user?.email}`,
+                    recipientEmail: `${SAfilteredData?.email}`,
                     subject: 'Version Changed',
                     message: 'New Change',
                 }),
@@ -59,12 +61,12 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({ data, uploadFile, ti
                     position: "top-right",
                     duration: 3000,
                     style: {
-                        border: '1px solid #63b6b3',
+                        border: '1px solid #65a34e',
                         padding: '16px',
-                        color: '#63b6b3',
+                        color: '#65a34e',
                     },
                     iconTheme: {
-                        primary: '#63b6b3',
+                        primary: '#65a34e',
                         secondary: '#FFFAEE',
                     },
                 });
@@ -76,12 +78,12 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({ data, uploadFile, ti
                 position: "top-right",
                 duration: 3000,
                 style: {
-                    border: '1px solid #9d4949',
+                    border: '1px solid #EB1C23',
                     padding: '16px',
-                    color: '#9d4949',
+                    color: '#EB1C23',
                 },
                 iconTheme: {
-                    primary: '#9d4949',
+                    primary: '#EB1C23',
                     secondary: '#FFFAEE',
                 },
             });

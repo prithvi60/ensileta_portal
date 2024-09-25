@@ -25,11 +25,11 @@ const ShuffleSortTable = ({ uploadFile, data, fileType }: Data) => {
 const Table = ({ uploadFile, data, fileType }: Data) => {
 
     return (
-        <div className="w-full bg-white shadow-lg rounded-lg overflow-x-hidden">
+        <div className="w-full bg-white shadow-lg rounded-lg overflow-x-auto">
             <table className="w-full min-w-[500px]">
                 <thead>
                     <tr className="border-b-[1px] border-slate-200 text-slate-400 text-sm uppercase">
-                        <th className="text-start p-2 sm:p-4 font-medium">Team Member</th>
+                        <th className="text-start p-2 sm:p-4 font-medium">Company</th>
                         <th className="text-start p-2 sm:p-4 font-medium">Version</th>
                         <th className="text-start p-2 sm:p-4 font-medium">File Upload</th>
                         <th className="text-start p-2 sm:p-4 font-medium">View File</th>
@@ -68,7 +68,7 @@ const TableRows = ({ uploadFile, data, fileType }: TableRowsProps) => {
                         <motion.tr className="text-xs sm:text-sm" key={user.id}>
                             <td className="p-2 sm:p-4 flex items-center gap-3 overflow-hidden">
                                 <div>
-                                    <span className="block mb-1 font-medium">{user.username}</span>
+                                    <span className="block mb-1 font-medium">{user.company_name}</span>
                                     <span className="block text-xs text-slate-500">{user.email}</span>
                                 </div>
                             </td>
@@ -86,9 +86,8 @@ const TableRows = ({ uploadFile, data, fileType }: TableRowsProps) => {
                                 ) : fileType === "viewboq" ? (
                                     <ViewModalWrapper pdf={user?.drawingBOQfiles[user?.drawingBOQfiles.length - 1]?.fileUrl || null} />
                                 ) : (
-                                    <ViewModalWrapper pdf={"https://ensiletadrawings.s3.ap-south-1.amazonaws.com/Webibee/2dview.pdf"} />
+                                    <ViewModalWrapper pdf={""} />
                                 )}
-                                {/* <ViewModalWrapper pdf={user?.drawing2Dfiles[user?.drawing2Dfiles.length - 1]?.fileUrl || null} /> */}
                             </td>
                         </motion.tr>
                     ))}

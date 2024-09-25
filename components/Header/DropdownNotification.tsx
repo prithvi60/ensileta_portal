@@ -12,7 +12,7 @@ const DropdownNotification = () => {
 
   return (
     <>
-      <ClickOutside onClick={() => setDropdownOpen(false)} className="relative">
+      {/* <ClickOutside onClick={() => setDropdownOpen(false)} className="relative">
         <li>
           <Link
             onClick={() => {
@@ -64,8 +64,6 @@ const DropdownNotification = () => {
                       <span className="text-black ">
                         welcome to ensileta portal
                       </span>{" "}
-                      {/* Sint occaecat cupidatat non proident, sunt in culpa qui
-                      officia deserunt mollit anim. */}
                     </p>
 
                     <p className="text-xs">12 May, 2025</p>
@@ -75,7 +73,7 @@ const DropdownNotification = () => {
             </div>
           )}
         </li>
-      </ClickOutside>
+      </ClickOutside> */}
       <button onClick={handleLogout} type="submit" className='ml-2 cursor-pointer px-5 py-2 shadow-md select-none bg-secondary text-white hover:bg-[#0E122B]'>Log Out</button>
     </>
   );

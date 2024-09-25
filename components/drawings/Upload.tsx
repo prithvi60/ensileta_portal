@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 export default function UploadFile({ uploadFile, setIsOpen, userId }: { uploadFile: any, setIsOpen: any, userId: number }) {
     const [file, setFile] = useState<File | null>(null);
     const [size, setSize] = useState<boolean>(false);
+    const [loadingButton, setLoadingButton] = useState<string>("Upload File");
     const { data: session } = useSession()
 
     const userName = session?.user?.name || 'anonymous';
@@ -15,10 +16,7 @@ export default function UploadFile({ uploadFile, setIsOpen, userId }: { uploadFi
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const uploadedFile = e.target.files?.[0] || null;
         setFile(uploadedFile);
-
     };
-
-    // console.log(file);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -29,12 +27,12 @@ export default function UploadFile({ uploadFile, setIsOpen, userId }: { uploadFi
                 position: "top-right",
                 duration: 3000,
                 style: {
-                    border: '1px solid #9d4949',
+                    border: '1px solid #EB1C23',
                     padding: '16px',
-                    color: '#9d4949',
+                    color: '#EB1C23',
                 },
                 iconTheme: {
-                    primary: '#9d4949',
+                    primary: '#EB1C23',
                     secondary: '#FFFAEE',
                 },
             });
@@ -43,6 +41,7 @@ export default function UploadFile({ uploadFile, setIsOpen, userId }: { uploadFi
         }
 
         try {
+            setLoadingButton("Uploading...");
             const formData = new FormData();
             formData.append('file', file);
             formData.append('filename', file.name);
@@ -68,12 +67,12 @@ export default function UploadFile({ uploadFile, setIsOpen, userId }: { uploadFi
                     position: "top-right",
                     duration: 3000,
                     style: {
-                        border: '1px solid #63b6b3',
+                        border: '1px solid #65a34e',
                         padding: '16px',
-                        color: '#63b6b3',
+                        color: '#65a34e',
                     },
                     iconTheme: {
-                        primary: '#63b6b3',
+                        primary: '#65a34e',
                         secondary: '#FFFAEE',
                     },
                 })
@@ -85,15 +84,17 @@ export default function UploadFile({ uploadFile, setIsOpen, userId }: { uploadFi
                 position: "top-right",
                 duration: 3000,
                 style: {
-                    border: '1px solid #9d4949',
+                    border: '1px solid #EB1C23',
                     padding: '16px',
-                    color: '#9d4949',
+                    color: '#EB1C23',
                 },
                 iconTheme: {
-                    primary: '#9d4949',
+                    primary: '#EB1C23',
                     secondary: '#FFFAEE',
                 },
             });
+        } finally {
+            setLoadingButton("Upload");
         }
     };
 
@@ -105,7 +106,7 @@ export default function UploadFile({ uploadFile, setIsOpen, userId }: { uploadFi
             {size && (
                 <p className="text-sm -mt-3.5 text-warning text-center font-bold tracking-wide">File size exceeds 10 MB</p>
             )}
-            <button type="submit" className='cursor-pointer w-full p-4 shadow-md select-none bg-secondary text-white hover:bg-[#0E122B]'>Upload File</button>
+            <button disabled={file === null ? true : false} type="submit" className='cursor-pointer w-full p-4 shadow-md select-none bg-secondary text-white hover:bg-[#0E122B] disabled:bg-opacity-60 disabled:cursor-not-allowed'>{loadingButton}</button>
         </form>
     );
 }

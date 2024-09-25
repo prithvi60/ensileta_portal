@@ -134,8 +134,9 @@ export const resolvers = {
   Mutation: {
     signUp: async (
       _: any,
-      { username, email, password, confirmPassword }: any
+      { username, email, company_name, password, confirmPassword }: any
     ) => {
+      console.log({ username, email, company_name, password, confirmPassword });
       try {
         // Validate password match
         if (password !== confirmPassword) {
@@ -159,7 +160,9 @@ export const resolvers = {
           data: {
             username,
             email,
+            company_name,
             password: hashedPwd,
+            role: "admin",
           },
         });
 
@@ -336,6 +339,10 @@ export const resolvers = {
       // Find the latest version of the file with the same filename for the user
       const existingFile = await prisma.drawing_2D.findMany();
 
+      const existingUser = await prisma.users.findUnique({
+        where: { id: userId },
+      });
+
       // Determine the new version number
       const newVersion = existingFile.length;
 
@@ -355,12 +362,12 @@ export const resolvers = {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          to: "prithvi@webibee.com",
+          to: `${existingUser?.email}`,
           subject: "2D Drawing File Upload Notification",
           message: "2D Drawing File Uploaded  Successful",
         }),
       });
-      console.log("after");
+
       return createdFile;
     },
     upload3DFile: async (
@@ -373,6 +380,10 @@ export const resolvers = {
     ) => {
       // Find the latest version of the file with the same filename for the user
       const existingFile = await prisma.drawing_3D.findMany();
+
+      const existingUser = await prisma.users.findUnique({
+        where: { id: userId },
+      });
 
       // Determine the new version number
       const newVersion = existingFile.length;
@@ -393,7 +404,7 @@ export const resolvers = {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          to: "prithvi@webibee.com",
+          to: `${existingUser?.email}`,
           subject: "3D Drawing File Upload Notification",
           message: "3D Drawing File Uploaded  Successful",
         }),
@@ -410,6 +421,10 @@ export const resolvers = {
     ) => {
       // Find the latest version of the file with the same filename for the user
       const existingFile = await prisma.drawing_BOQ.findMany();
+
+      const existingUser = await prisma.users.findUnique({
+        where: { id: userId },
+      });
 
       // Determine the new version number
       const newVersion = existingFile.length;
@@ -430,7 +445,7 @@ export const resolvers = {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          to: "prithvi@webibee.com",
+          to: `${existingUser?.email}`,
           subject: "BOQ  Drawing File Upload Notification",
           message: "BOQ  Drawing File Uploaded  Successful",
         }),
