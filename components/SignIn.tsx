@@ -9,12 +9,11 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import toast from "react-hot-toast";
 import Image from "next/image";
-import { useQuery } from "@apollo/client";
-import { GET_USER } from "@/lib/Queries";
 
 const schema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters long"),
+  // role: z.string()
 });
 
 type FormFields = z.infer<typeof schema>;
@@ -22,16 +21,28 @@ type FormFields = z.infer<typeof schema>;
 export const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
-  const { data: RoleBased } = useQuery(GET_USER);
+
   const {
     register,
     handleSubmit,
     setError,
-    formState: { errors, isSubmitting, isValid },
+    formState: { errors, isSubmitting, isValid }, watch
   } = useForm<FormFields>({
     resolver: zodResolver(schema),
     mode: "onChange",
+
   });
+
+  // const email = watch("email");
+  // console.log(email);
+
+
+  // const { loading, error, data: RoleBased } = useQuery(GET_USER_ROLE, {
+  //   variables: { email },
+  // });
+
+  // console.log("ad", RoleBased);
+
 
   const onSubmit: SubmitHandler<FormFields> = async (data) => {
     try {
@@ -56,11 +67,12 @@ export const SignIn = () => {
           },
         });
       } else {
-        {
-          RoleBased?.user?.role === "super admin" ?
-            (router.push("/portal/dashboard/view2d")) :
-            (router.push("/portal/dashboard/customerProfile"))
-        }
+        // {
+        //   RoleBased?.user?.role === "super admin" ?
+        //     (router.push("/portal/dashboard/view2d")) :
+        //     (router.push("/portal/dashboard/customerProfile"))
+        // }
+        (router.push("/portal/dashboard/customerProfile"))
         toast.success("Logged in successfully", {
           position: "top-right",
           duration: 3000,

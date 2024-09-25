@@ -65,6 +65,14 @@ export const GET_USER = gql`
   }
 `;
 
+export const GET_USER_ROLE = gql`
+  query GetUserRole($email: String!) {
+    user(email: $email) {
+      role
+    }
+  }
+`;
+
 // export const GET_USERS = gql`
 //   query GetUsers {
 //     users {
