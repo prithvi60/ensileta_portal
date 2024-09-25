@@ -9,6 +9,8 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import toast from "react-hot-toast";
 import Image from "next/image";
+import { useQuery } from "@apollo/client";
+import { GET_USER } from "@/lib/Queries";
 
 const schema = z.object({
   email: z.string().email("Invalid email address"),
@@ -20,6 +22,7 @@ type FormFields = z.infer<typeof schema>;
 export const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const { data: RoleBased } = useQuery(GET_USER);
   const {
     register,
     handleSubmit,
@@ -43,17 +46,21 @@ export const SignIn = () => {
           position: "top-right",
           duration: 3000,
           style: {
-            border: "1px solid #9d4949",
+            border: "1px solid #EB1C23",
             padding: "16px",
-            color: "#9d4949",
+            color: "#EB1C23",
           },
           iconTheme: {
-            primary: "#9d4949",
+            primary: "#EB1C23",
             secondary: "#FFFAEE",
           },
         });
       } else {
-        router.push("/portal/dashboard/customerProfile");
+        {
+          RoleBased?.user?.role === "super admin" ?
+            (router.push("/portal/dashboard/view2d")) :
+            (router.push("/portal/dashboard/customerProfile"))
+        }
         toast.success("Logged in successfully", {
           position: "top-right",
           duration: 3000,

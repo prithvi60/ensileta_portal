@@ -4,6 +4,7 @@ import { useState } from "react";
 import UploadFile from "./Upload";
 import FsLightbox from "fslightbox-react";
 import { usePDFJS } from "@/hooks/usePdfJS";
+import toast from "react-hot-toast";
 
 const ModalWrapper = ({ uploadFile, userId }: { uploadFile: any, userId: number }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -57,6 +58,26 @@ export const ViewModalWrapper = ({ pdf }: { pdf: string }) => {
     const [toggle, setToggle] = useState(false)
     const [imgs, setImgs] = useState<string[]>([]);
 
+    const handleClick = () => {
+        if (imgs.length !== 0) {
+            setToggle(!toggle)
+        } else {
+            toast.error("First, upload the file", {
+                position: "top-right",
+                duration: 3000,
+                style: {
+                    border: "1px solid #EB1C23",
+                    padding: "16px",
+                    color: "#EB1C23",
+                },
+                iconTheme: {
+                    primary: "#EB1C23",
+                    secondary: "#FFFAEE",
+                },
+            });
+        }
+    }
+
     usePDFJS(async (pdfjs) => {
         try {
 
@@ -102,9 +123,9 @@ export const ViewModalWrapper = ({ pdf }: { pdf: string }) => {
     return (
         <div>
             <button
-                disabled={imgs.length === 0 ? true : false}
-                onClick={() => setToggle(!toggle)}
-                className={`w-max cursor-pointer py-4 px-10 text-white bg-secondary mb-5 hover:bg-[#0E122B] transition-colors disabled:bg-opacity-70 disabled:cursor-not-allowed`}
+                // disabled={imgs.length === 0 ? true : false}
+                onClick={handleClick}
+                className={`w-max cursor-pointer py-4 px-10 text-white bg-secondary mb-5 hover:bg-[#0E122B] transition-colors `}
             >View</button>
             <FsLightbox
                 exitFullscreenOnClose={true}

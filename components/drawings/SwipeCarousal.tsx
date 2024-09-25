@@ -57,6 +57,7 @@ export default function ModernCarousel({ pdf, version, id }: { pdf: string, vers
         }
     });
 
+
     const trend = idx > prevIdx ? 1 : -1;
 
     const imageIndex = Math.abs(idx % imgs.length);

@@ -21,8 +21,8 @@ const config: Config = {
       colors: {
         primary: "#394b7a",
         secondary: "#65a34e",
-        success: "#499d49",
-        warning: "#9d4949", //upto this
+        success: "#65a34e",
+        warning: "#EB1C23", //upto this
         danger: "#D34053",
         current: "currentColor",
         transparent: "transparent",

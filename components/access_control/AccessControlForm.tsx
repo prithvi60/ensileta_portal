@@ -39,12 +39,12 @@ const AccessControlForm = () => {
                     position: "top-right",
                     duration: 3000,
                     style: {
-                        border: '1px solid #9d4949',
+                        border: '1px solid #EB1C23',
                         padding: '16px',
-                        color: '#9d4949',
+                        color: '#EB1C23',
                     },
                     iconTheme: {
-                        primary: '#9d4949',
+                        primary: '#EB1C23',
                         secondary: '#FFFAEE',
                     },
                 });
@@ -53,12 +53,12 @@ const AccessControlForm = () => {
                     position: "top-right",
                     duration: 3000,
                     style: {
-                        border: '1px solid #63b6b3',
+                        border: '1px solid #65a34e',
                         padding: '16px',
-                        color: '#63b6b3',
+                        color: '#65a34e',
                     },
                     iconTheme: {
-                        primary: '#63b6b3',
+                        primary: '#65a34e',
                         secondary: '#FFFAEE',
                     },
                 });
@@ -71,12 +71,12 @@ const AccessControlForm = () => {
                 position: "top-right",
                 duration: 3000,
                 style: {
-                    border: '1px solid #9d4949',
+                    border: '1px solid #EB1C23',
                     padding: '16px',
-                    color: '#9d4949',
+                    color: '#EB1C23',
                 },
                 iconTheme: {
-                    primary: '#9d4949',
+                    primary: '#EB1C23',
                     secondary: '#FFFAEE',
                 }
             });
