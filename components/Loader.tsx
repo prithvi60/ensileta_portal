@@ -25,7 +25,7 @@ const TRANSITION: DynamicAnimationOptions = {
     duration: DURATION_IN_SECS,
 };
 
-const ShuffleLoader = () => {
+export const ShuffleLoader = () => {
     const [blocks, setBlocks] = useState(
         Array.from(Array(NUM_BLOCKS).keys()).map((n) => ({ id: n }))
     );

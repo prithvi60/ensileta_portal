@@ -1,7 +1,7 @@
 "use client"
 import { CustomerInfoForm } from '@/components/customer_info/CustomerInfoForm'
 import DefaultLayout from '@/components/Layout/DefaultLayout'
-import { Loader } from '@/components/Loader'
+import { Loader, ShuffleLoader } from '@/components/Loader'
 import { GET_USER } from '@/lib/Queries'
 import { useQuery } from '@apollo/client'
 import Image from 'next/image'
@@ -13,8 +13,8 @@ const Page = () => {
     return (
         <DefaultLayout>
             <div className="mx-auto max-w-242.5">
-                {loading ? (<div className='w-full h-screen'>
-                    <Loader />
+                {loading ? (<div className='w-full h-screen flex justify-center mt-32'>
+                    <ShuffleLoader />
                 </div>) : (<>
                     {data?.user?.role === "admin" || data?.user?.role === "super admin" ? (<div className="overflow-hidden rounded-sm border border-stroke bg-white shadow-default">
                         <div className="relative z-20 h-35 md:h-65">
