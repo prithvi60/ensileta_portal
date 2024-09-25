@@ -2,12 +2,12 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useMutation } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import toast from 'react-hot-toast';
-import { SIGN_UP } from '@/lib/Queries';
+import { GET_USERS, SIGN_UP } from '@/lib/Queries';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -41,6 +41,10 @@ export const SignUp = () => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const router = useRouter();
     const [signUp] = useMutation(SIGN_UP);
+    // const { data: AllUsers } = useQuery(GET_USERS);
+    // const SAfilteredData = AllUsers.users.filter((val: any) => val.role === "super admin")
+    // console.log(SAfilteredData);
+
 
     const {
         register,
@@ -53,12 +57,31 @@ export const SignUp = () => {
     });
 
     const onSubmit: SubmitHandler<FormFields> = async (data) => {
-        console.log("submitted", data);
+        // console.log("submitted", data);
 
         try {
             const { data: result } = await signUp({ variables: { ...data } });
 
-            if (result) {
+            const response = await fetch('/api/sendMail', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                // Session info not changing based after update
+                body: JSON.stringify({
+                    recipientEmail: `prithvi@webibee.com`,
+                    subject: 'New Account Created',
+                    message: `Successfully created an new account for ${data.company_name} Company`,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const allData = await response.json();
+
+            if (result && allData) {
                 router.push("/api/auth/signin");
                 toast.success('Signed up successfully', {
                     position: "top-right",

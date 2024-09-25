@@ -5,11 +5,12 @@ import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
 
 
-export default function UploadFile({ uploadFile, setIsOpen, userId }: { uploadFile: any, setIsOpen: any, userId: number }) {
+export default function UploadFile({ uploadFile, setIsOpen, userId, email, fileType }: { uploadFile: any, setIsOpen: any, userId: number, email: string, fileType: string }) {
     const [file, setFile] = useState<File | null>(null);
     const [size, setSize] = useState<boolean>(false);
     const [loadingButton, setLoadingButton] = useState<string>("Upload File");
     const { data: session } = useSession()
+    // console.log({ email, fileType });
 
     const userName = session?.user?.name || 'anonymous';
 
@@ -52,12 +53,28 @@ export default function UploadFile({ uploadFile, setIsOpen, userId }: { uploadFi
                 body: formData,
             });
 
-            if (!response.ok) {
+            const res = await fetch('/api/sendMail', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    recipientEmail: `liwoc58139@sgatra.com`,
+                    subject: fileType === "view2d" ? '2D Drawing File Upload Notification' :
+                        fileType === "view3d" ? '3D Drawing File Upload Notification' : fileType === "viewboq" ? 'BOQ File Upload Notification' : 'Unknown File Type Notification',
+                    message: fileType === "view2d" ? '2D Drawing File Upload Successfully' :
+                        fileType === "view3d" ? '3D Drawing File Upload Successfully' : fileType === "viewboq" ? 'BOQ File Upload Successfully' : 'Unknown File Type Successfully',
+                }),
+            });
+
+            if (!response.ok && !res.ok) {
                 throw new Error('Failed to upload file');
             }
 
             const data = await response.json();
             const fileUrl = data.fileUrl;
+            console.log("uploading....");
+
             const result = await uploadFile({ variables: { fileUrl, filename: file.name, userId } })
 
             // console.log('File uploaded successfully:', response);

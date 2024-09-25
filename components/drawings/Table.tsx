@@ -76,7 +76,7 @@ const TableRows = ({ uploadFile, data, fileType }: TableRowsProps) => {
                                 {fileType === "view2d" ? (<span className="block mb-1 font-medium">{user.drawing2Dfiles.length}</span>) : fileType === "view3d" ? (<span className="block mb-1 font-medium">{user.drawing3Dfiles.length}</span>) : fileType === "viewboq" ? (<span className="block mb-1 font-medium">{user.drawingBOQfiles.length}</span>) : (<span className="block mb-1 font-medium">0</span>)}
                             </td>
                             <td className="p-2 sm:p-4">
-                                <ModalWrapper uploadFile={uploadFile} userId={user.id} />
+                                <ModalWrapper email={user.email} uploadFile={uploadFile} userId={user.id} fileType={fileType} />
                             </td>
                             <td className="p-2 sm:p-4">
                                 {fileType === "view2d" ? (
