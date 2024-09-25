@@ -25,6 +25,7 @@ interface GetAll2DViewProps {
   title: string;
   allUsers: any;
   fileType: string;
+  refetchUsers:any;
 }
 
 export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
@@ -33,15 +34,21 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
   title,
   allUsers,
   fileType,
+  refetchUsers
 }) => {
   const { data: RoleBased } = useQuery(GET_USER);
   // const { data: session } = useSession()
   const [isApproved, setIsApproved] = useState(false);
   const [isApproving, setIsApproving] = useState(false);
   // const superAdmin = allUsers.users.filter((val: any) => val.role === "super admin")
-  const filteredData = allUsers.users.filter(
-    (val: any) => val.role === "admin"
-  );
+  const [filteredData, setFilteredData] = useState<Array<any>>([]);
+
+  useEffect(() => {
+    // Update filteredData whenever allUsers changes
+    const admins = allUsers.users.filter((val: any) => val.role === "admin");
+    console.log("refetched",admins)
+    setFilteredData(admins);
+  }, [allUsers]);
   const SAfilteredData = allUsers.users.filter(
     (val: any) => val.role === "super admin"
   );
@@ -141,6 +148,8 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
       setIsApproving(false);
     }
   };
+
+
   return (
     <div className="h-full w-full pt-6 md:p-10 space-y-5">
       <h2 className="text-3xl w-full text-center font-semibold caption-bottom tracking-wide mb-10">
@@ -152,6 +161,7 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
           uploadFile={uploadFile}
           data={filteredData}
           fileType={fileType}
+          refetchUsers={refetchUsers}
         />
       ) : (
         <>

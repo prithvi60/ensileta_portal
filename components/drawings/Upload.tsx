@@ -5,12 +5,13 @@ import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
 
 
-export default function UploadFile({ uploadFile, setIsOpen, userId, email, fileType }: { uploadFile: any, setIsOpen: any, userId: number, email: string, fileType: string }) {
+export default function UploadFile({ uploadFile, setIsOpen, userId, email, fileType,refetchUsers }: { uploadFile: any, setIsOpen: any, userId: number, email: string, fileType: string ,refetchUsers:any}) {
     const [file, setFile] = useState<File | null>(null);
     const [size, setSize] = useState<boolean>(false);
     const [loadingButton, setLoadingButton] = useState<string>("Upload File");
     const { data: session } = useSession()
     // console.log({ email, fileType });
+
 
     const userName = session?.user?.name || 'anonymous';
 
@@ -73,7 +74,7 @@ export default function UploadFile({ uploadFile, setIsOpen, userId, email, fileT
 
             const data = await response.json();
             const fileUrl = data.fileUrl;
-            console.log("uploading....");
+            // console.log("uploading....");
 
             const result = await uploadFile({ variables: { fileUrl, filename: file.name, userId } })
 
@@ -93,6 +94,8 @@ export default function UploadFile({ uploadFile, setIsOpen, userId, email, fileT
                         secondary: '#FFFAEE',
                     },
                 })
+                // fetch from db
+                refetchUsers()
                 setIsOpen(false)
             }
         } catch (error: any) {

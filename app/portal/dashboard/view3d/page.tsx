@@ -22,7 +22,7 @@ interface GetAll3DViewResponse {
 const Page = () => {
     const [uploadFile] = useMutation(ADD_3D_FILENAME);
     const { data } = useQuery<GetAll3DViewResponse>(GET_ALL_3D_VIEW)
-    const { data: AllUsers, loading } = useQuery(GET_USERS);
+    const { data: AllUsers, loading,refetch } = useQuery(GET_USERS);
     const pathname = usePathname();
     const fileType = pathname.split('/').pop();
 
@@ -30,7 +30,7 @@ const Page = () => {
         <DefaultLayout>
             <section className='h-full w-full'>
                 {loading ? (<Loader />) : (
-                    <GetAll2dView data={data?.getAll3DFiles} allUsers={AllUsers} uploadFile={uploadFile} fileType={fileType || 'view2d'} title={"Your 3D Drawings"} />
+                    <GetAll2dView data={data?.getAll3DFiles} allUsers={AllUsers} uploadFile={uploadFile} fileType={fileType || 'view2d'} title={"Your 3D Drawings"} refetchUsers={refetch}/>
                 )}
             </section>
         </DefaultLayout>

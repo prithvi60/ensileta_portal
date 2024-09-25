@@ -22,7 +22,7 @@ interface GetAll2DViewResponse {
 const Page = () => {
     const [uploadFile] = useMutation(ADD_2D_FILENAME);
     const { data } = useQuery<GetAll2DViewResponse>(GET_ALL_2D_VIEW)
-    const { data: AllUsers, loading } = useQuery(GET_USERS);
+    const { data: AllUsers, loading,refetch } = useQuery(GET_USERS);
     const pathname = usePathname();
     const fileType = pathname.split('/').pop();
 
@@ -30,7 +30,7 @@ const Page = () => {
         <DefaultLayout>
             {loading ? (<Loader />) : (
                 <section className='h-full w-full'>
-                    <GetAll2dView data={data?.getAll2DFiles} allUsers={AllUsers} uploadFile={uploadFile} fileType={fileType || 'view2d'} title={"Your 2D Drawings"} />
+                    <GetAll2dView data={data?.getAll2DFiles} allUsers={AllUsers} uploadFile={uploadFile} fileType={fileType || 'view2d'} title={"Your 2D Drawings"} refetchUsers={refetch}/>
                 </section>
             )}
         </DefaultLayout>

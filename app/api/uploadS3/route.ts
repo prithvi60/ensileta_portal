@@ -24,17 +24,20 @@ export async function POST(req: Request) {
     // Parse the form data from the request
     const formData = await req.formData();
     const file = formData.get('file') as File;
-    const userName = formData.get('userName') as string;
-    const filename = formData.get('filename') as string;
+    const userNameUnformated = formData.get('userName') as string;
+    const filenameUnformated = formData.get('filename') as string;
+   
 
     // Check if required fields are present
-    if (!file || !filename || !userName) {
+    if (!file || !filenameUnformated || !userNameUnformated) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
     // Create a readable stream from the file
     const stream = file.stream();
 
+    const userName=userNameUnformated.split(" ")[0];
+    const filename=filenameUnformated.split(" ")[0];
     // Prepare S3 upload parameters
     const uploadParams = {
       Bucket: process.env.AWS_BUCKET_NAME,
