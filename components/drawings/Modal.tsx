@@ -6,7 +6,7 @@ import FsLightbox from "fslightbox-react";
 import { usePDFJS } from "@/hooks/usePdfJS";
 import toast from "react-hot-toast";
 
-const ModalWrapper = ({ uploadFile, userId }: { uploadFile: any, userId: number }) => {
+const ModalWrapper = ({ uploadFile, userId, email, fileType }: { uploadFile: any, userId: number, email: string, fileType: string }) => {
     const [isOpen, setIsOpen] = useState(false);
     return (
         <div>
@@ -15,12 +15,12 @@ const ModalWrapper = ({ uploadFile, userId }: { uploadFile: any, userId: number 
                 className={`w-max cursor-pointer py-4 px-10 text-white bg-secondary mb-5 hover:bg-[#0E122B] transition-colors`}
             >upload
             </button>
-            <SpringModal isOpen={isOpen} userId={userId} setIsOpen={setIsOpen} uploadFile={uploadFile} />
+            <SpringModal isOpen={isOpen} userId={userId} setIsOpen={setIsOpen} uploadFile={uploadFile} email={email} fileType={fileType} />
         </div>
     );
 };
 
-const SpringModal = ({ isOpen, setIsOpen, uploadFile, userId }: { isOpen: boolean, setIsOpen: Function, uploadFile: any, userId: number }) => {
+const SpringModal = ({ isOpen, setIsOpen, uploadFile, userId, email, fileType }: { isOpen: boolean, setIsOpen: Function, uploadFile: any, userId: number, email: string, fileType: string }) => {
     return (
         <AnimatePresence>
             {isOpen && (
@@ -43,7 +43,7 @@ const SpringModal = ({ isOpen, setIsOpen, uploadFile, userId }: { isOpen: boolea
                             <h3 className="text-3xl font-bold text-center mb-2">
                                 Upload File
                             </h3>
-                            <UploadFile uploadFile={uploadFile} userId={userId} setIsOpen={setIsOpen} />
+                            <UploadFile uploadFile={uploadFile} userId={userId} setIsOpen={setIsOpen} email={email} fileType={fileType} />
                         </div>
                     </motion.div>
                 </motion.div>

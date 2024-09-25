@@ -5,6 +5,7 @@ import ShuffleSortTable from './Table';
 import { GET_USER } from '@/lib/Queries';
 import { useQuery } from '@apollo/client';
 import toast from "react-hot-toast";
+import { useEffect, useState } from "react";
 
 
 interface FileData {
@@ -28,16 +29,51 @@ interface GetAll2DViewProps {
 export const GetAll2dView: React.FC<GetAll2DViewProps> = ({ data, uploadFile, title, allUsers, fileType }) => {
 
     const { data: RoleBased } = useQuery(GET_USER);
-    const { data: session } = useSession()
+    // const { data: session } = useSession()
+    const [isApproved, setIsApproved] = useState(false);
+    const [isApproving, setIsApproving] = useState(false);
     // const superAdmin = allUsers.users.filter((val: any) => val.role === "super admin")
     const filteredData = allUsers.users.filter((val: any) => val.role === "admin")
     const SAfilteredData = allUsers.users.filter((val: any) => val.role === "super admin")
-    // console.log(SAfilteredData?.email);
+    // console.log(SAfilteredData[0]?.email);
+    const userId = RoleBased?.user?.id
+    // console.log(fileType);
 
     const lastItem = data?.[data?.length - 1] || null;
+    console.log(data);
+
+
+    // Unique localStorage key for each user and file type
+    const localStorageKey = `isApproved_${userId}_${fileType}`;
+
+    // Check localStorage to see if the button has been approved before
+    useEffect(() => {
+        const approved = localStorage.getItem(localStorageKey);
+        if (approved === 'true') {
+            setIsApproved(true);
+        }
+    }, [localStorageKey]);
+
+    useEffect(() => {
+        if (lastItem?.id) {
+            const currentApprovalStatus = localStorage.getItem(localStorageKey);
+            if (currentApprovalStatus === 'true') {
+                const currentVersion = lastItem?.version;
+                const previouslyApprovedVersion = localStorage.getItem(`${localStorageKey}_version`);
+
+                if (previouslyApprovedVersion !== currentVersion.toString()) {
+                    setIsApproved(false);
+                    localStorage.removeItem(localStorageKey);
+                    localStorage.setItem(`${localStorageKey}_version`, currentVersion.toString());
+                }
+            }
+        }
+    }, [lastItem?.id, lastItem?.version]);
+
+
     const handleSendEmail = async () => {
         try {
-
+            setIsApproving(true);
             const response = await fetch('/api/sendMail', {
                 method: 'POST',
                 headers: {
@@ -45,7 +81,7 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({ data, uploadFile, ti
                 },
                 // Session info not changing based after update
                 body: JSON.stringify({
-                    recipientEmail: `${SAfilteredData?.email}`,
+                    recipientEmail: `${SAfilteredData[0]?.email}`,
                     subject: 'Version Changed',
                     message: 'New Change',
                 }),
@@ -57,6 +93,8 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({ data, uploadFile, ti
 
             const data = await response.json();
             if (data) {
+                setIsApproved(true);
+                localStorage.setItem(localStorageKey, 'true');
                 toast.success('Version Updated successfully', {
                     position: "top-right",
                     duration: 3000,
@@ -87,6 +125,8 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({ data, uploadFile, ti
                     secondary: '#FFFAEE',
                 },
             });
+        } finally {
+            setIsApproving(false);
         }
     };
     return (
@@ -100,7 +140,7 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({ data, uploadFile, ti
                     {/* dynamically send pdf links */}
                     <ModernCarousel pdf={lastItem?.fileUrl || ""} version={data?.length || 0} id={lastItem?.id || 1} />
                     <div className='w-full sm:w-1/2 mx-auto'>
-                        <button type="submit" className='cursor-pointer w-full p-4 shadow-md select-none bg-secondary text-white hover:bg-primary' onClick={handleSendEmail}>Approve</button>
+                        <button disabled={isApproved || isApproving} type="submit" className='cursor-pointer w-full p-4 shadow-md select-none bg-secondary text-white hover:bg-primary disabled:bg-opacity-70 disabled:cursor-not-allowed' onClick={handleSendEmail}>{isApproving ? 'Approving...' : isApproved ? 'Approved' : `Approve`}</button>
                     </div>
                 </>)}
 

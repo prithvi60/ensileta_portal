@@ -303,24 +303,6 @@ export const resolvers = {
             password: hashedPwd,
           },
         });
-        // we can refactor to call from API
-        // // Send email notification to the user
-        // await sendEmailNotification(
-        //   "prithvi@webibee.com",
-        //   "User Details Submission Notification",
-        //   "User Details Submission Successful"
-        // );
-        await fetch("/api/sendMail", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            to: "prithvi@webibee.com",
-            subject: "User Details Submission Notification",
-            message: "User Details Submission Successful",
-          }),
-        });
 
         return employeeData;
       } catch (error) {
@@ -339,10 +321,6 @@ export const resolvers = {
       // Find the latest version of the file with the same filename for the user
       const existingFile = await prisma.drawing_2D.findMany();
 
-      const existingUser = await prisma.users.findUnique({
-        where: { id: userId },
-      });
-
       // Determine the new version number
       const newVersion = existingFile.length;
 
@@ -354,18 +332,6 @@ export const resolvers = {
           createdAt: new Date(),
           userId,
         },
-      });
-
-      await fetch(`${process.env.NEXTAUTH_URL}/api/sendMail`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          to: `${existingUser?.email}`,
-          subject: "2D Drawing File Upload Notification",
-          message: "2D Drawing File Uploaded  Successful",
-        }),
       });
 
       return createdFile;
@@ -381,10 +347,6 @@ export const resolvers = {
       // Find the latest version of the file with the same filename for the user
       const existingFile = await prisma.drawing_3D.findMany();
 
-      const existingUser = await prisma.users.findUnique({
-        where: { id: userId },
-      });
-
       // Determine the new version number
       const newVersion = existingFile.length;
 
@@ -398,17 +360,6 @@ export const resolvers = {
         },
       });
 
-      await fetch(`${process.env.NEXTAUTH_URL}/api/sendMail`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          to: `${existingUser?.email}`,
-          subject: "3D Drawing File Upload Notification",
-          message: "3D Drawing File Uploaded  Successful",
-        }),
-      });
       return createdFile;
     },
     uploadBOQFile: async (
@@ -421,10 +372,6 @@ export const resolvers = {
     ) => {
       // Find the latest version of the file with the same filename for the user
       const existingFile = await prisma.drawing_BOQ.findMany();
-
-      const existingUser = await prisma.users.findUnique({
-        where: { id: userId },
-      });
 
       // Determine the new version number
       const newVersion = existingFile.length;
@@ -439,17 +386,6 @@ export const resolvers = {
         },
       });
 
-      await fetch(`${process.env.NEXTAUTH_URL}/api/sendMail`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          to: `${existingUser?.email}`,
-          subject: "BOQ  Drawing File Upload Notification",
-          message: "BOQ  Drawing File Uploaded  Successful",
-        }),
-      });
       return createdFile;
     },
   },

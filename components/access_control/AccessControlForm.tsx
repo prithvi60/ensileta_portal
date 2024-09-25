@@ -33,7 +33,25 @@ const AccessControlForm = () => {
         try {
             const result = await employeeData({ variables: { email: data.email, password: data.password } })
 
-            if (!result) {
+            const response = await fetch('/api/sendMail', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    recipientEmail: `prithvi@webibee.com`,
+                    subject: 'New Employee Added',
+                    message: `New Employee Email Successfully Added ${data.email}`,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const allData = await response.json();
+
+            if (!result && !allData) {
                 setError("root", { message: "unable to create a employee" });
                 toast.error("no employee list uploaded", {
                     position: "top-right",
