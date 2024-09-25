@@ -77,6 +77,7 @@ export const typeDefs = `#graphql
   type Query {
     user: User
     users: [User]
+    getUser(email: String!): User
     getAllAccessControlUsers: [AccessControl]!
     getAll2DFiles: [Drawing2D!]!
     getAll3DFiles: [Drawing3D!]!

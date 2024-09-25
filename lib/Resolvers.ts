@@ -69,6 +69,12 @@ export const resolvers = {
         throw new Error("Failed to fetch users");
       }
     },
+    getUser: async (_: any, { email }: { email: string }) => {
+      console.log(email);
+      const emailId = prisma.users.findUnique({ where: { email } });
+
+      return emailId;
+    },
     getAll2DFiles: async (_: any, __: any, { userId }: any) => {
       if (!userId) {
         throw new Error("Unauthorized");
