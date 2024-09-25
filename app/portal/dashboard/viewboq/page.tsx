@@ -22,7 +22,7 @@ interface GetAllBOQViewResponse {
 const Page = () => {
     const [uploadFile] = useMutation(ADD_BOQ_FILENAME);
     const { data } = useQuery<GetAllBOQViewResponse>(GET_ALL_BOQ_VIEW)
-    const { data: AllUsers, loading } = useQuery(GET_USERS);
+    const { data: AllUsers, loading,refetch } = useQuery(GET_USERS);
     const pathname = usePathname();
     const fileType = pathname.split('/').pop();
 
@@ -65,7 +65,7 @@ const Page = () => {
         <DefaultLayout>
             <section className='h-full w-full'>
                 {loading ? (<Loader />) : (
-                    <GetAll2dView data={data?.getAllBOQFiles} allUsers={AllUsers} uploadFile={uploadFile} fileType={fileType || ''} title={"Your BOQ Drawings"} />
+                    <GetAll2dView data={data?.getAllBOQFiles} allUsers={AllUsers} uploadFile={uploadFile} fileType={fileType || ''} title={"Your BOQ Drawings"} refetchUsers={refetch}/>
                 )}
             </section>
         </DefaultLayout>
