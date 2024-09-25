@@ -1,10 +1,27 @@
-import NextAuth from "next-auth";
+import NextAuth, { Session, User } from "next-auth";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import prisma from "@/prisma/db";
 import jwt from "jsonwebtoken";
-
+import { JWT } from "next-auth/jwt";
+// Extend the interface
+declare module "next-auth" {
+  interface Session {
+    user: {
+      role?: string; // Add role property
+      name?:string
+    };
+  }
+  interface User {
+    role?: string; // Add role property
+  }
+}
+declare module "next-auth/jwt" {
+  interface JWT {
+    role?: string; // Add role property
+  }
+}
 const JWT_SECRET = process.env.NEXTAUTH_SECRET;
 
 if (!JWT_SECRET) {
@@ -95,13 +112,15 @@ const handler = NextAuth({
     maxAge: 24 * 60 * 60, // 1 day
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user }:{user:User,token:JWT}) {
       if (user) {
+        token.role = user.role;
         token.accessToken = user.accessToken;
       }
       return token;
     },
-    async session({ session, token }) {
+    async session({ session, token }:{session:Session,token:JWT}) {
+      session.user.role = token.role;
       session.accessToken = token.accessToken;
       return session;
     },

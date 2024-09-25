@@ -10,7 +10,6 @@ import toast from 'react-hot-toast';
 import { GET_USERS, SIGN_UP } from '@/lib/Queries';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useSession } from 'next-auth/react';
 
 // Define the validation schema using Zod
 const schema = z.object({
@@ -41,7 +40,6 @@ export const SignUp = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const router = useRouter();
-    const { data: session } = useSession()
     const [signUp] = useMutation(SIGN_UP);
     // const { data: AllUsers } = useQuery(GET_USERS);
     // const SAfilteredData = AllUsers.users.filter((val: any) => val.role === "super admin")
@@ -71,7 +69,7 @@ export const SignUp = () => {
                 },
                 // Session info not changing based after update
                 body: JSON.stringify({
-                    recipientEmail: `${session?.user?.email}`,
+                    recipientEmail: `${data.email}`,
                     subject: 'Welcome to Ensileta',
                     message: `Hi, We have successfully created an new account for ${data.company_name}.`,
                 }),

@@ -1,49 +1,46 @@
 "use client";
 
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import toast from "react-hot-toast";
 import Image from "next/image";
 
-
 const schema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters long"),
   // role: z.string()
 });
-
 type FormFields = z.infer<typeof schema>;
 
 export const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const { data: session } = useSession();
 
   const {
     register,
     handleSubmit,
     setError,
-    formState: { errors, isSubmitting, isValid }, watch
+    formState: { errors, isSubmitting, isValid },
+    watch,
   } = useForm<FormFields>({
     resolver: zodResolver(schema),
     mode: "onChange",
-
   });
 
   // const email = watch("email");
   // console.log(email);
-
 
   // const { loading, error, data: RoleBased } = useQuery(GET_USER_ROLE, {
   //   variables: { email },
   // });
 
   // console.log("ad", RoleBased);
-
 
   const onSubmit: SubmitHandler<FormFields> = async (data) => {
     try {
@@ -68,50 +65,7 @@ export const SignIn = () => {
           },
         });
       } else {
-        // {
-        //   RoleBased?.user?.role === "super admin" ?
-        //     (router.push("/portal/dashboard/view2d")) :
-        //     (router.push("/portal/dashboard/customerProfile"))
-        // }
-        // Conditional routing based on fetched role
-        // if (loading) {
-        //   toast.info("Fetching user role...", { position: "top-right" });
-        // } else if (error) {
-        //   console.error("Error fetching user role:", error);
-        //   toast.error("An error occurred while fetching your role.", {
-        //     position: "top-right",
-        //   });
-        // } else if (data.role === "super_admin") {
-        //   router.push("/portal/dashboard/view2d");
-        //   toast.success("Logged in successfully (Super Admin)", {
-        //     position: "top-right",
-        //     duration: 3000,
-        //     style: {
-        //       border: "1px solid #499d49",
-        //       padding: "16px",
-        //       color: "#499d49",
-        //     },
-        //     iconTheme: {
-        //       primary: "#499d49",
-        //       secondary: "#FFFAEE",
-        //     },
-        //   });
-        // } else if (data.role === "admin") {
-        //   router.push("/portal/dashboard/customerProfile");
-        //   toast.success("Logged in successfully (Admin)", {
-        //     position: "top-right",
-        //     duration: 3000,
-        //     style: {
-        //       border: "1px solid #499d49",
-        //       padding: "16px",
-        //       color: "#499d49",
-        //     },
-        //     iconTheme: {
-        //       primary: "#499d49",
-        //       secondary: "#FFFAEE",
-        //     },
-        //   });
-        (router.push("/portal/dashboard/customerProfile"))
+        // router.push("/portal/dashboard/customerProfile");
         toast.success("Logged in successfully", {
           position: "top-right",
           duration: 3000,
@@ -125,6 +79,7 @@ export const SignIn = () => {
             secondary: "#FFFAEE",
           },
         });
+        // console.log("user deets", session, result);
       }
     } catch (error: any) {
       console.error("An unexpected error occurred:", error);
@@ -132,6 +87,15 @@ export const SignIn = () => {
       toast.error(error.message);
     }
   };
+  useEffect(() => {
+    if (session?.user) {
+      if (session?.user?.role === "admin") {
+        router.push("/portal/dashboard/customerProfile");
+      } else {
+        router.push("/portal/dashboard/view2d");
+      }
+    }
+  }, [session]);
 
   return (
     <div className="rounded-md border-4 border-secondary bg-white shadow-xl m-4">
@@ -270,10 +234,11 @@ export const SignIn = () => {
               <button
                 disabled={!isValid || isSubmitting}
                 type="submit"
-                className={`w-full cursor-pointer p-4 text-white transition  bg-secondary mb-5 ${!isValid || isSubmitting
-                  ? "bg-opacity-40 cursor-not-allowed"
-                  : "hover:bg-opacity-90"
-                  }`}
+                className={`w-full cursor-pointer p-4 text-white transition  bg-secondary mb-5 ${
+                  !isValid || isSubmitting
+                    ? "bg-opacity-40 cursor-not-allowed"
+                    : "hover:bg-opacity-90"
+                }`}
               >
                 {isSubmitting ? "Logging in..." : "Log In"}
               </button>
