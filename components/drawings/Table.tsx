@@ -11,18 +11,19 @@ interface Data {
     // id: number
     data: any
     fileType: string
+    refetchUsers:any
 }
 
-const ShuffleSortTable = ({ uploadFile, data, fileType }: Data) => {
+const ShuffleSortTable = ({ uploadFile, data, fileType,refetchUsers }: Data) => {
 
     return (
         <div className="md:w-full w-[90vw] overflow-hidden">
-        <Table uploadFile={uploadFile} fileType={fileType} data={data} />
+        <Table uploadFile={uploadFile} fileType={fileType} data={data} refetchUsers={refetchUsers}/>
         </div >
     );
 };
 
-const Table = ({ uploadFile, data, fileType }: Data) => {
+const Table = ({ uploadFile, data, fileType,refetchUsers }: Data) => {
 
     return (
         <div className="w-full bg-white shadow-lg rounded-lg overflow-x-auto">
@@ -39,6 +40,7 @@ const Table = ({ uploadFile, data, fileType }: Data) => {
                 <tbody>
                     <TableRows
                         uploadFile={uploadFile}
+                        refetchUsers={refetchUsers}
                         // pdf={pdf}
                         // id={id}
                         data={data}
@@ -56,9 +58,10 @@ interface TableRowsProps {
     // id: number
     data: any
     fileType: string
+    refetchUsers:any
 }
 
-const TableRows = ({ uploadFile, data, fileType }: TableRowsProps) => {
+const TableRows = ({ uploadFile, data, fileType,refetchUsers }: TableRowsProps) => {
 
     return (
         <>
@@ -76,7 +79,7 @@ const TableRows = ({ uploadFile, data, fileType }: TableRowsProps) => {
                                 {fileType === "view2d" ? (<span className="block mb-1 font-medium">{user.drawing2Dfiles.length}</span>) : fileType === "view3d" ? (<span className="block mb-1 font-medium">{user.drawing3Dfiles.length}</span>) : fileType === "viewboq" ? (<span className="block mb-1 font-medium">{user.drawingBOQfiles.length}</span>) : (<span className="block mb-1 font-medium">0</span>)}
                             </td>
                             <td className="p-2 sm:p-4">
-                                <ModalWrapper email={user.email} uploadFile={uploadFile} userId={user.id} fileType={fileType} />
+                                <ModalWrapper email={user.email} uploadFile={uploadFile} userId={user.id} fileType={fileType} refetchUsers={refetchUsers}/>
                             </td>
                             <td className="p-2 sm:p-4">
                                 {fileType === "view2d" ? (

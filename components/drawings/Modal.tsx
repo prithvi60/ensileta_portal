@@ -1,12 +1,12 @@
 "use client"
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import UploadFile from "./Upload";
 import FsLightbox from "fslightbox-react";
 import { usePDFJS } from "@/hooks/usePdfJS";
 import toast from "react-hot-toast";
 
-const ModalWrapper = ({ uploadFile, userId, email, fileType }: { uploadFile: any, userId: number, email: string, fileType: string }) => {
+const ModalWrapper = ({ uploadFile, userId, email, fileType,refetchUsers }: { uploadFile: any, userId: number, email: string, fileType: string,refetchUsers:any }) => {
     const [isOpen, setIsOpen] = useState(false);
     return (
         <div>
@@ -15,12 +15,12 @@ const ModalWrapper = ({ uploadFile, userId, email, fileType }: { uploadFile: any
                 className={`w-max cursor-pointer py-4 px-10 text-white bg-secondary mb-5 hover:bg-[#0E122B] transition-colors`}
             >upload
             </button>
-            <SpringModal isOpen={isOpen} userId={userId} setIsOpen={setIsOpen} uploadFile={uploadFile} email={email} fileType={fileType} />
+            <SpringModal isOpen={isOpen} userId={userId} setIsOpen={setIsOpen} uploadFile={uploadFile} email={email} fileType={fileType} refetchUsers={refetchUsers}/>
         </div>
     );
 };
 
-const SpringModal = ({ isOpen, setIsOpen, uploadFile, userId, email, fileType }: { isOpen: boolean, setIsOpen: Function, uploadFile: any, userId: number, email: string, fileType: string }) => {
+const SpringModal = ({ isOpen, setIsOpen, uploadFile, userId, email, fileType,refetchUsers }: { isOpen: boolean, setIsOpen: Function, uploadFile: any, userId: number, email: string, fileType: string ,refetchUsers:any}) => {
     return (
         <AnimatePresence>
             {isOpen && (
@@ -43,7 +43,7 @@ const SpringModal = ({ isOpen, setIsOpen, uploadFile, userId, email, fileType }:
                             <h3 className="text-3xl font-bold text-center mb-2">
                                 Upload File
                             </h3>
-                            <UploadFile uploadFile={uploadFile} userId={userId} setIsOpen={setIsOpen} email={email} fileType={fileType} />
+                            <UploadFile uploadFile={uploadFile} userId={userId} setIsOpen={setIsOpen} email={email} fileType={fileType} refetchUsers={refetchUsers}/>
                         </div>
                     </motion.div>
                 </motion.div>
@@ -57,8 +57,9 @@ export default ModalWrapper;
 export const ViewModalWrapper = ({ pdf }: { pdf: string }) => {
     const [toggle, setToggle] = useState(false)
     const [imgs, setImgs] = useState<string[]>([]);
-
+const [pdfFile,setPdfFile]= useState<string>(pdf);
     const handleClick = () => {
+
         if (imgs.length !== 0) {
             setToggle(!toggle)
         } else {
@@ -77,48 +78,49 @@ export const ViewModalWrapper = ({ pdf }: { pdf: string }) => {
             });
         }
     }
+    useEffect(() => {
+    console.log("current pdf",pdf)
+setPdfFile(pdf)
+}, [pdf])
 
-    usePDFJS(async (pdfjs) => {
-        try {
 
-            const url = pdf;
-            const response = await fetch(url);
-            const data = await response.arrayBuffer();
-            // console.log("data",url,data)
-            const loadingTask = pdfjs.getDocument(new Uint8Array(data));
-            const pdfDocument = await loadingTask.promise;
-            const imgArray: string[] = [];
+        usePDFJS(async (pdfjs) => {
+            try {
+                const url = pdfFile;
+                const response = await fetch(url);
+                const data = await response.arrayBuffer();
+                const loadingTask = pdfjs.getDocument(new Uint8Array(data));
+                const pdfDocument = await loadingTask.promise;
+                const imgArray: string[] = [];
 
-            for (let i = 1; i <= pdfDocument.numPages; i++) {
-                const page = await pdfDocument.getPage(i);
-                const viewport = page.getViewport({ scale: 1 });
-                const canvas = document.createElement("canvas");
-                const context = canvas.getContext("2d");
-                canvas.height = viewport.height;
-                canvas.width = viewport.width;
+                for (let i = 1; i <= pdfDocument.numPages; i++) {
+                    const page = await pdfDocument.getPage(i);
+                    const viewport = page.getViewport({ scale: 1 });
+                    const canvas = document.createElement("canvas");
+                    const context = canvas.getContext("2d");
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
 
-                if (context) {
-                    const renderContext = {
-                        canvasContext: context,
-                        viewport: viewport,
-                    };
-                    await page.render(renderContext).promise;
-                    const imageUrl = canvas.toDataURL();
-                    imgArray.push(imageUrl);
+                    if (context) {
+                        const renderContext = {
+                            canvasContext: context,
+                            viewport: viewport,
+                        };
+                        await page.render(renderContext).promise;
+                        const imageUrl = canvas.toDataURL();
+                        imgArray.push(imageUrl);
+                    }
                 }
+
+                if (imgArray.length === 0) {
+                    throw new Error("No images were generated from the PDF.");
+                }
+
+                setImgs(imgArray);
+            } catch (error) {
+                console.error("Error loading PDF:", error);
             }
-
-            if (imgArray.length === 0) {
-                throw new Error("No images were generated from the PDF.");
-            }
-
-            setImgs(imgArray);
-
-            // }
-        } catch (error) {
-            console.error("Error loading PDF:", error);
-        }
-    });
+        }, [pdfFile]);
 
     return (
         <div>
