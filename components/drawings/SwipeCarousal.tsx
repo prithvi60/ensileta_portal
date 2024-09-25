@@ -130,7 +130,7 @@ export default function ModernCarousel({ pdf, version, id }: { pdf: string, vers
                     key={imgs[imageIndex]}
                     className="text-white text-base md:text-xl p-2 rounded-lg bg-white/10 backdrop-blur-lg font-semibold shadow-lg absolute z-20 left-10 bottom-4"
                 >
-                    {`Version: ${version}`}
+                    {version === 0? "Your document will show here after upload": `Version: ${version}`}
                 </motion.span>
             </AnimatePresence>
 
