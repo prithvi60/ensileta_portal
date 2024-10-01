@@ -251,9 +251,18 @@ export const GET_ALL_BOQ_VIEW = gql`
 // Access Control
 
 export const ADD_EMPLOYEE = gql`
-  mutation UploadAccessControlUsers($email: String!, $password: String!) {
-    uploadAccessControlUsers(email: $email, password: $password) {
+  mutation UploadAccessControlUsers(
+    $username: String!
+    $email: String!
+    $password: String!
+  ) {
+    uploadAccessControlUsers(
+      username: $username
+      email: $email
+      password: $password
+    ) {
       id
+      username
       email
       role
     }
@@ -264,6 +273,17 @@ export const GET_ALL_EMPLOYEE_LISTS = gql`
   query getAllEmployeeLists {
     getAllAccessControlUsers {
       id
+      email
+      role
+    }
+  }
+`;
+
+export const GET_EMPLOYEE = gql`
+  query getEmployeeUser {
+    getEmployeeUser {
+      id
+      username
       email
       role
     }

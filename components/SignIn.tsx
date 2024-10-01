@@ -33,15 +33,6 @@ export const SignIn = () => {
     mode: "onChange",
   });
 
-  // const email = watch("email");
-  // console.log(email);
-
-  // const { loading, error, data: RoleBased } = useQuery(GET_USER_ROLE, {
-  //   variables: { email },
-  // });
-
-  // console.log("ad", RoleBased);
-
   const onSubmit: SubmitHandler<FormFields> = async (data) => {
     try {
       const result = await signIn("credentials", {
@@ -92,10 +83,10 @@ export const SignIn = () => {
       if (session?.user?.role === "admin") {
         router.push("/portal/dashboard/customerProfile");
       } else {
-        router.push("/portal/dashboard/view2d");
+        router.push("/portal/dashboard");
       }
     }
-  }, [session]);
+  }, [session, router]);
 
   return (
     <div className="rounded-md border-4 border-secondary bg-white shadow-xl m-4">
@@ -234,11 +225,10 @@ export const SignIn = () => {
               <button
                 disabled={!isValid || isSubmitting}
                 type="submit"
-                className={`w-full cursor-pointer p-4 text-white transition  bg-secondary mb-5 ${
-                  !isValid || isSubmitting
-                    ? "bg-opacity-40 cursor-not-allowed"
-                    : "hover:bg-opacity-90"
-                }`}
+                className={`w-full cursor-pointer p-4 text-white transition  bg-secondary mb-5 ${!isValid || isSubmitting
+                  ? "bg-opacity-40 cursor-not-allowed"
+                  : "hover:bg-opacity-90"
+                  }`}
               >
                 {isSubmitting ? "Logging in..." : "Log In"}
               </button>

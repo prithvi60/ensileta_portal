@@ -136,6 +136,24 @@ export const resolvers = {
         throw new Error("Failed to fetch employees lists");
       }
     },
+    getEmployeeUser: async (_: any, __: any, { userId }: any) => {
+      if (!userId) {
+        throw new Error("Unauthorized");
+      }
+
+      try {
+        const user = await prisma.accessControl.findUnique({
+          where: { id: userId },
+        });
+
+        // console.log("employee", user);
+
+        return user;
+      } catch (error) {
+        console.error("Error while fetching user:", error);
+        throw new Error("Failed to fetch user");
+      }
+    },
   },
   Mutation: {
     signUp: async (
@@ -282,8 +300,11 @@ export const resolvers = {
         throw new Error("Failed to update user");
       }
     },
-    uploadAccessControlUsers: async (_: any, { email, password }: any) => {
-      if (!email && !password) {
+    uploadAccessControlUsers: async (
+      _: any,
+      { username, email, password }: any
+    ) => {
+      if (!username && !email && !password) {
         throw new Error("All fields are mandatory");
       }
 
@@ -305,6 +326,7 @@ export const resolvers = {
       try {
         const employeeData = await prisma.accessControl.create({
           data: {
+            username,
             email,
             password: hashedPwd,
           },

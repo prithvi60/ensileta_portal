@@ -1,5 +1,5 @@
 "use client";
-import { useSession } from "next-auth/react";
+
 import ModernCarousel from "./SwipeCarousal";
 import ShuffleSortTable from "./Table";
 import { GET_USER } from "@/lib/Queries";
@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { Marquee } from "../Header/Marquee";
 import Image from "next/image";
+import React from "react"
 
 interface FileData {
   id: number;
@@ -25,7 +26,7 @@ interface GetAll2DViewProps {
   title: string;
   allUsers: any;
   fileType: string;
-  refetchUsers:any;
+  refetchUsers: any;
 }
 
 export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
@@ -40,24 +41,21 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
   // const { data: session } = useSession()
   const [isApproved, setIsApproved] = useState(false);
   const [isApproving, setIsApproving] = useState(false);
-  // const superAdmin = allUsers.users.filter((val: any) => val.role === "super admin")
   const [filteredData, setFilteredData] = useState<Array<any>>([]);
 
   useEffect(() => {
     // Update filteredData whenever allUsers changes
     const admins = allUsers.users.filter((val: any) => val.role === "admin");
-    console.log("refetched",admins)
+
     setFilteredData(admins);
   }, [allUsers]);
+
   const SAfilteredData = allUsers.users.filter(
     (val: any) => val.role === "super admin"
   );
-  // console.log(SAfilteredData[0]?.email);
-  const userId = RoleBased?.user?.id;
-  // console.log(fileType);
 
+  const userId = RoleBased?.user?.id;
   const lastItem = data?.[data?.length - 1] || null;
-//   console.log(data);
 
   // Unique localStorage key for each user and file type
   const localStorageKey = `isApproved_${userId}_${fileType}`;
@@ -181,8 +179,8 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
               {isApproving
                 ? "Approving..."
                 : isApproved
-                ? "Approved"
-                : `Approve`}
+                  ? "Approved"
+                  : `Approve`}
             </button>
           </div>
         </>

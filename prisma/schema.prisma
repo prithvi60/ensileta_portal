@@ -54,17 +54,8 @@ model Drawing_BOQ {
 
 model accessControl {
   id       Int    @id @default(autoincrement())
+  username String @db.VarChar(50)
   email    String @unique @db.VarChar(20)
   password String
   role     String @default("employee")
 }
-
-// model File {
-//   id        Int      @id @default(autoincrement())
-//   filename  String
-//   fileUrl   String
-//   version   Int
-//   createdAt DateTime @default(now())
-//   userId    Int
-//   user      users    @relation(fields: [userId], references: [id])
-// }
