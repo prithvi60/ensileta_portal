@@ -46,7 +46,7 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
   useEffect(() => {
     // Update filteredData whenever allUsers changes
     const admins = allUsers.users.filter((val: any) => val.role === "admin");
-    console.log("refetched",admins)
+    // console.log("refetched",admins)
     setFilteredData(admins);
   }, [allUsers]);
   const SAfilteredData = allUsers.users.filter(
@@ -170,6 +170,7 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
             pdf={lastItem?.fileUrl || ""}
             version={data?.length || 0}
             id={lastItem?.id || 1}
+            
           />
           <div className="w-full sm:w-1/2 mx-auto">
             <button

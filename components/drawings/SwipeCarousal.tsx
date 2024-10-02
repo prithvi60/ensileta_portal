@@ -21,6 +21,10 @@ export default function ModernCarousel({
   const [prevIdx, setPrevIdx] = useState(idx);
   const [imgs, setImgs] = useState<string[]>([]);
   const [toggle, setToggle] = useState(false);
+  const [loadremarks, setloadremarks] = useState(false);
+  const [edit, setEdit] = useState(false);
+
+
   const [selectedItem, setSelectedItem] = useState(0);
   const [lightboxController, setLightboxController] = useState({
     toggler: toggle,
@@ -106,8 +110,6 @@ export default function ModernCarousel({
       canvasRef.current
         .exportImage("png")
         .then((data) => {
-        //   console.log(data);
-        //   setNewImg(data);
           sendMail(data);
         })
         .catch(() => console.log("error"));
@@ -117,9 +119,8 @@ export default function ModernCarousel({
   const sendMail = async (imageurl: string) => {
     // Extract the base64 data (after the comma)
 const base64Data = imageurl.split(',')[1];
-
-// Convert base64 to buffer
-const imageBuffer = Buffer.from(base64Data, 'base64');
+// console.log(base64Data); 
+setloadremarks(true)
     try {
       const response = await fetch("/api/sendMail", {
         method: "POST",
@@ -132,15 +133,22 @@ const imageBuffer = Buffer.from(base64Data, 'base64');
           subject: "Update Image by Client",
           message: `
             <p>We need to make these changes </p>
-           <img src="cid:unique@image" style="max-width:100%;"/>
+            <img style="width:250px;" src="unique@image">
           `,
           attachments: [
             {
-                filename: 'image.png', // Name of the image
-                content: imageBuffer, // The buffer created from the base64 data
+                filename: 'change.png', // Name of the image
+                content: base64Data,
                 cid: 'unique@image', // Same CID as in the image src above
-                contentType: 'image/png' // Content type based on the data URL
-            }
+                contentType: 'image/png', // Content type based on the data URL
+                encoding: 'base64' 
+            },
+            // {
+            //   filename: 'document.pdf',
+            //   content: base64PDFData, // The base64 string of the PDF
+            //   contentType: 'application/pdf', // Set the correct content type for PDFs
+            //   encoding: 'base64', // Specify base64 encoding
+            // }
         ]
         }),
       });
@@ -148,12 +156,16 @@ const imageBuffer = Buffer.from(base64Data, 'base64');
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
-
+      setLightboxController({
+        toggler: !lightboxController.toggler,
+        slide: 1,
+      });
       const data = await response.json();
       if (data) {
+        setloadremarks(false)
         toast.success("Remark sent successfully", {
           position: "top-right",
-          duration: 3000,
+          duration: 6000,
           style: {
             border: "1px solid #65a34e",
             padding: "16px",
@@ -300,6 +312,17 @@ const imageBuffer = Buffer.from(base64Data, 'base64');
         sources={imgs.map((img) => (
           <div key={img} className="relative">
             <div className="mb-2 gap-2 align-items-center bg-white flex">
+            <button
+                type="button"
+                className="btn btn-sm btn-outline-primary"
+                onClick={() => {
+                  setEdit(true);
+                }}
+              >
+                Edit
+              </button>
+              {edit &&
+              <>
               <button
                 type="button"
                 className="btn btn-sm btn-outline-primary"
@@ -362,12 +385,13 @@ const imageBuffer = Buffer.from(base64Data, 'base64');
               >
                 Reset
               </button>
+              </>}
             </div>
 
             <ReactSketchCanvas
               ref={canvasRef}
-              width="50em"
-              height="50em"
+              width="20em"
+              height="20em"
               backgroundImage={img}
               strokeColor="#65a34e"
               // onClick={handleCanvasClick} // Handle canvas click
@@ -398,7 +422,7 @@ const imageBuffer = Buffer.from(base64Data, 'base64');
                 className="btn btn-sm btn-outline-primary bg-white mt-2 mx-auto p-5"
                 onClick={handleRemarks}
               >
-                Send Remarks
+               {loadremarks?" Sending changes... ":"Send Remarks"}
               </button>
             </div>
           </div>

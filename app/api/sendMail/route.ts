@@ -11,8 +11,8 @@
     },
   });
   export async function POST(req: Request) {
-    const { recipientEmail, subject, message,attachments } = await req.json();
-
+    const { recipientEmail, subject, message, attachments } = await req.json();
+console.log("attach" ,attachments)
     if (!recipientEmail) {
       return NextResponse.json(
         { success: false, message: "No recipient email provided" },
@@ -25,7 +25,13 @@
       to: recipientEmail,
       subject: subject,
       html: message,
-      // attachments: attachments
+      attachments: attachments.map((attachment:any) => ({
+        filename: attachment.filename,
+        content: attachment.content, // No need for Buffer, just use the base64 string
+        cid: attachment.cid,  // Attach image inline with CID
+        contentType: attachment.contentType,
+        encoding: 'base64',  // Indicate the content is base64 encoded
+      })),
     };
 
     try {
