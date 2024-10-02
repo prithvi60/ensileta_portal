@@ -124,8 +124,9 @@ export const CustomerInfoForm = () => {
                     <div className="relative">
                         <input
                             type="email"
+                            disabled
                             placeholder="Enter your Email Id"
-                            className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-[#0E132A] outline-none focus:border-primary focus-visible:shadow-none"
+                            className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-[#0E132A] outline-none focus:border-primary focus-visible:shadow-none disabled:opacity-50"
                             {...register("email")} />
                         {errors.email && (
                             <span className="text-warning font-semibold text-center mt-2">{errors.email.message}</span>

@@ -158,6 +158,7 @@ export const SignUp = () => {
                         </h2>
 
                         <form onSubmit={handleSubmit(onSubmit)} className='space-y-4' >
+                            
                             <div className=''>
                                 <div className='flex gap-3 items-center'>
                                     <label className=" block font-medium text-[#0E132A] text-sm md:text-base">

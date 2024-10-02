@@ -17,6 +17,7 @@ export const typeDefs = `#graphql
 
   type AccessControl {
     id: Int!
+    username: String
     email: String!
     role: String
   }
@@ -79,6 +80,7 @@ export const typeDefs = `#graphql
     users: [User]
     getUser(email: String!): User
     getAllAccessControlUsers: [AccessControl]!
+    getEmployeeUser: AccessControl!
     getAll2DFiles: [Drawing2D!]!
     getAll3DFiles: [Drawing3D!]!
     getAllBOQFiles: [DrawingBOQ!]!
@@ -98,7 +100,7 @@ export const typeDefs = `#graphql
     logout: Boolean!
     updateUser(
       id: Int!,
-      username: String!,
+      username: String
       email: String!,
       company_name: String!,
       phone_number: String!,
@@ -109,6 +111,7 @@ export const typeDefs = `#graphql
     upload3DFile(fileUrl: String!, filename: String!, userId: Int!) : Drawing3D!
     uploadBOQFile(fileUrl: String!, filename: String!, userId: Int!) : DrawingBOQ! 
     uploadAccessControlUsers(
+      username: String!,
       email: String!,
       password: String!
     ): AccessControl

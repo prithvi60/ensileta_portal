@@ -1,6 +1,5 @@
-import { useState } from "react";
-import Link from "next/link";
-import ClickOutside from "@/components/Sidebar/ClickOutside";
+
+import React, { useState } from "react";
 import { signOut } from "next-auth/react";
 
 const DropdownNotification = () => {
@@ -8,6 +7,7 @@ const DropdownNotification = () => {
   const [notifying, setNotifying] = useState(true);
   const handleLogout = () => {
     signOut({ redirect: true, callbackUrl: "/api/auth/signin" });
+    localStorage.removeItem("selectedMenu");
   }
 
   return (
