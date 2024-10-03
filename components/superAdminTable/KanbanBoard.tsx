@@ -62,7 +62,7 @@ const Column = ({ title, headingColor, cards, column, setCards }: any) => {
         const cardId = e.dataTransfer.getData("cardId");
 
         setActive(false);
-        clearHighlights();
+        // clearHighlights();
 
         const indicators = getIndicators();
         const { element } = getNearestIndicator(e, indicators);
@@ -147,7 +147,7 @@ const Column = ({ title, headingColor, cards, column, setCards }: any) => {
     };
 
     const handleDragLeave = () => {
-        clearHighlights();
+        // clearHighlights();
         setActive(false);
     };
 

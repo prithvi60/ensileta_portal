@@ -87,7 +87,7 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
         }
       }
     }
-  }, [lastItem?.id, lastItem?.version]);
+  }, [lastItem?.id, lastItem?.version, localStorageKey]);
 
   const handleSendEmail = async () => {
     try {
