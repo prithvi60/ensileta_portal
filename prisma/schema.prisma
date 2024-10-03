@@ -9,9 +9,9 @@ datasource db {
 }
 
 model users {
-  id              Int           @id @default(autoincrement())
-  username        String        @db.VarChar(50)
-  email           String        @unique @db.VarChar(20)
+  id              Int            @id @default(autoincrement())
+  username        String         @db.VarChar(50)
+  email           String         @unique @db.VarChar(20)
   password        String
   company_name    String?
   phone_number    String?
@@ -20,6 +20,7 @@ model users {
   drawing2Dfiles  Drawing_2D[]
   drawing3Dfiles  Drawing_3D[]
   drawingBOQfiles Drawing_BOQ[]
+  kanbanCards     Kanban_Cards[]
 }
 
 model Drawing_2D {
@@ -58,4 +59,12 @@ model accessControl {
   email    String @unique @db.VarChar(20)
   password String
   role     String @default("employee")
+}
+
+model Kanban_Cards {
+  id     Int    @id @default(autoincrement())
+  column String
+  title  String
+  userId Int
+  user   users  @relation(fields: [userId], references: [id])
 }

@@ -30,9 +30,30 @@ export const SATable = ({ name }: { name: string }) => {
             ) : (
                 <>
                     <SuperAdminTable data={filteredData[0]} refetchUsers={refetch} />
-                    <CustomKanban />
+                    <CustomKanban userId={filteredData[0]?.id}/>
                 </>
             )}
         </section>
     );
 };
+
+
+{/* <div className="text-center w-full flex flex-col justify-center items-center ">
+            <div
+                onDrop={handleDragEnd}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                className={`mt-10 grid size-14 shrink-0 place-content-center rounded border text-3xl ${active
+                    ? "border-red-800 bg-warning/50 text-warning/80"
+                    : "border-neutral-500 bg-primary text-white"
+                    }`}
+            >
+                {active ? <FaFire className="animate-bounce text-xl" /> : <FiTrash />}
+            </div>
+            <div className={` ${active
+                ? " text-warning/65"
+                : "text-neutral-500"
+                }`}>Drag and Drop to delete</div>
+        </div> */}
+
+// <div className="p-12 overflow-scroll scrollbar flex flex-col justify-center items-center">

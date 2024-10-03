@@ -1,57 +1,110 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FiPlus, FiTrash } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { FaFire } from "react-icons/fa";
+import { useMutation } from "@apollo/client";
+import { CARDS } from "@/lib/Queries";
 
-export const CustomKanban = () => {
+export const CustomKanban = ({ userId }: { userId: any }) => {
     return (
         <div className="h-auto w-full shadow-xl rounded-lg">
-            <Board />
+            <Board userId={userId} />
         </div>
     );
 };
 
-const Board = () => {
-    const [cards, setCards] = useState(DEFAULT_CARDS);
+const Board = ({ userId }: { userId: any }) => {
+    const [cards, setCards] = useState([]);
+    const [saveKanbanCards] = useMutation(CARDS);
+    const [isDisable, setIsDisable] = useState(false);
+    console.log("cards", cards);
+    console.log(isDisable);
+
+    useEffect(() => {
+        if (cards.length > 0) {
+            setIsDisable(true);
+        } else {
+            setIsDisable(false);
+        }
+    }, [cards]);
+
+    const handleSave = async () => {
+        try {
+            if (cards.length === 0) {
+                return alert("please a new card");
+            }
+            const updatedCards = cards.map((card: any) => ({
+                id: card.id ? parseInt(card.id, 10) : undefined,
+                title: card.title,
+                column: card.column,
+                userId: card.userId,
+            }));
+
+            // Execute the mutation to save cards to the database
+            const result = await saveKanbanCards({
+                variables: {
+                    userId,
+                    cards: updatedCards,
+                },
+            });
+            console.log("Cards saved successfully!");
+        } catch (error) {
+            console.error("Error saving cards:", error);
+        }
+    };
 
     return (
-        <div className="flex justify-between h-auto scrollbar w-full gap-3 overflow-scroll p-12">
-            <div className="flex flex-col items-center">
-                <Column
-                    title="2D Note"
-                    column="2D Note"
-                    headingColor="text-neutral-500"
-                    cards={cards}
-                    setCards={setCards}
-                />
-                <BurnBarrel setCards={setCards} />
+        <div className="px-6 py-8 md:p-12 overflow-scroll scrollbar flex flex-col justify-center items-center">
+            <div className="flex justify-between h-auto scrollbar w-full gap-3 overflow-scroll p-12">
+                <div className="flex flex-col items-center">
+                    <Column
+                        title="2D Note"
+                        column="2D Note"
+                        headingColor="text-neutral-500"
+                        cards={cards}
+                        setCards={setCards}
+                        userId={userId}
+                    />
+                    {/* <BurnBarrel setCards={setCards} /> */}
+                </div>
+                <div className="flex flex-col items-center">
+                    <Column
+                        title="3D Note"
+                        column="3D Note"
+                        headingColor="text-yellow-200"
+                        cards={cards}
+                        setCards={setCards}
+                        userId={userId}
+                    />
+                    {/* <BurnBarrel setCards={setCards} /> */}
+                </div>
+                <div className="flex flex-col items-center">
+                    <Column
+                        title="BOQ Note"
+                        column="BOQ Note"
+                        headingColor="text-blue-200"
+                        cards={cards}
+                        setCards={setCards}
+                        userId={userId}
+                    />
+                    {/* <BurnBarrel setCards={setCards} /> */}
+                </div>
             </div>
-            <div className="flex flex-col items-center">
-                <Column
-                    title="3D Note"
-                    column="3D Note"
-                    headingColor="text-yellow-200"
-                    cards={cards}
-                    setCards={setCards}
-                />
+            <div className="flex gap-3 items-center">
                 <BurnBarrel setCards={setCards} />
-            </div>
-            <div className="flex flex-col items-center">
-                <Column
-                    title="BOQ Note"
-                    column="BOQ Note"
-                    headingColor="text-blue-200"
-                    cards={cards}
-                    setCards={setCards}
-                />
-                <BurnBarrel setCards={setCards} />
+                <button
+                    onClick={handleSave}
+                    disabled={isDisable === false ? true : false}
+                    className={`w-full h-12 cursor-pointer px-5  text-white bg-secondary text-sm hover:bg-opacity-80 disabled:bg-opacity-50 disabled:cursor-not-allowed`}
+                >
+                    Save Comments
+                </button>
             </div>
         </div>
     );
 };
 
-
-const Column = ({ title, headingColor, cards, column, setCards }: any) => {
+const Column = ({ title, cards, column, setCards, userId }: any) => {
     const [active, setActive] = useState(false);
 
     const handleDragStart = (e: any, card: any) => {
@@ -60,7 +113,6 @@ const Column = ({ title, headingColor, cards, column, setCards }: any) => {
 
     const handleDragEnd = (e: any) => {
         const cardId = e.dataTransfer.getData("cardId");
-
         setActive(false);
         // clearHighlights();
 
@@ -154,7 +206,7 @@ const Column = ({ title, headingColor, cards, column, setCards }: any) => {
     const filteredCards = cards.filter((c: any) => c.column === column);
 
     return (
-        <div className="w-56 md:w-full shrink-0">
+        <div className="min-w-56 md:w-full shrink-0">
             <div className="mb-3 flex items-center justify-between">
                 <h3 className={`font-medium text-primary`}>{title}</h3>
                 {/* <span className="rounded text-sm text-neutral-400">
@@ -172,7 +224,12 @@ const Column = ({ title, headingColor, cards, column, setCards }: any) => {
                     return <Card key={c.id} {...c} handleDragStart={handleDragStart} />;
                 })}
                 <DropIndicator beforeId={null} column={column} />
-                <AddCard column={column} setCards={setCards} />
+                <AddCard
+                    column={column}
+                    userId={userId}
+                    setCards={setCards}
+                    cards={cards}
+                />
             </div>
         </div>
     );
@@ -219,6 +276,7 @@ const BurnBarrel = ({ setCards }: any) => {
 
     const handleDragEnd = (e: any) => {
         const cardId = e.dataTransfer.getData("cardId");
+        console.log(e.dataTransfer);
 
         setCards((pv: any) => pv.filter((c: any) => c.id !== cardId));
 
@@ -226,21 +284,29 @@ const BurnBarrel = ({ setCards }: any) => {
     };
 
     return (
-        <div
-            onDrop={handleDragEnd}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            className={`mt-10 grid size-14 shrink-0 place-content-center rounded border text-3xl ${active
-                ? "border-red-800 bg-warning/50 text-warning/80"
-                : "border-neutral-500 bg-primary text-white"
-                }`}
-        >
-            {active ? <FaFire className="animate-bounce text-xl" /> : <FiTrash />}
+        <div className="text-center w-full gap-2 flex flex-col justify-center items-center ">
+            <div
+                onDrop={handleDragEnd}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                className={`mt-10 grid size-14 shrink-0 place-content-center rounded border text-3xl ${active
+                    ? "border-red-800 bg-warning/50 text-warning/80"
+                    : "border-neutral-500 bg-primary text-white"
+                    }`}
+            >
+                {active ? <FaFire className="animate-bounce text-xl" /> : <FiTrash />}
+            </div>
+            <div
+                className={`text-xs ${active ? " text-warning/65" : "text-neutral-500"
+                    }`}
+            >
+                Drag & Drop to delete
+            </div>
         </div>
     );
 };
 
-const AddCard = ({ column, setCards }: any) => {
+const AddCard = ({ column, setCards, cards, userId }: any) => {
     const [text, setText] = useState("");
     const [adding, setAdding] = useState(false);
 
@@ -252,7 +318,8 @@ const AddCard = ({ column, setCards }: any) => {
         const newCard = {
             column,
             title: text.trim(),
-            id: Math.random().toString(),
+            id: (Math.floor(Math.random() * 100) + 1).toString(),
+            userId,
         };
 
         setCards((pv: any) => [...pv, newCard]);
@@ -301,31 +368,18 @@ const AddCard = ({ column, setCards }: any) => {
 };
 
 const DEFAULT_CARDS = [
-    // BACKLOG
-    { title: "Look into render bug in dashboard", id: "1", column: "2D Note" },
-    { title: "SOX compliance checklist", id: "2", column: "2D Note" },
-    { title: "[SPIKE] Migrate to Azure", id: "3", column: "2D Note" },
-    { title: "Document Notifications service", id: "4", column: "2D Note" },
-    // TODO
+    // 2D Note
+    { title: "Remarks", id: "1", column: "2D Note" },
+    // 2D Note
     {
-        title: "Research DB options for new microservice",
-        id: "5",
+        title: "Remarks",
+        id: "2",
         column: "3D Note",
     },
-    { title: "Postmortem for outage", id: "6", column: "3D Note" },
-    { title: "Sync with product on Q3 roadmap", id: "7", column: "3D Note" },
-
-    // DOING
+    // 2D Note
     {
-        title: "Refactor context providers to use Zustand",
-        id: "8",
+        title: "Remarks",
+        id: "3",
         column: "BOQ Note",
     },
-    { title: "Add logging to daily CRON", id: "9", column: "BOQ Note" },
-    // DONE
-    // {
-    //     title: "Set up DD dashboards for Lambda listener",
-    //     id: "10",
-    //     column: "done",
-    // },
 ];

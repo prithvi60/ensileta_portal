@@ -325,3 +325,10 @@ export const UPLOAD_S3_STORAGE = gql`
     }
   }
 `;
+
+// Kanban Cards
+export const CARDS = gql`
+  mutation SaveKanbanCards($userId: Int!, $cards: [KanbanCardInput!]!) {
+    saveKanbanCards(userId: $userId, cards: $cards)
+  }
+`;

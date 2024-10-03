@@ -13,6 +13,7 @@ export const typeDefs = `#graphql
     drawing2Dfiles: [Drawing2D]
     drawing3Dfiles: [Drawing3D]
     drawingBOQfiles: [DrawingBOQ]
+    kanbanCards:     [KanbanCard]
   }
 
   type AccessControl {
@@ -75,6 +76,20 @@ export const typeDefs = `#graphql
     createdAt: String!
   }
 
+  input KanbanCardInput {
+  id: Int
+  column: String!
+  title: String!
+  userId: Int!
+}
+
+type KanbanCard {
+  id: Int!
+  column: String!
+  title: String!
+  userId: Int!
+}
+
   type Query {
     user: User
     users: [User]
@@ -115,6 +130,6 @@ export const typeDefs = `#graphql
       email: String!,
       password: String!
     ): AccessControl
-    
+    saveKanbanCards(userId: Int!, cards: [KanbanCardInput!]!): Boolean!
   }
 `;

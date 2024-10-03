@@ -416,5 +416,36 @@ export const resolvers = {
 
       return createdFile;
     },
+    saveKanbanCards: async (_: any, { userId, cards }: any) => {
+      try {
+        if (!userId) {
+          throw new Error("Unauthorized");
+        }
+
+        // First, delete all existing cards for the user
+        await prisma.kanban_Cards.deleteMany({
+          where: { userId },
+        });
+
+        // Insert updated cards
+        const cardData = cards.map((card: any) => ({
+          id: card.id || undefined, // If new card, id will be undefined
+          title: card.title,
+          column: card.column,
+          userId,
+        }));
+
+        console.log(cardData);
+
+        await prisma.kanban_Cards.createMany({
+          data: cardData,
+        });
+
+        return true;
+      } catch (error) {
+        console.error("Error saving Kanban cards:", error);
+        return false;
+      }
+    },
   },
 };
