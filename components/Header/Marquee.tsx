@@ -27,7 +27,7 @@ const DoubleScrollingLogos = () => {
 
 const DoubleScrollingLogosSidebar = () => {
     return (
-        <section className="bg-secondary px-5">
+        <section className="bg-[#fafafa] px-5">
             <div className="flex  overflow-hidden">
                 <TranslateWrapper>
                     <LogoItemsSidebar />

@@ -90,6 +90,23 @@ type KanbanCard {
   userId: Int!
 }
 
+type DeleteKanbanCardResponse {
+  success: Boolean!
+  message: String
+}
+
+type UpdateKanbanCardResponse {
+  success: Boolean!
+  message: String!
+  card: KanbanCard
+}
+
+input UpdateKanbanCardInput {
+  id: Int!
+  title: String!
+  column: String!
+}
+
   type Query {
     user: User
     users: [User]
@@ -99,6 +116,7 @@ type KanbanCard {
     getAll2DFiles: [Drawing2D!]!
     getAll3DFiles: [Drawing3D!]!
     getAllBOQFiles: [DrawingBOQ!]!
+    kanbanCards(userId: Int!): [KanbanCard]
   }
   
 
@@ -131,5 +149,7 @@ type KanbanCard {
       password: String!
     ): AccessControl
     saveKanbanCards(userId: Int!, cards: [KanbanCardInput!]!): Boolean!
+    deleteKanbanCard(id: Int!): DeleteKanbanCardResponse!
+    updateKanbanCard(id: Int!, title: String!, column: String!): UpdateKanbanCardResponse!
   }
 `;

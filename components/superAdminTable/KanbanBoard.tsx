@@ -2,8 +2,14 @@ import React, { useEffect, useState } from "react";
 import { FiPlus, FiTrash } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { FaFire } from "react-icons/fa";
-import { useMutation } from "@apollo/client";
-import { CARDS } from "@/lib/Queries";
+import { useMutation, useQuery } from "@apollo/client";
+import {
+    CARDS,
+    DELETE_KANBAN_CARDS,
+    GET_KANBAN_CARDS,
+    UPDATE_KANBAN_CARDS,
+} from "@/lib/Queries";
+import { Loader } from "../Loader";
 
 export const CustomKanban = ({ userId }: { userId: any }) => {
     return (
@@ -14,30 +20,45 @@ export const CustomKanban = ({ userId }: { userId: any }) => {
 };
 
 const Board = ({ userId }: { userId: any }) => {
-    const [cards, setCards] = useState([]);
-    const [saveKanbanCards] = useMutation(CARDS);
+    const { data, loading, error, refetch } = useQuery(GET_KANBAN_CARDS, {
+        variables: { userId },
+    });
+
+    const [cards, setCards] = useState<any[]>([]);
     const [isDisable, setIsDisable] = useState(false);
-    console.log("cards", cards);
-    console.log(isDisable);
+    const [canEdit, setCanEdit] = useState(false);
+
+    const [saveKanbanCards] = useMutation(CARDS);
+    const [updateKanbanCard] = useMutation(UPDATE_KANBAN_CARDS);
 
     useEffect(() => {
-        if (cards.length > 0) {
-            setIsDisable(true);
-        } else {
-            setIsDisable(false);
+        if (data && data.kanbanCards) {
+            setCards(data.kanbanCards.map((card: any) => ({
+                ...card,
+                isNew: false,  // Mark all cards fetched from DB as not new
+            })));
         }
+    }, [data]);
+
+    useEffect(() => {
+        setIsDisable(cards.length > 0);
     }, [cards]);
+
+    if (loading) return <Loader />;
+    if (error) return <p>Error: {error.message}</p>;
 
     const handleSave = async () => {
         try {
             if (cards.length === 0) {
-                return alert("please a new card");
+                return alert("Please add a new card before saving");
             }
+
             const updatedCards = cards.map((card: any) => ({
                 id: card.id ? parseInt(card.id, 10) : undefined,
                 title: card.title,
                 column: card.column,
                 userId: card.userId,
+                isNew: false,
             }));
 
             // Execute the mutation to save cards to the database
@@ -47,9 +68,33 @@ const Board = ({ userId }: { userId: any }) => {
                     cards: updatedCards,
                 },
             });
-            console.log("Cards saved successfully!");
+
+            if (result) {
+                refetch();
+                setCanEdit(true);
+                console.log("Cards saved successfully!");
+            }
         } catch (error) {
             console.error("Error saving cards:", error);
+        }
+    };
+
+    const handleCardUpdate = async (
+        cardId: number,
+        newTitle: string,
+        column: string
+    ) => {
+        try {
+            const { data } = await updateKanbanCard({
+                variables: { id: cardId, title: newTitle, column },
+            });
+
+            if (data.updateKanbanCard.success) {
+                refetch(); // To update the client-side with the latest data
+                console.log("Card updated successfully!");
+            }
+        } catch (error) {
+            console.error("Error updating card:", error);
         }
     };
 
@@ -64,8 +109,9 @@ const Board = ({ userId }: { userId: any }) => {
                         cards={cards}
                         setCards={setCards}
                         userId={userId}
+                        handleCardUpdate={handleCardUpdate}
+                        canEdit={canEdit}
                     />
-                    {/* <BurnBarrel setCards={setCards} /> */}
                 </div>
                 <div className="flex flex-col items-center">
                     <Column
@@ -75,8 +121,9 @@ const Board = ({ userId }: { userId: any }) => {
                         cards={cards}
                         setCards={setCards}
                         userId={userId}
+                        handleCardUpdate={handleCardUpdate}
+                        canEdit={canEdit}
                     />
-                    {/* <BurnBarrel setCards={setCards} /> */}
                 </div>
                 <div className="flex flex-col items-center">
                     <Column
@@ -86,16 +133,17 @@ const Board = ({ userId }: { userId: any }) => {
                         cards={cards}
                         setCards={setCards}
                         userId={userId}
+                        handleCardUpdate={handleCardUpdate}
+                        canEdit={canEdit}
                     />
-                    {/* <BurnBarrel setCards={setCards} /> */}
                 </div>
             </div>
             <div className="flex gap-3 items-center">
-                <BurnBarrel setCards={setCards} />
+                <BurnBarrel setCards={setCards} refetch={refetch} />
                 <button
                     onClick={handleSave}
-                    disabled={isDisable === false ? true : false}
-                    className={`w-full h-12 cursor-pointer px-5  text-white bg-secondary text-sm hover:bg-opacity-80 disabled:bg-opacity-50 disabled:cursor-not-allowed`}
+                    disabled={!isDisable}
+                    className={`w-full h-12 cursor-pointer px-5 text-white bg-secondary text-sm hover:bg-opacity-80 disabled:bg-opacity-50 disabled:cursor-not-allowed`}
                 >
                     Save Comments
                 </button>
@@ -104,7 +152,15 @@ const Board = ({ userId }: { userId: any }) => {
     );
 };
 
-const Column = ({ title, cards, column, setCards, userId }: any) => {
+const Column = ({
+    title,
+    cards,
+    column,
+    setCards,
+    userId,
+    handleCardUpdate,
+    canEdit
+}: any) => {
     const [active, setActive] = useState(false);
 
     const handleDragStart = (e: any, card: any) => {
@@ -221,7 +277,15 @@ const Column = ({ title, cards, column, setCards, userId }: any) => {
                     }`}
             >
                 {filteredCards.map((c: any) => {
-                    return <Card key={c.id} {...c} handleDragStart={handleDragStart} />;
+                    return (
+                        <Card
+                            key={c.id}
+                            {...c}
+                            handleDragStart={handleDragStart}
+                            handleCardUpdate={handleCardUpdate}
+                            canEdit={canEdit}
+                        />
+                    );
                 })}
                 <DropIndicator beforeId={null} column={column} />
                 <AddCard
@@ -235,19 +299,70 @@ const Column = ({ title, cards, column, setCards, userId }: any) => {
     );
 };
 
-const Card = ({ title, id, column, handleDragStart }: any) => {
+const Card = ({ title, id, column, handleDragStart, handleCardUpdate, canEdit }: any) => {
+    const [isEditing, setIsEditing] = useState(false);
+    const [newTitle, setNewTitle] = useState(title);
+    // const cardId = id ? parseInt(id, 10) : undefined
+
+    const handleEdit = () => {
+        if (!canEdit) return;
+        setIsEditing(true);
+    };
+
+    const handleSaveEdit = () => {
+        handleCardUpdate(id, newTitle, column);
+        setIsEditing(false);
+    };
     return (
         <>
-            <DropIndicator beforeId={id} column={column} />
-            <motion.div
-                layout
-                layoutId={id}
-                draggable="true"
-                onDragStart={(e) => handleDragStart(e, { title, id, column })}
-                className="cursor-grab rounded border border-primary/60 bg-primary p-3 active:cursor-grabbing"
-            >
-                <p className="text-sm text-neutral-100">{title}</p>
-            </motion.div>
+            <DropIndicator beforeId={id.toString()} column={column} />
+            {isEditing ? (
+                // <div className="cursor-grab rounded border border-primary/60 bg-primary p-3">
+                //     <input
+                //         value={newTitle}
+                //         onChange={(e) => setNewTitle(e.target.value)}
+                //         className="bg-primary text-white w-full p-2"
+                //     />
+                //     <button onClick={handleSaveEdit} className="text-success">Save</button>
+                //     <button onClick={() => setIsEditing(false)} className="text-warning">Cancel</button>
+                // </div>
+                <motion.div>
+                    <textarea
+                        value={newTitle}
+                        onChange={(e) => setNewTitle(e.target.value)}
+                        autoFocus
+                        placeholder="Add new task..."
+                        className="w-full rounded border border-violet-400 bg-[#1E3A8A] p-3 text-sm text-white placeholder-white focus:outline-0"
+                    />
+                    <div className="mt-1.5 flex items-center justify-end gap-1.5">
+                        <button
+                            onClick={() => setIsEditing(false)}
+                            className="px-3 py-1.5 text-xs text-warning transition-colors hover:text-warning/40"
+                        >
+                            Close
+                        </button>
+                        <button
+                            onClick={handleSaveEdit}
+                            type="submit"
+                            className="flex items-center gap-1.5 rounded bg-success px-3 py-1.5 text-xs text-white transition-colors hover:bg-success/50"
+                        >
+                            <span>Save</span>
+                            <FiPlus />
+                        </button>
+                    </div>
+                </motion.div>
+            ) : (
+                <motion.div
+                    layout
+                    layoutId={id.toString()}
+                    draggable="true"
+                    onDragStart={(e) => handleDragStart(e, { title, id, column })}
+                    onClick={handleEdit}
+                    className="cursor-grab rounded border border-primary/60 bg-primary p-3 active:cursor-grabbing"
+                >
+                    <p className="text-sm text-neutral-100">{title}</p>
+                </motion.div>
+            )}
         </>
     );
 };
@@ -262,8 +377,9 @@ const DropIndicator = ({ beforeId, column }: any) => {
     );
 };
 
-const BurnBarrel = ({ setCards }: any) => {
+const BurnBarrel = ({ setCards, refetch }: any) => {
     const [active, setActive] = useState(false);
+    const [deleteKanbanCard] = useMutation(DELETE_KANBAN_CARDS);
 
     const handleDragOver = (e: any) => {
         e.preventDefault();
@@ -274,11 +390,35 @@ const BurnBarrel = ({ setCards }: any) => {
         setActive(false);
     };
 
-    const handleDragEnd = (e: any) => {
-        const cardId = e.dataTransfer.getData("cardId");
-        console.log(e.dataTransfer);
+    // const handleDragEnd = (e: any) => {
+    //     const cardId = e.dataTransfer.getData("cardId");
+    //     // console.log(e.dataTransfer);
 
-        setCards((pv: any) => pv.filter((c: any) => c.id !== cardId));
+    //     setCards((pv: any) => pv.filter((c: any) => c.id !== cardId));
+
+    //     setActive(false);
+    // };
+
+    const handleDragEnd = async (e: any) => {
+        const cardId = e.dataTransfer.getData("cardId");
+
+        try {
+            // Call the mutation to delete the card from the database
+            const { data } = await deleteKanbanCard({
+                variables: { id: parseInt(cardId, 10) },
+            });
+
+            if (data.deleteKanbanCard.success) {
+                // Remove the card from the state
+                setCards((prev: any) => prev.filter((c: any) => c.id !== cardId));
+                refetch();
+                console.log("Card deleted successfully!");
+            } else {
+                console.error("Failed to delete card:", data.deleteKanbanCard.message);
+            }
+        } catch (error) {
+            console.error("Error deleting card:", error);
+        }
 
         setActive(false);
     };
@@ -366,20 +506,3 @@ const AddCard = ({ column, setCards, cards, userId }: any) => {
         </>
     );
 };
-
-const DEFAULT_CARDS = [
-    // 2D Note
-    { title: "Remarks", id: "1", column: "2D Note" },
-    // 2D Note
-    {
-        title: "Remarks",
-        id: "2",
-        column: "3D Note",
-    },
-    // 2D Note
-    {
-        title: "Remarks",
-        id: "3",
-        column: "BOQ Note",
-    },
-];
