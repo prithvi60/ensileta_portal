@@ -143,7 +143,7 @@ const Board = ({ userId }: { userId: any }) => {
                 <button
                     onClick={handleSave}
                     disabled={!isDisable}
-                    className={`w-full h-12 cursor-pointer px-5 text-white bg-secondary text-sm hover:bg-opacity-80 disabled:bg-opacity-50 disabled:cursor-not-allowed`}
+                    className={`w-full py-8 mt-10 cursor-pointer px-5 text-white bg-secondary text-sm hover:bg-opacity-80 disabled:bg-opacity-50 disabled:cursor-not-allowed`}
                 >
                     Save Comments
                 </button>
@@ -424,25 +424,31 @@ const BurnBarrel = ({ setCards, refetch }: any) => {
     };
 
     return (
-        <div className="text-center w-full gap-2 flex flex-col justify-center items-center ">
-            <div
-                onDrop={handleDragEnd}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                className={`mt-10 grid size-14 shrink-0 place-content-center rounded border text-3xl ${active
-                    ? "border-red-800 bg-warning/50 text-warning/80"
-                    : "border-neutral-500 bg-primary text-white"
-                    }`}
-            >
-                {active ? <FaFire className="animate-bounce text-xl" /> : <FiTrash />}
-            </div>
-            <div
-                className={`text-xs ${active ? " text-warning/65" : "text-neutral-500"
+        // <div className="text-center w-full gap-2 flex flex-col justify-center items-center">
+        <div
+            onDrop={handleDragEnd}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            className={`mt-10 grid py-3 px-5 shrink-0 place-items-center gap-3 place-content-center rounded border text-3xl ${active
+                ? "border-red-800 bg-warning/50 text-warning/80"
+                : "border-neutral-500 bg-primary text-white"
+                }`}
+        >
+            <h4 className="text-center">{active ? <FaFire className="animate-bounce text-xl" /> : <FiTrash />}</h4>
+            <p
+                className={`text-xs w-full ${active ? " text-warning/65" : "text-white whitespace-normal"
                     }`}
             >
                 Drag & Drop to delete
-            </div>
+            </p>
         </div>
+        // {/* <div
+        //     className={`text-xs ${active ? " text-warning/65" : "text-neutral-500"
+        //         }`}
+        // >
+        //     Drag & Drop to delete
+        // </div> */}
+        // </div>
     );
 };
 
