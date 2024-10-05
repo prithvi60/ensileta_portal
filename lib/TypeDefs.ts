@@ -13,6 +13,7 @@ export const typeDefs = `#graphql
     drawing2Dfiles: [Drawing2D]
     drawing3Dfiles: [Drawing3D]
     drawingBOQfiles: [DrawingBOQ]
+    kanbanCards:     [KanbanCard]
   }
 
   type AccessControl {
@@ -75,6 +76,37 @@ export const typeDefs = `#graphql
     createdAt: String!
   }
 
+  input KanbanCardInput {
+  id: Int
+  column: String!
+  title: String!
+  userId: Int!
+}
+
+type KanbanCard {
+  id: Int!
+  column: String!
+  title: String!
+  userId: Int!
+}
+
+type DeleteKanbanCardResponse {
+  success: Boolean!
+  message: String
+}
+
+type UpdateKanbanCardResponse {
+  success: Boolean!
+  message: String!
+  card: KanbanCard
+}
+
+input UpdateKanbanCardInput {
+  id: Int!
+  title: String!
+  column: String!
+}
+
   type Query {
     user: User
     users: [User]
@@ -84,6 +116,7 @@ export const typeDefs = `#graphql
     getAll2DFiles: [Drawing2D!]!
     getAll3DFiles: [Drawing3D!]!
     getAllBOQFiles: [DrawingBOQ!]!
+    kanbanCards(userId: Int!): [KanbanCard]
   }
   
 
@@ -115,6 +148,8 @@ export const typeDefs = `#graphql
       email: String!,
       password: String!
     ): AccessControl
-    
+    saveKanbanCards(userId: Int!, cards: [KanbanCardInput!]!): Boolean!
+    deleteKanbanCard(id: Int!): DeleteKanbanCardResponse!
+    updateKanbanCard(id: Int!, title: String!, column: String!): UpdateKanbanCardResponse!
   }
 `;

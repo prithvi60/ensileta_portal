@@ -325,3 +325,44 @@ export const UPLOAD_S3_STORAGE = gql`
     }
   }
 `;
+
+// Kanban Cards
+export const CARDS = gql`
+  mutation SaveKanbanCards($userId: Int!, $cards: [KanbanCardInput!]!) {
+    saveKanbanCards(userId: $userId, cards: $cards)
+  }
+`;
+
+export const GET_KANBAN_CARDS = gql`
+  query GetKanbanCards($userId: Int!) {
+    kanbanCards(userId: $userId) {
+      id
+      title
+      column
+      userId
+    }
+  }
+`;
+
+export const DELETE_KANBAN_CARDS = gql`
+  mutation DeleteKanbanCard($id: Int!) {
+    deleteKanbanCard(id: $id) {
+      success
+      message
+    }
+  }
+`;
+
+export const UPDATE_KANBAN_CARDS = gql`
+  mutation UpdateKanbanCard($id: Int!, $title: String!, $column: String!) {
+    updateKanbanCard(id: $id, title: $title, column: $column) {
+      success
+      message
+      card {
+        id
+        title
+        column
+      }
+    }
+  }
+`;

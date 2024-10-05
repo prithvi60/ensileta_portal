@@ -154,6 +154,17 @@ export const resolvers = {
         throw new Error("Failed to fetch user");
       }
     },
+    kanbanCards: async (_: any, { userId }: { userId: number }) => {
+      try {
+        const cards = await prisma.kanban_Cards.findMany({
+          where: { userId },
+        });
+        return cards;
+      } catch (error) {
+        console.error("Error fetching Kanban cards:", error);
+        throw new Error("Unable to fetch Kanban cards");
+      }
+    },
   },
   Mutation: {
     signUp: async (
@@ -415,6 +426,90 @@ export const resolvers = {
       });
 
       return createdFile;
+    },
+    saveKanbanCards: async (_: any, { userId, cards }: any) => {
+      try {
+        if (!userId) {
+          throw new Error("Unauthorized");
+        }
+
+        // First, delete all existing cards for the user
+        await prisma.kanban_Cards.deleteMany({
+          where: { userId },
+        });
+
+        // Insert updated cards
+        const cardData = cards.map((card: any) => ({
+          id: card.id || undefined,
+          title: card.title,
+          column: card.column,
+          userId,
+        }));
+
+        console.log(cardData);
+
+        await prisma.kanban_Cards.createMany({
+          data: cardData,
+        });
+
+        return true;
+      } catch (error) {
+        console.error("Error saving Kanban cards:", error);
+        return false;
+      }
+    },
+    deleteKanbanCard: async (_: any, { id }: { id: number }) => {
+      try {
+        // Check if the card exists
+        const card = await prisma.kanban_Cards.findUnique({
+          where: { id },
+        });
+
+        if (!card) {
+          return {
+            success: false,
+            message: "Card not found",
+          };
+        }
+
+        // Delete the card
+        await prisma.kanban_Cards.delete({
+          where: { id },
+        });
+
+        return {
+          success: true,
+          message: "Card deleted successfully",
+        };
+      } catch (error) {
+        console.error("Error deleting card:", error);
+        return {
+          success: false,
+          message: "Failed to delete the card",
+        };
+      }
+    },
+    updateKanbanCard: async (_: any, { id, title, column }: any) => {
+      try {
+        const updatedCard = await prisma.kanban_Cards.update({
+          where: { id },
+          data: {
+            title,
+            column,
+          },
+        });
+        return {
+          success: true,
+          message: "Card updated successfully",
+          card: updatedCard,
+        };
+      } catch (error) {
+        return {
+          success: false,
+          message: "Failed to update card",
+          card: null,
+        };
+      }
     },
   },
 };

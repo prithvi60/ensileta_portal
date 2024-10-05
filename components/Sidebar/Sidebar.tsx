@@ -13,6 +13,7 @@ import { SiLibreofficedraw } from "react-icons/si";
 import { GET_EMPLOYEE, GET_USERS } from "@/lib/Queries";
 import { useQuery } from "@apollo/client";
 import { useParams } from "next/navigation";
+import { MarqueeSidebar } from "../Header/Marquee";
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -154,7 +155,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   return (
     <ClickOutside onClick={() => setSidebarOpen(false)}>
       <aside
-        className={`fixed left-0 top-0 z-[1001] flex h-screen w-72.5 flex-col overflow-y-hidden bg-primary duration-300 ease-linear lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        className={`fixed left-0 top-0 z-[1001] flex h-screen w-72.5 flex-col overflow-y-hidden bg-primary duration-300 ease-linear lg:translate-x-0 gap-4 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
           }`}
       >
         {/* <!-- SIDEBAR HEADER --> */}
@@ -203,7 +204,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         </div>
         {/* <!-- SIDEBAR HEADER --> */}
 
-        <div className="no-scrollbar flex flex-col overflow-y-auto scrollbar duration-300 ease-linear">
+        <div className="no-scrollbar flex flex-col overflow-y-auto sidebar_scroll duration-300 ease-linear h-full max-h-[480px]">
           {/* <!-- Sidebar Menu --> */}
           {role === "super admin" ? (
             <>
@@ -231,9 +232,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             <nav className="px-4 py-4 lg:px-6">
               {menuGroups.map((group, groupIndex) => (
                 <div key={groupIndex}>
-                  <h3 className="mb-4 ml-4 capitalize text-xl font-semibold text-bodydark2">
+                  {/* <h3 className="mb-4 ml-4 capitalize text-xl font-semibold text-bodydark2">
                     {group.name}
-                  </h3>
+                  </h3> */}
 
                   <ul className="mb-6 flex flex-col gap-1.5">
                     {group.menuItems.map((menuItem, menuIndex) => (
@@ -252,6 +253,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
           )}
           {/* <!-- Sidebar Menu --> */}
         </div>
+        <MarqueeSidebar />
       </aside>
     </ClickOutside>
   );
