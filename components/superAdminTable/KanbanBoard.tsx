@@ -3,6 +3,7 @@ import { FiPlus, FiTrash } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { FaFire } from "react-icons/fa";
 import { useMutation, useQuery } from "@apollo/client";
+import { MdEdit } from "react-icons/md";
 import {
     CREATE_CARD,
     DELETE_KANBAN_CARDS,
@@ -12,6 +13,7 @@ import {
 } from "@/lib/Queries";
 import { Loader } from "../Loader";
 import toast from "react-hot-toast";
+import DeleteModal from "./Modal";
 
 export const CustomKanban = ({ userId }: { userId: any }) => {
     return (
@@ -162,13 +164,6 @@ const Board = ({ userId }: { userId: any }) => {
             </div>
             <div className="flex gap-3 items-center">
                 <BurnBarrel setCards={setCards} refetch={refetch} />
-                {/* <button
-                    onClick={handleSave}
-                    disabled={!isDisable}
-                    className={`w-full py-8 mt-10 cursor-pointer px-5 text-white bg-secondary text-sm hover:bg-opacity-80 disabled:bg-opacity-50 disabled:cursor-not-allowed`}
-                >
-                    Save Comments
-                </button> */}
             </div>
         </div>
     );
@@ -370,9 +365,10 @@ const Card = ({ title, id, column, handleDragStart, handleCardUpdate }: any) => 
                     draggable="true"
                     onDragStart={(e) => handleDragStart(e, { title, id, column })}
                     onClick={handleEdit}
-                    className="cursor-grab rounded border border-primary/60 bg-primary p-3 active:cursor-grabbing"
+                    className="cursor-grab rounded border border-primary/60 bg-primary p-3 active:cursor-grabbing relative"
                 >
                     <p className="text-sm text-neutral-100">{title}</p>
+                    <MdEdit className="text-white text-xl absolute top-[12px] right-2" />
                 </motion.div>
             )}
         </>
@@ -393,6 +389,9 @@ const DropIndicator = ({ beforeId, column }: any) => {
 const BurnBarrel = ({ setCards, refetch }: any) => {
     const [active, setActive] = useState(false);
     const [deleteKanbanCard] = useMutation(DELETE_KANBAN_CARDS);
+    const [isOpen, setIsOpen] = useState(false);
+    const [deleteCardId, setDeleteCardId] = useState("");
+    console.log("id", deleteCardId);
 
     const handleDragOver = (e: any) => {
         e.preventDefault();
@@ -405,16 +404,18 @@ const BurnBarrel = ({ setCards, refetch }: any) => {
 
     const handleDragEnd = async (e: any) => {
         const cardId = e.dataTransfer.getData("cardId");
+        setIsOpen(true)
+        setDeleteCardId(cardId)
+    };
 
+    const confirmDeleteCard = async () => {
         try {
-            // Call the mutation to delete the card from the database
             const { data } = await deleteKanbanCard({
-                variables: { id: parseInt(cardId, 10) },
+                variables: { id: parseInt(deleteCardId, 10) },
             });
 
             if (data.deleteKanbanCard.success) {
-                // Remove the card from the state
-                setCards((prev: any) => prev.filter((c: any) => c.id !== cardId));
+                setCards((prev: any) => prev.filter((c: any) => c.id !== deleteCardId));
                 refetch();
                 toast.success("Card deleted successfully!", {
                     position: "top-right",
@@ -449,28 +450,31 @@ const BurnBarrel = ({ setCards, refetch }: any) => {
             console.error("Error deleting card:", error);
         }
 
+        setIsOpen(false);
         setActive(false);
     };
 
     return (
-        // <div className="text-center w-full gap-2 flex flex-col justify-center items-center">
-        <div
-            onDrop={handleDragEnd}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            className={`mt-10 grid py-3 px-5 shrink-0 place-items-center gap-3 place-content-center rounded border text-3xl ${active
-                ? "border-red-800 bg-warning/50 text-warning/80"
-                : "border-neutral-500 bg-primary text-white"
-                }`}
-        >
-            <h4 className="text-center">{active ? <FaFire className="animate-bounce text-xl" /> : <FiTrash />}</h4>
-            <p
-                className={`text-xs w-full ${active ? " text-warning/65" : "text-white whitespace-normal"
+        <>
+            <div
+                onDrop={handleDragEnd}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                className={`mt-10 grid py-3 px-5 shrink-0 place-items-center gap-3 place-content-center rounded border text-3xl ${active
+                    ? "border-red-800 bg-warning/50 text-warning/80"
+                    : "border-neutral-500 bg-primary text-white"
                     }`}
             >
-                Drag & Drop to delete
-            </p>
-        </div>
+                <h4 className="text-center">{active ? <FaFire className="animate-bounce text-xl" /> : <FiTrash />}</h4>
+                <p
+                    className={`text-xs w-full ${active ? " text-warning/65" : "text-white whitespace-normal"
+                        }`}
+                >
+                    Drag & Drop to delete
+                </p>
+            </div>
+            <DeleteModal isOpen={isOpen} setIsOpen={setIsOpen} setActive={setActive} confirmDeleteCard={confirmDeleteCard} />
+        </>
     );
 };
 
@@ -561,36 +565,40 @@ const AddCard = ({ column, setCards, cards, userId, refetch }: any) => {
             if (data?.saveKanbanCard) {
                 setCards((prevCards: any) => [...prevCards, newCard]);
                 refetch();
-                console.log("Card added successfully!");
+                toast.success("Card added successfully!", {
+                    position: "top-right",
+                    duration: 3000,
+                    style: {
+                        border: "1px solid #499d49",
+                        padding: "16px",
+                        color: "#499d49",
+                    },
+                    iconTheme: {
+                        primary: "#499d49",
+                        secondary: "#FFFAEE",
+                    },
+                });
             }
         } catch (error) {
             console.error("Error adding card:", error);
+            toast.error("Failed to add card", {
+                position: "top-right",
+                duration: 3000,
+                style: {
+                    border: "1px solid #EB1C23",
+                    padding: "16px",
+                    color: "#EB1C23",
+                },
+                iconTheme: {
+                    primary: "#EB1C23",
+                    secondary: "#FFFAEE",
+                },
+            });
         }
 
         setAdding(false);
         setText("");
     };
-
-
-    // const [text, setText] = useState("");
-    // const [adding, setAdding] = useState(false);
-
-    // const handleSubmit = (e: any) => {
-    //     e.preventDefault();
-
-    //     if (!text.trim().length) return;
-
-    //     const newCard = {
-    //         column,
-    //         title: text.trim(),
-    //         id: (Math.floor(Math.random() * 100) + 1).toString(),
-    //         userId,
-    //     };
-
-    //     setCards((pv: any) => [...pv, newCard]);
-
-    //     setAdding(false);
-    // };
 
     return (
         <>
