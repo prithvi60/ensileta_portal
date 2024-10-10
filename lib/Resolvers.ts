@@ -427,34 +427,28 @@ export const resolvers = {
 
       return createdFile;
     },
-    saveKanbanCards: async (_: any, { userId, cards }: any) => {
+    saveKanbanCard: async (_: any, { userId, card }: any) => {
       try {
         if (!userId) {
           throw new Error("Unauthorized");
         }
 
-        // First, delete all existing cards for the user
-        await prisma.kanban_Cards.deleteMany({
-          where: { userId },
-        });
-
-        // Insert updated cards
-        const cardData = cards.map((card: any) => ({
+        // Construct the card data
+        const cardData = {
           id: card.id || undefined,
           title: card.title,
           column: card.column,
           userId,
-        }));
+        };
 
-        console.log(cardData);
-
-        await prisma.kanban_Cards.createMany({
+        // Create the card in the database
+        await prisma.kanban_Cards.create({
           data: cardData,
         });
 
         return true;
       } catch (error) {
-        console.error("Error saving Kanban cards:", error);
+        console.error("Error saving Kanban card:", error);
         return false;
       }
     },
@@ -513,3 +507,35 @@ export const resolvers = {
     },
   },
 };
+
+// saveKanbanCards: async (_: any, { userId, cards }: any) => {
+//   try {
+//     if (!userId) {
+//       throw new Error("Unauthorized");
+//     }
+
+//     // First, delete all existing cards for the user
+//     await prisma.kanban_Cards.deleteMany({
+//       where: { userId },
+//     });
+
+//     // Insert updated cards
+//     const cardData = cards.map((card: any) => ({
+//       id: card.id || undefined,
+//       title: card.title,
+//       column: card.column,
+//       userId,
+//     }));
+
+//     console.log(cardData);
+
+//     await prisma.kanban_Cards.createMany({
+//       data: cardData,
+//     });
+
+//     return true;
+//   } catch (error) {
+//     console.error("Error saving Kanban cards:", error);
+//     return false;
+//   }
+// },
