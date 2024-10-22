@@ -21,6 +21,7 @@ model users {
   drawing3Dfiles  Drawing_3D[]
   drawingBOQfiles Drawing_BOQ[]
   kanbanCards     Kanban_Cards[]
+  markers  Marker[]
 }
 
 model Drawing_2D {
@@ -67,4 +68,15 @@ model Kanban_Cards {
   title  String
   userId Int
   user   users  @relation(fields: [userId], references: [id])
+}
+
+model Marker {
+  id        Int      @id @default(autoincrement())
+  top       Float
+  left      Float
+  comment   String
+  userId    Int
+  user      users     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

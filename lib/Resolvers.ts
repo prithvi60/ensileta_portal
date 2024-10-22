@@ -165,6 +165,20 @@ export const resolvers = {
         throw new Error("Unable to fetch Kanban cards");
       }
     },
+    markers: async (_: any, { userId }: { userId: number }) => {
+      try {
+        const data = await prisma.marker.findMany({
+          where: { userId },
+        });
+        return data;
+      } catch (error) {
+        console.error("Error fetching Markers Data:", error);
+        throw new Error("Unable to fetch Markers Data");
+      }
+    },
+    // marker: async (_: any, { id }: { id: number }) => {
+    //   return await prisma.marker.findUnique({ where: { id } });
+    // },
   },
   Mutation: {
     signUp: async (
@@ -446,7 +460,7 @@ export const resolvers = {
           userId,
         }));
 
-        console.log(cardData);
+        // console.log(cardData);
 
         await prisma.kanban_Cards.createMany({
           data: cardData,
@@ -510,6 +524,55 @@ export const resolvers = {
           card: null,
         };
       }
+    },
+    addMarkers: async (
+      _: any,
+      {
+        userId,
+        markers,
+      }: {
+        userId: number;
+        markers: Array<{ top: number; left: number; comment: string }>;
+      }
+    ) => {
+      try {
+        if (!userId) {
+          throw new Error("Unauthorized");
+        }
+
+        await prisma.marker.deleteMany({
+          where: { userId },
+        });
+
+        await prisma.marker.createMany({
+          data: markers.map((marker) => ({
+            top: marker.top,
+            left: marker.left,
+            comment: marker.comment,
+            userId,
+          })),
+        });
+
+        return true;
+      } catch (error) {
+        console.error("Error saving markers data:", error);
+        return false;
+      }
+    },
+    updateMarker: async (
+      _: any,
+      { id, comment }: { id: number; comment: string }
+    ) => {
+      return await prisma.marker.update({
+        where: { id },
+        data: { comment },
+      });
+    },
+
+    deleteMarker: async (_: any, { id }: { id: number }) => {
+      return await prisma.marker.delete({
+        where: { id },
+      });
     },
   },
 };

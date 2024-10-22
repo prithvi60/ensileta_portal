@@ -366,3 +366,22 @@ export const UPDATE_KANBAN_CARDS = gql`
     }
   }
 `;
+
+// Markers
+
+export const GET_MARKERS = gql`
+  query GetMarkers($userId: Int!) {
+    markers(userId: $userId) {
+      id
+      top
+      left
+      comment
+    }
+  }
+`;
+
+export const ADD_MARKERS = gql`
+  mutation AddMarkers($userId: Int!, $markers: [MarkerInput!]!) {
+    addMarkers(userId: $userId, markers: $markers)
+  }
+`;

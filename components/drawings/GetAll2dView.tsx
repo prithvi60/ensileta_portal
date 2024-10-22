@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { Marquee } from "../Header/Marquee";
 import Image from "next/image";
 import React from "react"
+import RemarkModal from "./RemarkModal";
 
 interface FileData {
   id: number;
@@ -27,6 +28,7 @@ interface GetAll2DViewProps {
   allUsers: any;
   fileType: string;
   refetchUsers: any;
+  handleSave: any
 }
 
 export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
@@ -35,7 +37,8 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
   title,
   allUsers,
   fileType,
-  refetchUsers
+  refetchUsers,
+  handleSave
 }) => {
   const { data: RoleBased } = useQuery(GET_USER);
   // const { data: session } = useSession()
@@ -170,13 +173,13 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
             pdf={lastItem?.fileUrl || ""}
             version={data?.length || 0}
             id={lastItem?.id || 1}
-            
+
           />
-          <div className="w-full sm:w-1/2 mx-auto">
+          <div className="w-full flex justify-between items-center">
             <button
               disabled={isApproved || isApproving}
               type="submit"
-              className="cursor-pointer w-full p-4 shadow-md select-none bg-secondary text-white hover:bg-primary disabled:bg-opacity-70 disabled:cursor-not-allowed"
+              className="cursor-pointer w-full sm:w-1/2 p-4 shadow-md select-none bg-secondary text-white hover:bg-primary disabled:bg-opacity-70 disabled:cursor-not-allowed"
               onClick={handleSendEmail}
             >
               {isApproving
@@ -185,6 +188,14 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
                   ? "Approved"
                   : `Approve`}
             </button>
+            {/* <button
+              type="button"
+              className="cursor-pointer w-max p-4 shadow-md select-none bg-secondary text-white hover:bg-primary"
+            // onClick={handleSendEmail}
+            >
+              Remarks
+            </button> */}
+            <RemarkModal handleSave={handleSave} />
           </div>
         </>
       )}

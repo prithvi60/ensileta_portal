@@ -107,6 +107,22 @@ input UpdateKanbanCardInput {
   column: String!
 }
 
+type Marker {
+    id: Int!
+    top: Float!
+    left: Float!
+    comment: String!
+    userId: Int!
+    createdAt: String!
+    updatedAt: String!
+  }
+
+  input MarkerInput {
+    top: Float!
+    left: Float!
+    comment: String!
+  }
+
   type Query {
     user: User
     users: [User]
@@ -117,6 +133,8 @@ input UpdateKanbanCardInput {
     getAll3DFiles: [Drawing3D!]!
     getAllBOQFiles: [DrawingBOQ!]!
     kanbanCards(userId: Int!): [KanbanCard]
+    markers(userId: Int!): [Marker!]!
+    marker(id: Int!): Marker
   }
   
 
@@ -151,5 +169,8 @@ input UpdateKanbanCardInput {
     saveKanbanCards(userId: Int!, cards: [KanbanCardInput!]!): Boolean!
     deleteKanbanCard(id: Int!): DeleteKanbanCardResponse!
     updateKanbanCard(id: Int!, title: String!, column: String!): UpdateKanbanCardResponse!
+    addMarkers(userId: Int!, markers: [MarkerInput!]!): Boolean!
+    updateMarker(id: Int!, comment: String!): Marker!
+    deleteMarker(id: Int!): Marker!
   }
 `;
