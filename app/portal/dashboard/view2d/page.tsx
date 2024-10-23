@@ -45,34 +45,24 @@ const Page = () => {
     // console.log(userId);
 
     //Define the markers
-    const [markers, setMarkers] = useState<Array<Marker & { comment?: string }>>([
+    const [markers, setMarkers] = useState<Array<Marker & { comment?: string, id?:number }>>([
         // Add comment field to Marker type
     ]);
-
-    console.log("exist", existingMarkers);
-
-    useEffect(() => {
-        console.log("Existing markers fetched:", existingMarkers);
-        if (existingMarkers && existingMarkers.length > 0) {
-            setMarkers(existingMarkers);
-        }
-    }, [existingMarkers]);
 
     // const handleAddMarker = (marker: Marker, comment: string) => {
     //     const newMarker = { ...marker, comment };
     //     setMarkers([...markers, newMarker]);
     // };
-    const handleAddMarker = (marker: Marker, comment: string) => {
-        // const isMarkerExist = markers.some(
-        //     (m) => m.top === marker.top && m.left === marker.left
-        // );
-
-        // if (!isMarkerExist) {
-        const newMarker = { ...marker, comment };
-        setMarkers((prevMarkers) => [...prevMarkers, newMarker]);
-        // } else {
-        //     console.log("Marker already exists at this position.");
-        // }
+    const handleAddMarker = (marker: Marker, comment: string,id:number) => {
+        
+        // console.log("new",marker)
+        const latestcomment= comment === "" ? "nil": comment
+        const newMarker = { ...marker, comment:latestcomment ,id:id};
+        setMarkers((prevMarkers) => {
+            const filteredMarkers = prevMarkers.filter(m => m.top !== newMarker.top);
+            return [...filteredMarkers, newMarker];
+        });
+    
     };
 
     const handleSave = async () => {
@@ -123,19 +113,16 @@ const Page = () => {
                 </section>
             )}
 
-            {existingLoading ? (
-                <p className="text-xl font-semibold">Loading....</p>
-            ) : (
+          
                 <ImageMarker
                     src="/cover/banner-img.jpg"
                     markers={markers}
-                    onAddMarker={(marker: Marker) => handleAddMarker(marker, "")} // Pass empty comment initially
+                    onAddMarker={(marker: Marker) => handleAddMarker(marker, "",markers.length)} // Pass empty comment initially
                     markerComponent={(props) => (
-                        <CustomMarker {...props} onAddComment={handleAddMarker} />
+                        <CustomMarker {...props} onAddComment={handleAddMarker} markers={markers}/>
                     )}
                     extraClass="cursor-crosshair"
                 />
-            )}
         </DefaultLayout>
     );
 };
@@ -144,10 +131,12 @@ export default Page;
 
 const CustomMarker = ({
     onAddComment,
+    markers,
     top,
     left,
 }: MarkerComponentProps & {
-    onAddComment: (marker: Marker, comment: string) => void;
+    onAddComment: (marker: Marker, comment: string, id:number) => void;
+    markers:any;
 }) => {
     const [isHovered, setIsHovered] = useState<boolean>(false);
     const [inputValue, setInputValue] = useState<string>("");
@@ -162,8 +151,8 @@ const CustomMarker = ({
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Enter" && inputRef.current) {
             const marker = { top, left };
-            onAddComment(marker, inputValue); // Pass the comment back to the Page component
-            inputRef.current.blur();
+            onAddComment(marker, inputValue,markers.length); // Pass the comment back to the Page component
+            console.log("val",inputValue)
         }
     };
     return (
@@ -172,8 +161,10 @@ const CustomMarker = ({
             onMouseLeave={() => setIsHovered(false)}
             className="relative"
         >
-            {isHovered ? (
-                // true
+            {
+            // isHovered
+            true
+             ? (
                 <input
                     ref={inputRef}
                     type="text"
