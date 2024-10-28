@@ -396,19 +396,29 @@ const SpringModal = ({
                 })}
               </Slider>
             </div>
-            <div className="absolute top-8 right-0 flex ">
-          { isMarkerEnabled &&   <div className="text-black">
-                Click anywhere to type and Enter / use button to comment
-              </div>}
-              <button
-                type="submit"
-                className="cursor-pointer w-full  p-4 shadow-md select-none bg-secondary text-white hover:bg-primary"
-                onClick={()=>setIsMarkerEnabled((o)=>!o)}
-              >
-                Add Remarks
-              </button>
-            </div>
           </motion.div>
+          <div
+            className="fixed top-0 right-0 flex bg-white"
+            onClick={(e) => {
+              e.stopPropagation(); // Prevent event from bubbling up
+            }}
+          >
+            {isMarkerEnabled && (
+              <div className="text-black">
+                Click anywhere to type and Enter / use button to comment
+              </div>
+            )}
+            <button
+              type="submit"
+              className="cursor-pointer w-full  p-4 shadow-md select-none bg-secondary text-white hover:bg-primary"
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent event from bubbling up
+                setIsMarkerEnabled((o) => !o);
+              }}
+            >
+              {isMarkerEnabled ? "Close Remarks" : "Add Remarks"}
+            </button>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>
