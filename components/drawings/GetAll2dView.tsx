@@ -175,7 +175,7 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
             id={lastItem?.id || 1}
 
           />
-          <div className="w-full flex justify-between items-center">
+          {/* <div className="w-full flex justify-between items-center">
             <button
               disabled={isApproved || isApproving}
               type="submit"
@@ -187,7 +187,7 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
                 : isApproved
                   ? "Approved"
                   : `Approve`}
-            </button>
+            </button> */}
             {/* <button
               type="button"
               className="cursor-pointer w-max p-4 shadow-md select-none bg-secondary text-white hover:bg-primary"
@@ -195,8 +195,8 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
             >
               Remarks
             </button> */}
-            <RemarkModal handleSave={handleSave} />
-          </div>
+            <RemarkModal handleSave={handleSave} pdf={lastItem?.fileUrl || ""} handleSendEmail={handleSendEmail} isApproved={isApproved} isApproving={isApproving}/>
+          {/* </div> */}
         </>
       )}
       <div className="fixed bottom-0 z-[1000] flex flex-col justify-center  w-full bg-white drop-shadow-1 sm:hidden px-4 py-4 items-center shadow-2 md:px-6 2xl:px-11">
