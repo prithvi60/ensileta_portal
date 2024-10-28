@@ -262,9 +262,6 @@ export default function ModernCarousel({
         setIsOpen={setIsOpen}
         handleSave={handleSave}
         images={imgs}
-        handleSendEmail={handleSendEmail}
-        isApproved={isApproved}
-        isApproving={isApproving}
       />
     </div>
   );
@@ -299,42 +296,55 @@ const SpringModal = ({
   setIsOpen,
   handleSave,
   images,
-  handleSendEmail,
-  isApproved,
-  isApproving,
 }: {
   isOpen: boolean;
   setIsOpen: Function;
   handleSave: any;
   images: string[];
-  handleSendEmail: any;
-  isApproved: any;
-  isApproving: any;
 }) => {
-  const [isMarkerEnabled, setIsMarkerEnabled] = useState<boolean>(true);
-  const [markers, setMarkers] = useState<Array<Marker & { comment?: string }>>([
-    // Update from DB
-    {
-      top: 45.12916772715704,
-      left: 51.92,
-      comment: "change colour",
-    },
-    {
-      top: 64.83901756172054,
-      left: 30.24,
-      comment: "remove this",
-    },
-  ]);
-  // console.log("markers", markers);
-  const handleAddMarker = (marker: Marker, comment: string) => {
-    // console.log("new",marker)
-    // const latestcomment = comment === "" ? "nil" : comment;
+  const [isMarkerEnabled, setIsMarkerEnabled] = useState<boolean>(false);
+  const [index, setIndex] = useState<number>(0);
+
+  const [markers, setMarkers] = useState<
+    Array<Array<Marker & { comment?: string }>>
+  >(
+    Array.from(
+      { length: images.length },
+      (_, index) =>
+        index === 0
+          ? [
+              // Only populate the first array with dummy data
+              {
+                top: 45.12916772715704,
+                left: 51.92,
+                comment: "change colour",
+              },
+              {
+                top: 64.83901756172054,
+                left: 30.24,
+                comment: "remove this",
+              },
+            ]
+          : [] // Other arrays remain empty
+    )
+  );
+  const handleSliderChange = (newIndex: number) => {
+    setIndex(newIndex); // Update the index when the slider changes
+  };
+  // Update the handleAddMarker function to accept an image index
+  const handleAddMarker = (
+    imageIndex: number,
+    marker: Marker,
+    comment: string
+  ) => {
     const newMarker = { ...marker, comment: comment };
     setMarkers((prevMarkers) => {
-      const filteredMarkers = prevMarkers.filter(
-        (m) => m.top !== newMarker.top
-      );
-      return [...filteredMarkers, newMarker];
+      const updatedMarkers = [...prevMarkers];
+      const filteredMarkers =
+        updatedMarkers[imageIndex]?.filter((m) => m.top !== newMarker.top) ||
+        [];
+      updatedMarkers[imageIndex] = [...filteredMarkers, newMarker];
+      return updatedMarkers;
     });
   };
   const handleClose = () => {
@@ -351,6 +361,18 @@ const SpringModal = ({
     // speed: 1000,
     nextArrow: <NextArrow />,
     prevArrow: <PrevArrow />,
+  };
+  const toggleFullScreen = () => {
+    const element = document.documentElement; // Get the document element
+    if (!document.fullscreenElement) {
+      element.requestFullscreen().catch((err) => {
+        console.error(
+          `Error attempting to enable full-screen mode: ${err.message} (${err.name})`
+        );
+      });
+    } else {
+      document.exitFullscreen();
+    }
   };
   return (
     <AnimatePresence>
@@ -371,21 +393,23 @@ const SpringModal = ({
             onContextMenu={(e) => e.preventDefault()} // Disable right-click
           >
             <div className="slider-container">
-              <Slider {...settings}>
+              <Slider {...settings} afterChange={handleSliderChange}>
                 {images.map((src, idx) => {
                   return (
                     <ImageMarker
                       key={idx}
                       src={src}
-                      markers={markers}
-                      onAddMarker={(marker: Marker) =>
-                        handleAddMarker(marker, "")
-                      } // Pass empty comment initially
+                      markers={markers[idx] || []} // Pass markers for the current image
+                      onAddMarker={
+                        (marker: Marker) => handleAddMarker(idx, marker, "") // Pass the current image index
+                      }
                       markerComponent={(props) => (
                         <CustomMarker
                           {...props}
-                          onAddComment={handleAddMarker}
-                          markers={markers}
+                          onAddComment={(marker, comment) =>
+                            handleAddMarker(idx, marker, comment)
+                          } // Pass the current image index
+                          markers={markers[idx] || []} // Pass markers for the current image
                         />
                       )}
                       extraClass={`cursor-crosshair ${
@@ -397,6 +421,21 @@ const SpringModal = ({
               </Slider>
             </div>
           </motion.div>
+          <div className="fixed top-0 left-0 flex bg-white">
+            <div>
+              {index + 1} / {images.length}
+            </div>
+            <button
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent event from bubbling up
+                toggleFullScreen();
+              }}
+              className="bg-secondary hover:bg-primary transition-colors text-white p-2 ml-4"
+            >
+              Fullscreen
+            </button>
+          </div>
+
           <div
             className="fixed top-0 right-0 flex bg-white"
             onClick={(e) => {
