@@ -9,7 +9,6 @@ import { useEffect, useState } from "react";
 import { Marquee } from "../Header/Marquee";
 import Image from "next/image";
 import React from "react"
-import RemarkModal from "./RemarkModal";
 
 interface FileData {
   id: number;
@@ -173,9 +172,10 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
             pdf={lastItem?.fileUrl || ""}
             version={data?.length || 0}
             id={lastItem?.id || 1}
-
+            handleSave={handleSave}
+            handleSendEmail={handleSendEmail} isApproved={isApproved} isApproving={isApproving}
           />
-          {/* <div className="w-full flex justify-between items-center">
+          <div className="w-full flex flex-col justify-between items-center text-justify">
             <button
               disabled={isApproved || isApproving}
               type="submit"
@@ -187,7 +187,10 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
                 : isApproved
                   ? "Approved"
                   : `Approve`}
-            </button> */}
+            </button>
+            <p className="mt-8">
+            Please review the drawings and click the &apos;Approve&apos; button to confirm if this version is acceptable. You can add comments in the &apos;Remarks&apos; section by viewing the drawing in fullscreen and annotating directly on the image.
+            </p>
             {/* <button
               type="button"
               className="cursor-pointer w-max p-4 shadow-md select-none bg-secondary text-white hover:bg-primary"
@@ -195,8 +198,8 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
             >
               Remarks
             </button> */}
-            <RemarkModal handleSave={handleSave} pdf={lastItem?.fileUrl || ""} handleSendEmail={handleSendEmail} isApproved={isApproved} isApproving={isApproving}/>
-          {/* </div> */}
+            {/* <RemarkModal handleSave={handleSave} pdf={lastItem?.fileUrl || ""} handleSendEmail={handleSendEmail} isApproved={isApproved} isApproving={isApproving}/> */}
+          </div>
         </>
       )}
       <div className="fixed bottom-0 z-[1000] flex flex-col justify-center  w-full bg-white drop-shadow-1 sm:hidden px-4 py-4 items-center shadow-2 md:px-6 2xl:px-11">

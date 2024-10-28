@@ -1,51 +1,36 @@
-import React, { useState, useRef } from "react";
-import {
-  ReactSketchCanvas,
-  type ReactSketchCanvasRef,
-} from "react-sketch-canvas";
+import React, { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePDFJS } from "@/hooks/usePdfJS";
-import FsLightbox from "fslightbox-react";
 import toast from "react-hot-toast";
-
+import Image from "next/image";
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
+import { GiVirtualMarker } from "react-icons/gi";
+import Slider from "react-slick";
+import ImageMarker, { Marker, MarkerComponentProps } from "react-image-marker";
+import { FaCircleArrowUp } from "react-icons/fa6";
+import { useSession } from "next-auth/react";
 export default function ModernCarousel({
   pdf,
   version,
   id,
+  handleSendEmail,
+  isApproved,
+  isApproving,
+  handleSave,
 }: {
   pdf: string;
   version: number;
   id: number;
+  handleSave: any;
+  handleSendEmail: any;
+  isApproved: any;
+  isApproving: any;
 }) {
   const [idx, setIdx] = useState(0);
   const [prevIdx, setPrevIdx] = useState(idx);
   const [imgs, setImgs] = useState<string[]>([]);
-  const [toggle, setToggle] = useState(false);
-  const [loadremarks, setloadremarks] = useState(false);
-  const [edit, setEdit] = useState(false);
 
-
-  const [selectedItem, setSelectedItem] = useState(0);
-  const [lightboxController, setLightboxController] = useState({
-    toggler: toggle,
-    slide: selectedItem + 1,
-  });
-  const canvasRef = useRef<ReactSketchCanvasRef>(null);
-  const [eraseMode, setEraseMode] = useState(false);
-  //   text box related
-  const [textInput, setTextInput] = useState("");
-  const [textPosition, setTextPosition] = useState<{
-    x: number;
-    y: number;
-  } | null>(null);
-
-  function openLightboxOnSlide(number: number) {
-    setLightboxController({
-      toggler: !lightboxController.toggler,
-      slide: number + 1,
-    });
-    setToggle(true);
-  }
+  const [isOpen, setIsOpen] = useState(false);
 
   usePDFJS(async (pdfjs) => {
     try {
@@ -79,121 +64,87 @@ export default function ModernCarousel({
     }
   });
 
-  //   const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
-  //     const canvas = canvasRef.current;
-  //     if (canvas) {
-  //       const rect = canvas.getCanvas().getBoundingClientRect();
-  //       const x = e.clientX - rect.left;
-  //       const y = e.clientY - rect.top;
-  //       setTextPosition({ x, y });
-  //       setTextInput("");
-  //     }
-  //   };
-
-  const handleAddText = () => {
-    if (canvasRef.current && textInput && textPosition) {
-      canvasRef.current.addText(textInput, {
-        fontSize: 20,
-        color: "black",
-        x: textPosition.x,
-        y: textPosition.y,
-      });
-      setTextPosition(null);
-    }
-  };
-
   const trend = idx > prevIdx ? 1 : -1;
   const imageIndex = Math.abs(idx % imgs.length);
 
-  const handleRemarks = () => {
-    if (canvasRef.current) {
-      canvasRef.current
-        .exportImage("png")
-        .then((data) => {
-          sendMail(data);
-        })
-        .catch(() => console.log("error"));
-    }
-  };
+  //   const sendMail = async (imageurl: string) => {
+  //     // Extract the base64 data (after the comma)
+  // const base64Data = imageurl.split(',')[1];
+  // // console.log(base64Data);
+  // setloadremarks(true)
+  //     try {
+  //       const response = await fetch("/api/sendMail", {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({
+  //           // admin email
+  //           recipientEmail: `prithvi@webibee.com`,
+  //           subject: "Update Image by Client",
+  //           message: `
+  //             <p>We need to make these changes </p>
+  //             <img style="width:250px;" src="unique@image">
+  //           `,
+  //           attachments: [
+  //             {
+  //                 filename: 'change.png', // Name of the image
+  //                 content: base64Data,
+  //                 cid: 'unique@image', // Same CID as in the image src above
+  //                 contentType: 'image/png', // Content type based on the data URL
+  //                 encoding: 'base64'
+  //             },
+  //             // {
+  //             //   filename: 'document.pdf',
+  //             //   content: base64PDFData, // The base64 string of the PDF
+  //             //   contentType: 'application/pdf', // Set the correct content type for PDFs
+  //             //   encoding: 'base64', // Specify base64 encoding
+  //             // }
+  //         ]
+  //         }),
+  //       });
 
-  const sendMail = async (imageurl: string) => {
-    // Extract the base64 data (after the comma)
-const base64Data = imageurl.split(',')[1];
-// console.log(base64Data); 
-setloadremarks(true)
-    try {
-      const response = await fetch("/api/sendMail", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          // admin email
-          recipientEmail: `prithvi@webibee.com`,
-          subject: "Update Image by Client",
-          message: `
-            <p>We need to make these changes </p>
-            <img style="width:250px;" src="unique@image">
-          `,
-          attachments: [
-            {
-                filename: 'change.png', // Name of the image
-                content: base64Data,
-                cid: 'unique@image', // Same CID as in the image src above
-                contentType: 'image/png', // Content type based on the data URL
-                encoding: 'base64' 
-            },
-            // {
-            //   filename: 'document.pdf',
-            //   content: base64PDFData, // The base64 string of the PDF
-            //   contentType: 'application/pdf', // Set the correct content type for PDFs
-            //   encoding: 'base64', // Specify base64 encoding
-            // }
-        ]
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      setLightboxController({
-        toggler: !lightboxController.toggler,
-        slide: 1,
-      });
-      const data = await response.json();
-      if (data) {
-        setloadremarks(false)
-        toast.success("Remark sent successfully", {
-          position: "top-right",
-          duration: 6000,
-          style: {
-            border: "1px solid #65a34e",
-            padding: "16px",
-            color: "#65a34e",
-          },
-          iconTheme: {
-            primary: "#65a34e",
-            secondary: "#FFFAEE",
-          },
-        });
-      }
-    } catch (error: any) {
-      console.error("Error sending email:", error);
-      toast.error(error.message, {
-        position: "top-right",
-        duration: 3000,
-        style: {
-          border: "1px solid #EB1C23",
-          padding: "16px",
-          color: "#EB1C23",
-        },
-        iconTheme: {
-          primary: "#EB1C23",
-          secondary: "#FFFAEE",
-        },
-      });
-    }
-  };
+  //       if (!response.ok) {
+  //         throw new Error("Network response was not ok");
+  //       }
+  //       setLightboxController({
+  //         toggler: !lightboxController.toggler,
+  //         slide: 1,
+  //       });
+  //       const data = await response.json();
+  //       if (data) {
+  //         setloadremarks(false)
+  //         toast.success("Remark sent successfully", {
+  //           position: "top-right",
+  //           duration: 6000,
+  //           style: {
+  //             border: "1px solid #65a34e",
+  //             padding: "16px",
+  //             color: "#65a34e",
+  //           },
+  //           iconTheme: {
+  //             primary: "#65a34e",
+  //             secondary: "#FFFAEE",
+  //           },
+  //         });
+  //       }
+  //     } catch (error: any) {
+  //       console.error("Error sending email:", error);
+  //       toast.error(error.message, {
+  //         position: "top-right",
+  //         duration: 3000,
+  //         style: {
+  //           border: "1px solid #EB1C23",
+  //           padding: "16px",
+  //           color: "#EB1C23",
+  //         },
+  //         iconTheme: {
+  //           primary: "#EB1C23",
+  //           secondary: "#FFFAEE",
+  //         },
+  //       });
+  //     }
+  //   };
 
   return (
     <div className="h-[30vw] min-h-[200px] max-h-[400px] bg-black relative overflow-hidden">
@@ -222,7 +173,7 @@ setloadremarks(true)
         <AnimatePresence initial={false} custom={trend}>
           {imgs.length > 0 ? (
             <motion.img
-              onClick={() => openLightboxOnSlide(imageIndex)}
+              onClick={() => setIsOpen(true)}
               variants={imgVariants}
               custom={trend}
               initial="initial"
@@ -237,7 +188,7 @@ setloadremarks(true)
             />
           ) : (
             <motion.img
-              onClick={() => openLightboxOnSlide(imageIndex)}
+              onClick={() => setIsOpen(true)}
               variants={imgVariants}
               custom={trend}
               initial="initial"
@@ -306,132 +257,14 @@ setloadremarks(true)
           }}
         />
       </AnimatePresence>
-      <FsLightbox
-        exitFullscreenOnClose={true}
-        toggler={lightboxController.toggler}
-        sources={imgs.map((img) => (
-          <div key={img} className="relative">
-            <div className="mb-2 gap-2 align-items-center bg-white flex">
-            <button
-                type="button"
-                className="btn btn-sm btn-outline-primary"
-                onClick={() => {
-                  setEdit(true);
-                }}
-              >
-                Edit
-              </button>
-              {edit &&
-              <>
-              <button
-                type="button"
-                className="btn btn-sm btn-outline-primary"
-                disabled={!eraseMode}
-                onClick={() => {
-                  setEraseMode(false);
-                  canvasRef.current?.eraseMode(false);
-                }}
-              >
-                Draw
-              </button>
-              <button
-                type="button"
-                className="btn btn-sm btn-outline-primary"
-                disabled={eraseMode}
-                onClick={() => {
-                  setEraseMode(true);
-                  canvasRef.current?.eraseMode(true);
-                }}
-              >
-                Eraser
-              </button>
-              <button
-                type="button"
-                className="btn btn-sm btn-outline-primary"
-                onClick={() => {
-                  // Toggle visibility of text input
-                  setTextInput(""); // Reset text input
-                  setTextPosition(null); // Clear text position
-                }}
-              >
-                Add Text
-              </button>
-              <div className="vr" />
-              <button
-                type="button"
-                className="btn btn-sm btn-outline-primary"
-                onClick={() => canvasRef.current?.undo()}
-              >
-                Undo
-              </button>
-              <button
-                type="button"
-                className="btn btn-sm btn-outline-primary"
-                onClick={() => canvasRef.current?.redo()}
-              >
-                Redo
-              </button>
-              <button
-                type="button"
-                className="btn btn-sm btn-outline-primary"
-                onClick={() => canvasRef.current?.clearCanvas()}
-              >
-                Clear
-              </button>
-              <button
-                type="button"
-                className="btn btn-sm btn-outline-primary"
-                onClick={() => canvasRef.current?.resetCanvas()}
-              >
-                Reset
-              </button>
-              </>}
-            </div>
-
-            <ReactSketchCanvas
-              ref={canvasRef}
-              width="20em"
-              height="20em"
-              backgroundImage={img}
-              strokeColor="#65a34e"
-              // onClick={handleCanvasClick} // Handle canvas click
-            />
-            {/* Add text bx manually */}
-            {textPosition && (
-              <input
-                type="text"
-                value={textInput}
-                onChange={(e) => setTextInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    // Add text on Enter key press
-                    handleAddText();
-                  }
-                }}
-                placeholder="Enter text"
-                className="absolute" // Position it as needed
-                style={{
-                  left: textPosition.x,
-                  top: textPosition.y,
-                }}
-              />
-            )}
-            <div className="mb-2 gap-2 flex w-full relative">
-              <button
-                type="button"
-                className="btn btn-sm btn-outline-primary bg-white mt-2 mx-auto p-5"
-                onClick={handleRemarks}
-              >
-               {loadremarks?" Sending changes... ":"Send Remarks"}
-              </button>
-            </div>
-          </div>
-        ))}
-        type="image"
-        slide={lightboxController.slide}
-        onClose={() => {
-          setToggle(false);
-        }}
+      <SpringModal
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        handleSave={handleSave}
+        images={imgs}
+        handleSendEmail={handleSendEmail}
+        isApproved={isApproved}
+        isApproving={isApproving}
       />
     </div>
   );
@@ -460,3 +293,243 @@ const titleVariants = {
     opacity: 0,
   }),
 };
+
+const SpringModal = ({
+  isOpen,
+  setIsOpen,
+  handleSave,
+  images,
+  handleSendEmail,
+  isApproved,
+  isApproving,
+}: {
+  isOpen: boolean;
+  setIsOpen: Function;
+  handleSave: any;
+  images: string[];
+  handleSendEmail: any;
+  isApproved: any;
+  isApproving: any;
+}) => {
+  const [isMarkerEnabled, setIsMarkerEnabled] = useState<boolean>(true);
+  const [markers, setMarkers] = useState<Array<Marker & { comment?: string }>>([
+    // Update from DB
+    {
+      top: 45.12916772715704,
+      left: 51.92,
+      comment: "change colour",
+    },
+    {
+      top: 64.83901756172054,
+      left: 30.24,
+      comment: "remove this",
+    },
+  ]);
+  // console.log("markers", markers);
+  const handleAddMarker = (marker: Marker, comment: string) => {
+    // console.log("new",marker)
+    // const latestcomment = comment === "" ? "nil" : comment;
+    const newMarker = { ...marker, comment: comment };
+    setMarkers((prevMarkers) => {
+      const filteredMarkers = prevMarkers.filter(
+        (m) => m.top !== newMarker.top
+      );
+      return [...filteredMarkers, newMarker];
+    });
+  };
+  const handleClose = () => {
+    setIsOpen(false);
+    handleSave();
+  };
+  const settings = {
+    dots: false,
+    infinite: false,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    // autoplay: true,
+    // autoplaySpeed: 3000,
+    // speed: 1000,
+    nextArrow: <NextArrow />,
+    prevArrow: <PrevArrow />,
+  };
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={handleClose}
+          className="bg-black/90 backdrop-blur p-8 fixed inset-0 z-[1001] grid place-items-center overflow-y-scroll"
+        >
+          <motion.div
+            initial={{ scale: 0, rotate: "12.5deg" }}
+            animate={{ scale: 1, rotate: "0deg" }}
+            exit={{ scale: 0, rotate: "0deg" }}
+            className="text-white p-6 w-full max-w-7xl relative h-full"
+            onClick={(e) => e.stopPropagation()}
+            onContextMenu={(e) => e.preventDefault()} // Disable right-click
+          >
+            <div className="slider-container">
+              <Slider {...settings}>
+                {images.map((src, idx) => {
+                  return (
+                    <ImageMarker
+                      key={idx}
+                      src={src}
+                      markers={markers}
+                      onAddMarker={(marker: Marker) =>
+                        handleAddMarker(marker, "")
+                      } // Pass empty comment initially
+                      markerComponent={(props) => (
+                        <CustomMarker
+                          {...props}
+                          onAddComment={handleAddMarker}
+                          markers={markers}
+                        />
+                      )}
+                      extraClass={`cursor-crosshair ${
+                        !isMarkerEnabled ? "pointer-events-none" : ""
+                      }`}
+                    />
+                  );
+                })}
+              </Slider>
+            </div>
+            <div className="absolute top-8 right-0 flex ">
+          { isMarkerEnabled &&   <div className="text-black">
+                Click anywhere to type and Enter / use button to comment
+              </div>}
+              <button
+                type="submit"
+                className="cursor-pointer w-full  p-4 shadow-md select-none bg-secondary text-white hover:bg-primary"
+                onClick={()=>setIsMarkerEnabled((o)=>!o)}
+              >
+                Add Remarks
+              </button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
+const CustomMarker = ({
+  onAddComment,
+  markers,
+  top,
+  left,
+}: MarkerComponentProps & {
+  onAddComment: (marker: Marker, comment: string) => void;
+  markers: any;
+}) => {
+  const [isHovered, setIsHovered] = useState<boolean>(false);
+  const [inputValue, setInputValue] = useState<string>("");
+  const [storedValue, setStoredValue] = useState<string>("");
+
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const { data: session } = useSession();
+  const userName = session?.user?.name || "Unknown";
+  // console.log("custom marker",markers)
+  useEffect(() => {
+    if (isHovered && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isHovered]);
+  useEffect(() => {
+    const existingMarker = markers.find(
+      (marker: { top: Number }) => marker.top === top
+    );
+    if (existingMarker) {
+      setInputValue(existingMarker.comment || ""); // Set comment if exists
+      setStoredValue(existingMarker.comment || "");
+    }
+  }, [markers, top]);
+  // @ts-ignore
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && inputRef.current) {
+      const marker = { top, left };
+      onAddComment(marker, inputValue); // Pass the comment back to the Page component
+      setIsHovered(false);
+      //   console.log("val", inputValue);
+    }
+  };
+
+  const handleBtn = () => {
+    if (inputRef.current) {
+      const marker = { top, left };
+      onAddComment(marker, inputValue); // Pass the comment back to the Page component
+      setIsHovered(false);
+
+      //   console.log("val", inputValue);
+    }
+  };
+  return (
+    <div
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className="relative"
+    >
+      {isHovered ? (
+        <div className="relative">
+          <label className="mb-.5 block font-medium text-black">
+            {userName}
+          </label>
+          <div className="relative">
+            <textarea
+              ref={inputRef}
+              disabled={storedValue.length > 0}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              placeholder="Add comments"
+              className=" scrollbar-hidden z-1000 w-full rounded-lg border bg-white border-stroke bg-transparent py-2 pl-2 pr-10 text-[#0E132A] outline-none focus:border-primary focus-visible:shadow-none mr-8"
+              onKeyDown={handleKeyDown}
+              rows={1}
+            />
+            {storedValue.length === 0 ? (
+              <button
+                className="absolute right-4 top-[42%] transform -translate-y-1/2 cursor-pointer "
+                onClick={handleBtn} // Trigger handleKeyDown on click
+                // disabled={storedValue.length > 0}
+              >
+                <FaCircleArrowUp size={24} className={"text-secondary"} />
+              </button>
+            ) : null}
+          </div>
+        </div>
+      ) : (
+        <div className="absolute top-0 left-0 flex items-center">
+          <GiVirtualMarker className="text-4xl sm:text-5xl text-secondary shadow-md" />
+        </div>
+      )}
+    </div>
+  );
+};
+function NextArrow(props: any) {
+  const { onClick } = props;
+  return (
+    <div
+      className={
+        "p-1.5 md:p-2 xl:p-3 rounded-full bg-primary absolute top-1/2 cursor-pointer -right-5 md:-right-10 xl:-right-14 group"
+      }
+      onClick={onClick}
+    >
+      <FaArrowRight className="text-sm text-white md:text-lg xl:text-xl group-hover:text-secondary" />
+    </div>
+  );
+}
+
+function PrevArrow(props: any) {
+  const { onClick } = props;
+  return (
+    <div
+      className={
+        "p-1.5 md:p-2 xl:p-3 rounded-full bg-primary absolute top-1/2 cursor-pointer -left-5 md:-left-10 xl:-left-14 group"
+      }
+      onClick={onClick}
+    >
+      <FaArrowLeft className="text-sm text-white md:text-lg xl:text-xl group-hover:text-secondary" />
+    </div>
+  );
+}
