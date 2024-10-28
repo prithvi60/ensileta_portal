@@ -35,3 +35,17 @@
   background: #fafafa;
   border-radius: 5px;
 }
+.scrollbar-hidden {
+  overflow: auto; /* Allow scrolling */
+}
+
+/* Hide scrollbar for WebKit browsers (Chrome, Safari, Opera) */
+.scrollbar-hidden::-webkit-scrollbar {
+  width: 0; /* Hide scrollbar width */
+  background: transparent; /* Optional: make background transparent */
+}
+
+/* Hide scrollbar for Firefox */
+.scrollbar-hidden {
+  scrollbar-width: none; /* Hide scrollbar for Firefox */
+}
