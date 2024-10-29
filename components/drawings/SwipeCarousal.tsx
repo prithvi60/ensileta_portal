@@ -66,85 +66,8 @@ export default function ModernCarousel({
 
   const trend = idx > prevIdx ? 1 : -1;
   const imageIndex = Math.abs(idx % imgs.length);
-
-  //   const sendMail = async (imageurl: string) => {
-  //     // Extract the base64 data (after the comma)
-  // const base64Data = imageurl.split(',')[1];
-  // // console.log(base64Data);
-  // setloadremarks(true)
-  //     try {
-  //       const response = await fetch("/api/sendMail", {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({
-  //           // admin email
-  //           recipientEmail: `prithvi@webibee.com`,
-  //           subject: "Update Image by Client",
-  //           message: `
-  //             <p>We need to make these changes </p>
-  //             <img style="width:250px;" src="unique@image">
-  //           `,
-  //           attachments: [
-  //             {
-  //                 filename: 'change.png', // Name of the image
-  //                 content: base64Data,
-  //                 cid: 'unique@image', // Same CID as in the image src above
-  //                 contentType: 'image/png', // Content type based on the data URL
-  //                 encoding: 'base64'
-  //             },
-  //             // {
-  //             //   filename: 'document.pdf',
-  //             //   content: base64PDFData, // The base64 string of the PDF
-  //             //   contentType: 'application/pdf', // Set the correct content type for PDFs
-  //             //   encoding: 'base64', // Specify base64 encoding
-  //             // }
-  //         ]
-  //         }),
-  //       });
-
-  //       if (!response.ok) {
-  //         throw new Error("Network response was not ok");
-  //       }
-  //       setLightboxController({
-  //         toggler: !lightboxController.toggler,
-  //         slide: 1,
-  //       });
-  //       const data = await response.json();
-  //       if (data) {
-  //         setloadremarks(false)
-  //         toast.success("Remark sent successfully", {
-  //           position: "top-right",
-  //           duration: 6000,
-  //           style: {
-  //             border: "1px solid #65a34e",
-  //             padding: "16px",
-  //             color: "#65a34e",
-  //           },
-  //           iconTheme: {
-  //             primary: "#65a34e",
-  //             secondary: "#FFFAEE",
-  //           },
-  //         });
-  //       }
-  //     } catch (error: any) {
-  //       console.error("Error sending email:", error);
-  //       toast.error(error.message, {
-  //         position: "top-right",
-  //         duration: 3000,
-  //         style: {
-  //           border: "1px solid #EB1C23",
-  //           padding: "16px",
-  //           color: "#EB1C23",
-  //         },
-  //         iconTheme: {
-  //           primary: "#EB1C23",
-  //           secondary: "#FFFAEE",
-  //         },
-  //       });
-  //     }
-  //   };
+  const { data: session } = useSession();
+  const userName = session?.user?.name || "Unknown";
 
   return (
     <div className="h-[30vw] min-h-[200px] max-h-[400px] bg-black relative overflow-hidden">
@@ -262,6 +185,7 @@ export default function ModernCarousel({
         setIsOpen={setIsOpen}
         handleSave={handleSave}
         images={imgs}
+        userName={userName}
       />
     </div>
   );
@@ -296,11 +220,13 @@ const SpringModal = ({
   setIsOpen,
   handleSave,
   images,
+  userName
 }: {
   isOpen: boolean;
   setIsOpen: Function;
   handleSave: any;
   images: string[];
+  userName:string;
 }) => {
   const [isMarkerEnabled, setIsMarkerEnabled] = useState<boolean>(false);
   const [index, setIndex] = useState<number>(0);
@@ -335,9 +261,10 @@ const SpringModal = ({
   const handleAddMarker = (
     imageIndex: number,
     marker: Marker,
-    comment: string
+    comment: string,
+    user:string
   ) => {
-    const newMarker = { ...marker, comment: comment };
+    const newMarker = { ...marker, comment: comment,user };
     setMarkers((prevMarkers) => {
       const updatedMarkers = [...prevMarkers];
       const filteredMarkers =
@@ -374,6 +301,7 @@ const SpringModal = ({
       document.exitFullscreen();
     }
   };
+  console.log("markers",markers)
   return (
     <AnimatePresence>
       {isOpen && (
@@ -401,13 +329,13 @@ const SpringModal = ({
                       src={src}
                       markers={markers[idx] || []} // Pass markers for the current image
                       onAddMarker={
-                        (marker: Marker) => handleAddMarker(idx, marker, "") // Pass the current image index
+                        (marker: Marker) => handleAddMarker(idx, marker, "",userName) // Pass the current image index
                       }
                       markerComponent={(props) => (
                         <CustomMarker
                           {...props}
                           onAddComment={(marker, comment) =>
-                            handleAddMarker(idx, marker, comment)
+                            handleAddMarker(idx, marker, comment,userName)
                           } // Pass the current image index
                           markers={markers[idx] || []} // Pass markers for the current image
                         />
@@ -480,6 +408,7 @@ const CustomMarker = ({
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const { data: session } = useSession();
   const userName = session?.user?.name || "Unknown";
+  const [user, setUser] = useState<string>(userName);
   // console.log("custom marker",markers)
   useEffect(() => {
     if (isHovered && inputRef.current) {
@@ -493,6 +422,7 @@ const CustomMarker = ({
     if (existingMarker) {
       setInputValue(existingMarker.comment || ""); // Set comment if exists
       setStoredValue(existingMarker.comment || "");
+      setUser(existingMarker.user)
     }
   }, [markers, top]);
   // @ts-ignore
@@ -523,7 +453,7 @@ const CustomMarker = ({
       {isHovered ? (
         <div className="relative">
           <label className="mb-.5 block font-medium text-black">
-            {userName}
+            {user}
           </label>
           <div className="relative">
             <textarea
