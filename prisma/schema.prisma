@@ -21,18 +21,17 @@ model users {
   drawing3Dfiles  Drawing_3D[]
   drawingBOQfiles Drawing_BOQ[]
   kanbanCards     Kanban_Cards[]
-  markers         Marker[]
-  MarkerGroup     MarkerGroup[]
 }
 
 model Drawing_2D {
-  id        Int      @id @default(autoincrement())
-  filename  String
-  fileUrl   String
-  version   Int
-  createdAt DateTime @default(now())
-  userId    Int
-  user      users    @relation(fields: [userId], references: [id])
+  id           Int           @id @default(autoincrement())
+  filename     String
+  fileUrl      String
+  version      Int
+  createdAt    DateTime      @default(now())
+  userId       Int
+  user         users         @relation(fields: [userId], references: [id])
+  markerGroups MarkerGroup[]
 }
 
 model Drawing_3D {
@@ -43,6 +42,7 @@ model Drawing_3D {
   createdAt DateTime @default(now())
   userId    Int
   user      users    @relation(fields: [userId], references: [id])
+  // markerGroups MarkerGroup[]
 }
 
 model Drawing_BOQ {
@@ -53,7 +53,31 @@ model Drawing_BOQ {
   createdAt DateTime @default(now())
   userId    Int
   user      users    @relation(fields: [userId], references: [id])
+  // markerGroups MarkerGroup[]
 }
+
+model Marker {
+  id            Int         @id @default(autoincrement())
+  top           Float
+  left          Float
+  comment       String
+  user          String
+  userId        Int
+  markerGroupId Int
+  markerGroup   MarkerGroup @relation(fields: [markerGroupId], references: [id])
+}
+
+model MarkerGroup {
+  id          Int         @id @default(autoincrement())
+  markers     Marker[]
+  drawing2DId Int?
+  drawing2D   Drawing_2D? @relation(fields: [drawing2DId], references: [id])
+}
+
+// drawing3DId  Int?
+// drawingBOQId Int?
+// drawing3D    Drawing_3D?  @relation(fields: [drawing3DId], references: [id])
+// drawingBOQ   Drawing_BOQ? @relation(fields: [drawingBOQId], references: [id])
 
 model accessControl {
   id       Int    @id @default(autoincrement())
@@ -71,34 +95,12 @@ model Kanban_Cards {
   user   users  @relation(fields: [userId], references: [id])
 }
 
-model Marker {
-  id        Int      @id @default(autoincrement())
-  top       Float
-  left      Float
-  comment   String
-  userId    Int
-  user      users    @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 // model Marker {
-//   id            Int         @id @default(autoincrement())
-//   top           Float
-//   left          Float
-//   comment       String
-//   markerGroupId Int
-//   markerGroup   MarkerGroup @relation(fields: [markerGroupId], references: [id])
-//   createdAt     DateTime    @default(now())
-//   updatedAt     DateTime    @updatedAt
-//   users         users?      @relation(fields: [usersId], references: [id])
-//   usersId       Int?
-// }
-
-// model MarkerGroup {
 //   id        Int      @id @default(autoincrement())
-//   markers   Marker[] 
-//   userId    Int 
+//   top       Float
+//   left      Float
+//   comment   String
+//   userId    Int
 //   user      users    @relation(fields: [userId], references: [id])
 //   createdAt DateTime @default(now())
 //   updatedAt DateTime @updatedAt

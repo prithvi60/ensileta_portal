@@ -40,6 +40,7 @@ export const typeDefs = `#graphql
     version: Int
     userId: String
     createdAt: String
+    markerGroups: [MarkerGroup!]!
   }
 
   type Drawing3D {
@@ -49,6 +50,7 @@ export const typeDefs = `#graphql
     version: Int
     userId: String
     createdAt: String
+    markerGroups: [MarkerGroup]
   }
 
   type DrawingBOQ {
@@ -58,6 +60,7 @@ export const typeDefs = `#graphql
     version: Int
     userId: String
     createdAt: String
+    markerGroups: [MarkerGroup]
   }
 
 
@@ -108,20 +111,35 @@ input UpdateKanbanCardInput {
 }
 
 type Marker {
-    id: Int!
-    top: Float!
-    left: Float!
-    comment: String!
-    userId: Int!
-    createdAt: String!
-    updatedAt: String!
-  }
+  id: Int!
+  comment: String!
+  left: Float!
+  top: Float!
+  user: String!
+  userId: Int!
+  markerGroupId: Int!
+}
 
-  input MarkerInput {
-    top: Float!
-    left: Float!
-    comment: String!
-  }
+input MarkerInput {
+  comment: String!
+  left: Float!
+  top: Float!
+  user: String!
+  userId: Int!
+}
+
+input MarkerGroupInput {
+  drawing2DId: Int
+  markers: [MarkerInput!]!
+}
+
+type MarkerGroup {
+  id: Int!
+  markers: [Marker!]!
+  drawing2DId: Int
+  drawing2D: Drawing2D
+}
+
 
   type Query {
     user: User
@@ -133,8 +151,8 @@ type Marker {
     getAll3DFiles: [Drawing3D!]!
     getAllBOQFiles: [DrawingBOQ!]!
     kanbanCards(userId: Int!): [KanbanCard]
-    markers(userId: Int!): [Marker!]!
-    marker(id: Int!): Marker
+    getAllMarkerGroups: [MarkerGroup!]!
+  getMarkerGroupsByDrawing2D(drawing2DId: Int!): [MarkerGroup!]!
   }
   
 
@@ -169,8 +187,6 @@ type Marker {
     saveKanbanCards(userId: Int!, cards: [KanbanCardInput!]!): Boolean!
     deleteKanbanCard(id: Int!): DeleteKanbanCardResponse!
     updateKanbanCard(id: Int!, title: String!, column: String!): UpdateKanbanCardResponse!
-    addMarkers(userId: Int!, markers: [MarkerInput!]!): Boolean!
-    updateMarker(id: Int!, comment: String!): Marker!
-    deleteMarker(id: Int!): Marker!
+    addMarkerGroup(data: MarkerGroupInput!): MarkerGroup!
   }
 `;

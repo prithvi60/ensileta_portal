@@ -16,15 +16,17 @@ export default function ModernCarousel({
   handleSendEmail,
   isApproved,
   isApproving,
-  handleSave,
+  addMarkerGroup,
+  userId,
 }: {
   pdf: string;
   version: number;
   id: number;
-  handleSave: any;
+  addMarkerGroup: any;
   handleSendEmail: any;
   isApproved: any;
   isApproving: any;
+  userId: number;
 }) {
   const [idx, setIdx] = useState(0);
   const [prevIdx, setPrevIdx] = useState(idx);
@@ -183,9 +185,11 @@ export default function ModernCarousel({
       <SpringModal
         isOpen={isOpen}
         setIsOpen={setIsOpen}
-        handleSave={handleSave}
+        addMarkerGroup={addMarkerGroup}
         images={imgs}
         userName={userName}
+        userId={userId}
+        id={id}
       />
     </div>
   );
@@ -218,15 +222,19 @@ const titleVariants = {
 const SpringModal = ({
   isOpen,
   setIsOpen,
-  handleSave,
+  addMarkerGroup,
   images,
-  userName
+  userName,
+  userId,
+  id,
 }: {
   isOpen: boolean;
   setIsOpen: Function;
-  handleSave: any;
+  addMarkerGroup: any;
   images: string[];
-  userName:string;
+  userName: string;
+  userId: number;
+  id: number;
 }) => {
   const [isMarkerEnabled, setIsMarkerEnabled] = useState<boolean>(false);
   const [index, setIndex] = useState<number>(0);
@@ -239,18 +247,18 @@ const SpringModal = ({
       (_, index) =>
         index === 0
           ? [
-              // Only populate the first array with dummy data
-              {
-                top: 45.12916772715704,
-                left: 51.92,
-                comment: "change colour",
-              },
-              {
-                top: 64.83901756172054,
-                left: 30.24,
-                comment: "remove this",
-              },
-            ]
+            // Only populate the first array with dummy data
+            {
+              top: 45.12916772715704,
+              left: 51.92,
+              comment: "change colour",
+            },
+            {
+              top: 64.83901756172054,
+              left: 30.24,
+              comment: "remove this",
+            },
+          ]
           : [] // Other arrays remain empty
     )
   );
@@ -262,9 +270,10 @@ const SpringModal = ({
     imageIndex: number,
     marker: Marker,
     comment: string,
-    user:string
+    user: string,
+    userId: number
   ) => {
-    const newMarker = { ...marker, comment: comment,user };
+    const newMarker = { ...marker, comment: comment, user, userId };
     setMarkers((prevMarkers) => {
       const updatedMarkers = [...prevMarkers];
       const filteredMarkers =
@@ -274,10 +283,16 @@ const SpringModal = ({
       return updatedMarkers;
     });
   };
-  const handleClose = () => {
+
+  const handleClose = async () => {
     setIsOpen(false);
-    handleSave();
+    await addMarkerGroup({
+      variables: { data: { drawing2DId: id, markers: markers.flat() } },
+    });
+    alert("Successfully saved!");
+
   };
+
   const settings = {
     dots: false,
     infinite: false,
@@ -301,7 +316,7 @@ const SpringModal = ({
       document.exitFullscreen();
     }
   };
-  console.log("markers",markers)
+  console.log("markers", markers);
   return (
     <AnimatePresence>
       {isOpen && (
@@ -329,20 +344,26 @@ const SpringModal = ({
                       src={src}
                       markers={markers[idx] || []} // Pass markers for the current image
                       onAddMarker={
-                        (marker: Marker) => handleAddMarker(idx, marker, "",userName) // Pass the current image index
+                        (marker: Marker) =>
+                          handleAddMarker(idx, marker, "", userName, userId) // Pass the current image index
                       }
                       markerComponent={(props) => (
                         <CustomMarker
                           {...props}
                           onAddComment={(marker, comment) =>
-                            handleAddMarker(idx, marker, comment,userName)
+                            handleAddMarker(
+                              idx,
+                              marker,
+                              comment,
+                              userName,
+                              userId
+                            )
                           } // Pass the current image index
                           markers={markers[idx] || []} // Pass markers for the current image
                         />
                       )}
-                      extraClass={`cursor-crosshair ${
-                        !isMarkerEnabled ? "pointer-events-none" : ""
-                      }`}
+                      extraClass={`cursor-crosshair ${!isMarkerEnabled ? "pointer-events-none" : ""
+                        }`}
                     />
                   );
                 })}
@@ -422,7 +443,7 @@ const CustomMarker = ({
     if (existingMarker) {
       setInputValue(existingMarker.comment || ""); // Set comment if exists
       setStoredValue(existingMarker.comment || "");
-      setUser(existingMarker.user)
+      setUser(existingMarker.user);
     }
   }, [markers, top]);
   // @ts-ignore
@@ -452,9 +473,7 @@ const CustomMarker = ({
     >
       {isHovered ? (
         <div className="relative">
-          <label className="mb-.5 block font-medium text-black">
-            {user}
-          </label>
+          <label className="mb-.5 block font-medium text-black">{user}</label>
           <div className="relative">
             <textarea
               ref={inputRef}
@@ -470,7 +489,7 @@ const CustomMarker = ({
               <button
                 className="absolute right-4 top-[42%] transform -translate-y-1/2 cursor-pointer "
                 onClick={handleBtn} // Trigger handleKeyDown on click
-                // disabled={storedValue.length > 0}
+              // disabled={storedValue.length > 0}
               >
                 <FaCircleArrowUp size={24} className={"text-secondary"} />
               </button>
@@ -485,6 +504,7 @@ const CustomMarker = ({
     </div>
   );
 };
+
 function NextArrow(props: any) {
   const { onClick } = props;
   return (
@@ -512,3 +532,52 @@ function PrevArrow(props: any) {
     </div>
   );
 }
+
+// const arr = [
+//   [
+//     {
+//       comment: "new",
+//       left: 28.45927379784102,
+//       top: 30.830272907716967,
+//       user: "Web Dev",
+//       userId: 2,
+//     },
+//     {
+//       comment: "new",
+//       left: 28.45927379784102,
+//       top: 30.830272907716967,
+//       user: "Web Dev",
+//       userId: 2,
+//     },
+//   ],[
+//     {
+//       comment: "new",
+//       left: 28.45927379784102,
+//       top: 30.830272907716967,
+//       user: "Web Dev",
+//       userId: 2,
+//     },
+//     {
+//       comment: "new",
+//       left: 28.45927379784102,
+//       top: 30.830272907716967,
+//       user: "Web Dev",
+//       userId: 2,
+//     },
+//   ],[
+//     {
+//       comment: "new",
+//       left: 28.45927379784102,
+//       top: 30.830272907716967,
+//       user: "Web Dev",
+//       userId: 2,
+//     },
+//     {
+//       comment: "new",
+//       left: 28.45927379784102,
+//       top: 30.830272907716967,
+//       user: "Web Dev",
+//       userId: 2,
+//     },
+//   ],
+// ];

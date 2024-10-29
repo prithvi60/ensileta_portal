@@ -35,7 +35,7 @@ const Board = ({ userId }: { userId: any }) => {
         if (data && data.kanbanCards) {
             setCards(data.kanbanCards.map((card: any) => ({
                 ...card,
-                isNew: false,  // Mark all cards fetched from DB as not new
+                // isNew: false,  // Mark all cards fetched from DB as not new
             })));
         }
     }, [data]);
@@ -58,7 +58,7 @@ const Board = ({ userId }: { userId: any }) => {
                 title: card.title,
                 column: card.column,
                 userId: card.userId,
-                isNew: false,
+                // isNew: false,
             }));
 
             // Execute the mutation to save cards to the database

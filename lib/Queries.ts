@@ -369,19 +369,60 @@ export const UPDATE_KANBAN_CARDS = gql`
 
 // Markers
 
-export const GET_MARKERS = gql`
-  query GetMarkers($userId: Int!) {
-    markers(userId: $userId) {
+export const GET_ALL_MARKER_GROUPS = gql`
+  query GetAllMarkerGroups {
+    getAllMarkerGroups {
       id
-      top
-      left
-      comment
+      drawing2DId
+      drawing2D {
+        id
+        filename
+      }
+      markers {
+        id
+        comment
+        left
+        top
+        user
+        userId
+      }
     }
   }
 `;
 
-export const ADD_MARKERS = gql`
-  mutation AddMarkers($userId: Int!, $markers: [MarkerInput!]!) {
-    addMarkers(userId: $userId, markers: $markers)
+export const GET_MARKER_GROUPS_BY_DRAWING_2D = gql`
+  query GetMarkerGroupsByDrawing2D($drawing2DId: Int!) {
+    getMarkerGroupsByDrawing2D(drawing2DId: $drawing2DId) {
+      id
+      drawing2DId
+      drawing2D {
+        id
+        filename
+      }
+      markers {
+        id
+        comment
+        left
+        top
+        user
+        userId
+      }
+    }
+  }
+`;
+
+export const ADD_MARKER_GROUP = gql`
+  mutation AddMarkerGroup($data: MarkerGroupInput!) {
+    addMarkerGroup(data: $data) {
+      id
+      markers {
+        id
+        comment
+      }
+      drawing2D {
+        id
+        filename
+      }
+    }
   }
 `;

@@ -27,7 +27,7 @@ interface GetAll2DViewProps {
   allUsers: any;
   fileType: string;
   refetchUsers: any;
-  handleSave: any
+  addMarkerGroup: any
 }
 
 export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
@@ -37,7 +37,7 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
   allUsers,
   fileType,
   refetchUsers,
-  handleSave
+  addMarkerGroup
 }) => {
   const { data: RoleBased } = useQuery(GET_USER);
   // const { data: session } = useSession()
@@ -47,19 +47,25 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
 
   useEffect(() => {
     // Update filteredData whenever allUsers changes
-    const admins = allUsers.users.filter((val: any) => val.role === "admin");
+    if (allUsers && allUsers.users) {
+      const admins = allUsers.users.filter((val: any) => val.role === "admin") || [];
+      // Use the `admins` variable as needed
+      console.log("Filtered admins:", admins);
+      setFilteredData(admins);
+    }
 
     // console.log("refetched",admins)
 
-    setFilteredData(admins);
   }, [allUsers]);
 
-  const SAfilteredData = allUsers.users.filter(
+  const SAfilteredData = allUsers?.users?.filter(
     (val: any) => val.role === "super admin"
-  );
+  ) || [];
 
   const userId = RoleBased?.user?.id;
-  const lastItem = data?.[data?.length - 1] || null;
+  const lastItem = data?.[data?.length - 1] || data?.[0] || null;
+  // console.log("last", lastItem);
+
 
   // Unique localStorage key for each user and file type
   const localStorageKey = `isApproved_${userId}_${fileType}`;
@@ -172,8 +178,9 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
             pdf={lastItem?.fileUrl || ""}
             version={data?.length || 0}
             id={lastItem?.id || 1}
-            handleSave={handleSave}
+            addMarkerGroup={addMarkerGroup}
             handleSendEmail={handleSendEmail} isApproved={isApproved} isApproving={isApproving}
+            userId={userId}
           />
           <div className="w-full flex flex-col justify-between items-center text-justify">
             <button
@@ -189,7 +196,7 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
                   : `Approve`}
             </button>
             <p className="mt-8">
-            Please review the drawings and click the &apos;Approve&apos; button to confirm if this version is acceptable. You can add comments in the &apos;Remarks&apos; section by viewing the drawing in fullscreen and annotating directly on the image.
+              Please review the drawings and click the &apos;Approve&apos; button to confirm if this version is acceptable. You can add comments in the &apos;Remarks&apos; section by viewing the drawing in fullscreen and annotating directly on the image.
             </p>
             {/* <button
               type="button"

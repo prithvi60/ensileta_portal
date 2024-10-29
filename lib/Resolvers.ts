@@ -165,10 +165,25 @@ export const resolvers = {
         throw new Error("Unable to fetch Kanban cards");
       }
     },
-    markers: async (_: any, { userId }: { userId: number }) => {
+    getAllMarkerGroups: async (_: any, { userId }: { userId: number }) => {
       try {
-        const data = await prisma.marker.findMany({
-          where: { userId },
+        const data = await prisma.markerGroup.findMany({
+          include: { markers: true, drawing2D: true },
+        });
+        return data;
+      } catch (error) {
+        console.error("Error fetching Markers All Data:", error);
+        throw new Error("Unable to fetch Markers All Data");
+      }
+    },
+    getMarkerGroupsByDrawing2D: async (
+      _: any,
+      { drawing2DId }: { drawing2DId: number }
+    ) => {
+      try {
+        const data = await prisma.markerGroup.findMany({
+          where: { drawing2DId },
+          include: { markers: true, drawing2D: true },
         });
         return data;
       } catch (error) {
@@ -176,9 +191,6 @@ export const resolvers = {
         throw new Error("Unable to fetch Markers Data");
       }
     },
-    // marker: async (_: any, { id }: { id: number }) => {
-    //   return await prisma.marker.findUnique({ where: { id } });
-    // },
   },
   Mutation: {
     signUp: async (
@@ -525,54 +537,24 @@ export const resolvers = {
         };
       }
     },
-    addMarkers: async (
-      _: any,
-      {
-        userId,
-        markers,
-      }: {
-        userId: number;
-        markers: Array<{ top: number; left: number; comment: string }>;
-      }
-    ) => {
-      try {
-        if (!userId) {
-          throw new Error("Unauthorized");
-        }
-
-        await prisma.marker.deleteMany({
-          where: { userId },
-        });
-
-        await prisma.marker.createMany({
-          data: markers.map((marker) => ({
-            top: marker.top,
-            left: marker.left,
-            comment: marker.comment,
-            userId,
-          })),
-        });
-
-        return true;
-      } catch (error) {
-        console.error("Error saving markers data:", error);
-        return false;
-      }
-    },
-    updateMarker: async (
-      _: any,
-      { id, comment }: { id: number; comment: string }
-    ) => {
-      return await prisma.marker.update({
-        where: { id },
-        data: { comment },
+    addMarkerGroup: async (_: any, { data }: { data: any }) => {
+      const { drawing2DId, markers } = data;
+      const markerGroup = await prisma.markerGroup.create({
+        data: {
+          drawing2DId: drawing2DId,
+          markers: {
+            create: markers.map((marker: any) => ({
+              comment: marker.comment,
+              left: marker.left,
+              top: marker.top,
+              user: marker.user,
+              userId: marker.userId,
+            })),
+          },
+        },
+        include: { markers: true, drawing2D: true },
       });
-    },
-
-    deleteMarker: async (_: any, { id }: { id: number }) => {
-      return await prisma.marker.delete({
-        where: { id },
-      });
+      return markerGroup;
     },
   },
 };

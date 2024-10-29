@@ -5,9 +5,9 @@ import DefaultLayout from "@/components/Layout/DefaultLayout";
 import { Loader } from "@/components/Loader";
 import {
   ADD_2D_FILENAME,
-  ADD_MARKERS,
+  ADD_MARKER_GROUP,
   GET_ALL_2D_VIEW,
-  GET_MARKERS,
+  GET_ALL_MARKER_GROUPS,
   GET_USER,
   GET_USERS,
 } from "@/lib/Queries";
@@ -33,38 +33,41 @@ const Page = () => {
   const fileType = pathname.split("/").pop();
   const { data: RoleBased } = useQuery(GET_USER);
   const userId = RoleBased?.user?.id;
-  const { loading: existingLoading, data: existingMarkers } = useQuery(
-    GET_MARKERS,
-    {
-      variables: { userId },
-    }
-  );
-  const [addMarkers] = useMutation(ADD_MARKERS);
-  // console.log(userId);
 
-  const handleSave = async () => {
+  const [addMarkerGroup] = useMutation(ADD_MARKER_GROUP);
+  // console.log(data);
+
+  // const handleSave = async ({ id, comment, left, top }: { id: number, comment: string, left: any, top: any }) => {
+  //   await addMarkerGroup({
+  //     variables: {
+  //       input: {
+  //         drawing2DId: id,
+  //         markers: [
+  //           {
+  //             comment,
+  //             left,
+  //             top,
+  //             user: 'Web Dev',
+  //             userId: 1,
+  //           },
+  //         ],
+  //       },
+  //     },
+  //   });
+  // };
+
+  const handleSave = async (id: any, markers: any) => {
     try {
-      if (markers.length === 0) {
-        return alert("Please add a new card before saving");
-      }
-
-      const result = await addMarkers({
-        variables: {
-          userId,
-          markers: markers,
-        },
+      await addMarkerGroup({
+        variables: { data: { drawing2DId: id, markers: markers.flat() } },
       });
-
-      if (result) {
-        refetch();
-        console.log("Markers saved successfully!");
-      }
-    } catch (error) {
-      console.error("Error saving marker:", error);
+      alert("Successfully saved!");
+    } catch (err) {
+      console.error(err);
     }
   };
 
-//   console.log("markers", markers);
+  // console.log("data", data);
 
   return (
     <DefaultLayout>
@@ -79,7 +82,7 @@ const Page = () => {
             fileType={fileType || "view2d"}
             title={"Your 2D Drawings"}
             refetchUsers={refetch}
-            handleSave={handleSave}
+            addMarkerGroup={addMarkerGroup}
           />
         </section>
       )}
@@ -88,5 +91,3 @@ const Page = () => {
 };
 
 export default Page;
-
-
