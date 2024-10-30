@@ -2,8 +2,8 @@
 import { motion } from "framer-motion";
 import React from "react";
 import ModalWrapper, { ModalWrapper2D, ViewModalWrapper } from "./Modal";
-import { useMutation } from "@apollo/client";
-import { ADD_2D_FILENAME, ADD_3D_FILENAME, ADD_BOQ_FILENAME } from "@/lib/Queries";
+import { useMutation, useQuery } from "@apollo/client";
+import { ADD_2D_FILENAME, ADD_3D_FILENAME, ADD_BOQ_FILENAME, GET_MARKER_GROUP_BY_ID_2D, GET_MARKER_GROUP_BY_ID_3D, GET_MARKER_GROUP_BY_ID_BOQ } from "@/lib/Queries";
 
 interface Data {
     uploadFile: any;
@@ -119,7 +119,7 @@ const TableRows = ({
                                     refetchUsers={refetchUsers}
                                 />
                             </td>
-                            <td className="p-2 sm:p-4">
+                            {/* <td className="p-2 sm:p-4">
                                 {fileType === "view2d" ? (
                                     <ViewModalWrapper
                                         pdf={
@@ -144,7 +144,7 @@ const TableRows = ({
                                 ) : (
                                     <ViewModalWrapper pdf={""} />
                                 )}
-                            </td>
+                            </td> */}
                         </motion.tr>
                     ))}
                 </>
@@ -202,6 +202,20 @@ const TableRows2 = ({ data, refetchUsers }: { data: any, refetchUsers: any }) =>
     const drawingBoq =
         data?.drawingBOQfiles[data.drawingBOQfiles.length - 1];
 
+    const { data: marker2d } = useQuery(GET_MARKER_GROUP_BY_ID_2D, {
+        variables: { drawing2DId: drawing2d?.id },
+    });
+    const { data: marker3d } = useQuery(GET_MARKER_GROUP_BY_ID_3D, {
+        variables: { drawing3DId: drawing3d?.id },
+    });
+
+    const { data: markerBoq } = useQuery(GET_MARKER_GROUP_BY_ID_BOQ, {
+        variables: { drawingBoqId: drawingBoq?.id },
+    });
+
+    console.log(drawing2d);
+
+
     return (
         <>
             <motion.tr className="text-xs sm:text-sm">
@@ -233,6 +247,7 @@ const TableRows2 = ({ data, refetchUsers }: { data: any, refetchUsers: any }) =>
                         pdf={
                             drawing2d?.fileUrl
                         }
+                        markerData={marker2d?.getMarkerGroupBy2DId?.data}
                     />
                 </td>
             </motion.tr>
@@ -265,6 +280,7 @@ const TableRows2 = ({ data, refetchUsers }: { data: any, refetchUsers: any }) =>
                         pdf={
                             drawing3d?.fileUrl
                         }
+                        markerData={marker3d?.getMarkerGroupBy3DId?.data}
                     />
                 </td>
             </motion.tr>
@@ -297,6 +313,7 @@ const TableRows2 = ({ data, refetchUsers }: { data: any, refetchUsers: any }) =>
                         pdf={
                             drawingBoq?.fileUrl
                         }
+                        markerData={markerBoq?.getMarkerGroupByBoqId?.data}
                     />
                 </td>
             </motion.tr>

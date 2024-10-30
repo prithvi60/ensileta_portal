@@ -5,9 +5,9 @@ import DefaultLayout from "@/components/Layout/DefaultLayout";
 import { Loader } from "@/components/Loader";
 import {
   ADD_2D_FILENAME,
-  ADD_MARKER_GROUP,
+  CREATE_MARKER_GROUP_2D,
   GET_ALL_2D_VIEW,
-  GET_ALL_MARKER_GROUPS,
+  GET_MARKER_GROUP_BY_ID_2D,
   GET_USER,
   GET_USERS,
 } from "@/lib/Queries";
@@ -34,40 +34,38 @@ const Page = () => {
   const { data: RoleBased } = useQuery(GET_USER);
   const userId = RoleBased?.user?.id;
 
-  const [addMarkerGroup] = useMutation(ADD_MARKER_GROUP);
-  // console.log(data);
+  // ID
+  const lastItem =
+    data?.getAll2DFiles[data?.getAll2DFiles.length - 1] ||
+    data?.getAll2DFiles[0] ||
+    null;
 
-  // const handleSave = async ({ id, comment, left, top }: { id: number, comment: string, left: any, top: any }) => {
-  //   await addMarkerGroup({
-  //     variables: {
-  //       input: {
-  //         drawing2DId: id,
-  //         markers: [
-  //           {
-  //             comment,
-  //             left,
-  //             top,
-  //             user: 'Web Dev',
-  //             userId: 1,
-  //           },
-  //         ],
-  //       },
-  //     },
-  //   });
-  // };
+  // Mutation
+  const [createMarkerGroup] = useMutation(CREATE_MARKER_GROUP_2D, {
+    refetchQueries: [
+      { query: GET_MARKER_GROUP_BY_ID_2D, variables: { id: lastItem?.id } },
+    ],
+    awaitRefetchQueries: true,
+  });
+  // Query
+  const { data: marker2d } = useQuery(GET_MARKER_GROUP_BY_ID_2D, {
+    variables: { drawing2DId: lastItem?.id },
+  });
 
-  const handleSave = async (id: any, markers: any) => {
+  const createData = async (markers: any, id: number) => {
     try {
-      await addMarkerGroup({
-        variables: { data: { drawing2DId: id, markers: markers.flat() } },
+      const { data } = await createMarkerGroup({
+        variables: {
+          data: markers,
+          drawing2DId: lastItem?.id,
+        },
       });
-      alert("Successfully saved!");
-    } catch (err) {
-      console.error(err);
+      console.log("Created Marker Group:", data);
+      // alert("Successfully saved!");
+    } catch (error) {
+      console.error("Error creating marker group:", error);
     }
   };
-
-  // console.log("data", data);
 
   return (
     <DefaultLayout>
@@ -82,7 +80,9 @@ const Page = () => {
             fileType={fileType || "view2d"}
             title={"Your 2D Drawings"}
             refetchUsers={refetch}
-            addMarkerGroup={addMarkerGroup}
+            lastItem={lastItem}
+            createMarkerGroup={createData}
+            markerData={marker2d?.getMarkerGroupBy2DId?.data}
           />
         </section>
       )}

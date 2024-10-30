@@ -1,12 +1,11 @@
 "use client";
 
-import { GetAll2dView } from '@/components/drawings/GetAll2dView';
-import DefaultLayout from '@/components/Layout/DefaultLayout';
-import { Loader } from '@/components/Loader';
-import { ADD_BOQ_FILENAME, GET_ALL_BOQ_VIEW, GET_USERS } from '@/lib/Queries';
-import { useMutation, useQuery } from '@apollo/client';
-import { usePathname } from 'next/navigation';
-
+import { GetAll2dView } from "@/components/drawings/GetAll2dView";
+import DefaultLayout from "@/components/Layout/DefaultLayout";
+import { Loader } from "@/components/Loader";
+import { ADD_BOQ_FILENAME, CREATE_MARKER_GROUP_BOQ, GET_ALL_BOQ_VIEW, GET_MARKER_GROUP_BY_ID_BOQ, GET_USERS } from "@/lib/Queries";
+import { useMutation, useQuery } from "@apollo/client";
+import { usePathname } from "next/navigation";
 
 interface GetAllBOQViewResponse {
     getAllBOQFiles: Array<{
@@ -14,58 +13,63 @@ interface GetAllBOQViewResponse {
         filename: string;
         fileUrl: string;
         version: number;
-        userId: number
+        userId: number;
         createdAt: string;
     }>;
 }
 
 const Page = () => {
     const [uploadFile] = useMutation(ADD_BOQ_FILENAME);
-    const { data } = useQuery<GetAllBOQViewResponse>(GET_ALL_BOQ_VIEW)
-    const { data: AllUsers, loading,refetch } = useQuery(GET_USERS);
+    const { data } = useQuery<GetAllBOQViewResponse>(GET_ALL_BOQ_VIEW);
+    const { data: AllUsers, loading, refetch } = useQuery(GET_USERS);
     const pathname = usePathname();
-    const fileType = pathname.split('/').pop();
+    const fileType = pathname.split("/").pop();
+    const lastItem =
+        data?.getAllBOQFiles[data?.getAllBOQFiles.length - 1] ||
+        data?.getAllBOQFiles[0] ||
+        null;
+    const [createMarkerGroup] = useMutation(CREATE_MARKER_GROUP_BOQ, {
+        refetchQueries: [
+            { query: GET_MARKER_GROUP_BY_ID_BOQ, variables: { drawingBoqId: lastItem?.id } },
+        ],
+        awaitRefetchQueries: true,
+    });
+    const { data: markerBoq } = useQuery(GET_MARKER_GROUP_BY_ID_BOQ, {
+        variables: { drawingBoqId: lastItem?.id },
+    });
 
-
-    // const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    //     e.preventDefault();
-    //     if (!inputValue) {
-    //         alert("please enter file name")
-    //         return
-    //     } else {
-    //         try {
-    //             const result = await viewBOQFileName({ variables: { fileName: inputValue } })
-    //             if (result) {
-    //                 toast.success('successfully Created', {
-    //                     position: "top-right",
-    //                     duration: 3000,
-    //                     style: {
-    //                         border: '1px solid #65a34e',
-    //                         padding: '16px',
-    //                         color: '#65a34e',
-    //                     },
-    //                     iconTheme: {
-    //                         primary: '#65a34e',
-    //                         secondary: '#FFFAEE',
-    //                     },
-    //                 })
-    //                 setInputValue('');
-    //             }
-    //         } catch (error) {
-    //             console.error(error)
-    //         }
-
-    //     }
-    // }
-    // const length = data?.files.length
-
-    // console.log(data?.files[length - 1] || null);
+    const createData = async (markers: any) => {
+        try {
+            const { data } = await createMarkerGroup({
+                variables: {
+                    data: markers,
+                    drawingBoqId: lastItem?.id,
+                },
+            });
+            console.log("Created Marker Group:", data);
+            // alert("Successfully saved!");
+        } catch (error) {
+            console.error("Error creating marker group:", error);
+        }
+    };
 
     return (
         <DefaultLayout>
-            <section className='h-full w-full'>
-                {loading ? (<Loader />) : (
-                    <GetAll2dView data={data?.getAllBOQFiles} allUsers={AllUsers} uploadFile={uploadFile} fileType={fileType || ''} title={"Your BOQ Drawings"} refetchUsers={refetch}/>
+            <section className="h-full w-full">
+                {loading ? (
+                    <Loader />
+                ) : (
+                    <GetAll2dView
+                        data={data?.getAllBOQFiles}
+                        allUsers={AllUsers}
+                        uploadFile={uploadFile}
+                        fileType={fileType || ""}
+                        title={"Your BOQ Drawings"}
+                        refetchUsers={refetch}
+                        lastItem={lastItem}
+                        createMarkerGroup={createData}
+                        markerData={markerBoq?.getMarkerGroupByBoqId?.data}
+                    />
                 )}
             </section>
         </DefaultLayout>

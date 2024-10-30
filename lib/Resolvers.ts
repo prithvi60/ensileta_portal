@@ -165,17 +165,6 @@ export const resolvers = {
         throw new Error("Unable to fetch Kanban cards");
       }
     },
-    getAllMarkerGroups: async (_: any, { userId }: { userId: number }) => {
-      try {
-        const data = await prisma.markerGroup.findMany({
-          include: { markers: true, drawing2D: true },
-        });
-        return data;
-      } catch (error) {
-        console.error("Error fetching Markers All Data:", error);
-        throw new Error("Unable to fetch Markers All Data");
-      }
-    },
     getMarkerGroupsByDrawing2D: async (
       _: any,
       { drawing2DId }: { drawing2DId: number }
@@ -189,6 +178,52 @@ export const resolvers = {
       } catch (error) {
         console.error("Error fetching Markers Data:", error);
         throw new Error("Unable to fetch Markers Data");
+      }
+    },
+    getMarkerGroupBy2DId: async (
+      _: any,
+      { drawing2DId }: { drawing2DId: number }
+    ) => {
+      try {
+        const markerGroup = await prisma.markerGroup2D.findFirst({
+          where: { drawing2DId },
+        });
+
+        return markerGroup;
+      } catch (error) {
+        console.error("Error fetching marker group:", error);
+        throw new Error("Unable to fetch marker group.");
+      }
+    },
+    getMarkerGroupBy3DId: async (
+      _: any,
+      { drawing3DId }: { drawing3DId: number }
+    ) => {
+      try {
+        const markerGroup = await prisma.markerGroup3D.findFirst({
+          where: { drawing3DId },
+        });
+
+        return markerGroup;
+      } catch (error) {
+        console.error("Error fetching marker group:", error);
+        throw new Error("Unable to fetch marker group.");
+      }
+    },
+    getMarkerGroupByBoqId: async (
+      _: any,
+      { drawingBoqId }: { drawingBoqId: number }
+    ) => {
+      console.log("id get boq", drawingBoqId);
+      try {
+        const markerGroup = await prisma.markerGroupBoq.findFirst({
+          where: { drawingBoqId },
+        });
+
+        return markerGroup;
+      } catch (error) {
+        console.error("Error fetching marker group:", error);
+        throw new Error("Unable to fetch marker group.");
       }
     },
   },
@@ -569,6 +604,63 @@ export const resolvers = {
       } catch (error) {
         console.error("Error in addMarkerGroups:", error);
         throw new Error("Failed to create marker groups");
+      }
+    },
+    createMarkerGroup2D: async (_: any, { data, drawing2DId }: any) => {
+      const jsonData = JSON.stringify(data);
+      try {
+        await prisma.markerGroup2D.deleteMany({
+          where: { drawing2DId },
+        });
+        const newMarkerGroup = await prisma.markerGroup2D.create({
+          data: {
+            data: jsonData,
+            drawing2DId,
+          },
+        });
+
+        return newMarkerGroup;
+      } catch (error) {
+        console.error("Error creating marker group:", error);
+        throw new Error("Failed to create marker group");
+      }
+    },
+    createMarkerGroup3D: async (_: any, { data, drawing3DId }: any) => {
+      const jsonData = JSON.stringify(data);
+      try {
+        await prisma.markerGroup3D.deleteMany({
+          where: { drawing3DId },
+        });
+        const newMarkerGroup = await prisma.markerGroup3D.create({
+          data: {
+            data: jsonData,
+            drawing3DId,
+          },
+        });
+
+        return newMarkerGroup;
+      } catch (error) {
+        console.error("Error creating marker group:", error);
+        throw new Error("Failed to create marker group");
+      }
+    },
+    createMarkerGroupBOQ: async (_: any, { data, drawingBoqId }: any) => {
+      const jsonData = JSON.stringify(data);
+      try {
+        await prisma.markerGroupBoq.deleteMany({
+          where: { drawingBoqId },
+        });
+        const newMarkerGroup = await prisma.markerGroupBoq.create({
+          data: {
+            data: jsonData,
+            drawingBoqId,
+          },
+        });
+
+        return newMarkerGroup;
+      } catch (error) {
+        console.error("Error creating marker group:", error);
+        throw new Error("Failed to create marker group");
       }
     },
   },

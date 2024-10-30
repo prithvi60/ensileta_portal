@@ -27,7 +27,9 @@ interface GetAll2DViewProps {
   allUsers: any;
   fileType: string;
   refetchUsers: any;
-  addMarkerGroup: any
+  lastItem: any
+  createMarkerGroup: any
+  markerData: any
 }
 
 export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
@@ -37,7 +39,9 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
   allUsers,
   fileType,
   refetchUsers,
-  addMarkerGroup
+  createMarkerGroup,
+  lastItem,
+  markerData
 }) => {
   const { data: RoleBased } = useQuery(GET_USER);
   // const { data: session } = useSession()
@@ -63,7 +67,6 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
   ) || [];
 
   const userId = RoleBased?.user?.id;
-  const lastItem = data?.[data?.length - 1] || data?.[0] || null;
   // console.log("last", lastItem);
 
 
@@ -178,9 +181,10 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
             pdf={lastItem?.fileUrl || ""}
             version={data?.length || 0}
             id={lastItem?.id || 1}
-            addMarkerGroup={addMarkerGroup}
+            createMarkerGroup={createMarkerGroup}
             handleSendEmail={handleSendEmail} isApproved={isApproved} isApproving={isApproving}
             userId={userId}
+            markerData={markerData}
           />
           <div className="w-full flex flex-col justify-between items-center text-justify">
             <button

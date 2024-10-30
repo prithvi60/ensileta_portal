@@ -10,7 +10,6 @@ import ImageMarker, { Marker, MarkerComponentProps } from "react-image-marker";
 import { FaCircleArrowUp } from "react-icons/fa6";
 import { useSession } from "next-auth/react";
 import { useMutation, useQuery } from "@apollo/client";
-import { ADD_MARKER_GROUP, GET_MARKER_GROUPS_BY_DRAWING_2D } from "@/lib/Queries";
 export default function ModernCarousel({
   pdf,
   version,
@@ -18,17 +17,19 @@ export default function ModernCarousel({
   handleSendEmail,
   isApproved,
   isApproving,
-  addMarkerGroup,
+  createMarkerGroup,
   userId,
+  markerData,
 }: {
   pdf: string;
   version: number;
   id: number;
-  addMarkerGroup: any;
+  createMarkerGroup: any;
   handleSendEmail: any;
   isApproved: any;
   isApproving: any;
   userId: number;
+  markerData: any;
 }) {
   const [idx, setIdx] = useState(0);
   const [prevIdx, setPrevIdx] = useState(idx);
@@ -187,11 +188,12 @@ export default function ModernCarousel({
       <SpringModal
         isOpen={isOpen}
         setIsOpen={setIsOpen}
-        addMarkerGroup={addMarkerGroup}
+        createMarkerGroup={createMarkerGroup}
         images={imgs}
         userName={userName}
         userId={userId}
         id={id}
+        markerData={markerData}
       />
     </div>
   );
@@ -224,7 +226,8 @@ const titleVariants = {
 const SpringModal = ({
   isOpen,
   setIsOpen,
-  addMarkerGroup,
+  createMarkerGroup,
+  markerData,
   images,
   userName,
   userId,
@@ -232,42 +235,39 @@ const SpringModal = ({
 }: {
   isOpen: boolean;
   setIsOpen: Function;
-  addMarkerGroup: any;
+  createMarkerGroup: any;
   images: string[];
   userName: string;
   userId: number;
   id: number;
+  markerData: any;
 }) => {
   const [isMarkerEnabled, setIsMarkerEnabled] = useState<boolean>(false);
   const [index, setIndex] = useState<number>(0);
-  const [addMarkerGroup1] = useMutation(ADD_MARKER_GROUP);
-  const { data, loading, error, refetch } = useQuery(GET_MARKER_GROUPS_BY_DRAWING_2D, {
-    variables: { drawing2DId: id },
-  });
+  const [IsChanged, setIsChanged] = useState<boolean>(false);
+
+  // if (data) {
+  //   const parse = JSON.parse(data?.getMarkerGroupById.data)
+  //   // setMarkers()
+  //   console.log("get", parse);
+  // }
 
   const [markers, setMarkers] = useState<
     Array<Array<Marker & { comment?: string }>>
   >(
     Array.from(
       { length: images.length },
-      (_, index) =>
-        index === 0
-          ? [
-            // Only populate the first array with dummy data
-            {
-              top: 45.12916772715704,
-              left: 51.92,
-              comment: "change colour",
-              user: "Web Dev",
-              userId: 1
-            }
-          ]
-          : [] // Other arrays remain empty
+      (_, index) => (index === 0 ? [] : []) // Other arrays remain empty
     )
   );
-  if (loading) return <p>loading....</p>
-  // if (error) return <p>Error: {error.message}</p>;
-  console.log("get", data?.getMarkerGroupsByDrawing2D);
+
+  useEffect(() => {
+    if (markerData) {
+      const parsedMarkers = JSON.parse(markerData);
+      setMarkers(parsedMarkers);
+      console.log("Markers set from data:", parsedMarkers);
+    }
+  }, [markerData]);
 
   const handleSliderChange = (newIndex: number) => {
     setIndex(newIndex); // Update the index when the slider changes
@@ -292,17 +292,11 @@ const SpringModal = ({
   };
 
   const handleClose = async () => {
-    setIsOpen(false);
-    const input = markers.map(markerArray =>
-      markerArray.map(marker => ({
-        ...marker,
-      }))
-    );
-    await addMarkerGroup1({
-      variables: { drawing2DId: id, input },
-    });
-    alert("Successfully saved!");
-
+    try {
+      await createMarkerGroup(markers);
+    } finally {
+      setIsOpen(false); // Close the modal
+    }
   };
 
   const settings = {
@@ -328,7 +322,9 @@ const SpringModal = ({
       document.exitFullscreen();
     }
   };
-  console.log("markers", markers);
+  // const parse = JSON.stringify(markers)
+  // console.log("markers",);
+  // console.log("markers parse", { markers, IsChanged });
   return (
     <AnimatePresence>
       {isOpen && (
@@ -361,6 +357,7 @@ const SpringModal = ({
                       }
                       markerComponent={(props) => (
                         <CustomMarker
+                          setIsChanged={setIsChanged}
                           {...props}
                           onAddComment={(marker, comment) =>
                             handleAddMarker(
@@ -430,9 +427,11 @@ const CustomMarker = ({
   markers,
   top,
   left,
+  setIsChanged,
 }: MarkerComponentProps & {
   onAddComment: (marker: Marker, comment: string) => void;
   markers: any;
+  setIsChanged: Function;
 }) => {
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>("");
@@ -461,20 +460,25 @@ const CustomMarker = ({
   // @ts-ignore
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && inputRef.current) {
+      setIsChanged(0);
       const marker = { top, left };
       onAddComment(marker, inputValue); // Pass the comment back to the Page component
       setIsHovered(false);
       //   console.log("val", inputValue);
+    } else {
+      setIsChanged(false);
     }
   };
 
   const handleBtn = () => {
     if (inputRef.current) {
+      setIsChanged(true);
       const marker = { top, left };
       onAddComment(marker, inputValue); // Pass the comment back to the Page component
       setIsHovered(false);
-
       //   console.log("val", inputValue);
+    } else {
+      setIsChanged(false);
     }
   };
   return (
@@ -594,3 +598,40 @@ function PrevArrow(props: any) {
 //     },
 //   ],
 // ];
+
+// [
+//   [
+//       [
+//           {
+//               "top": 8.62678399606913,
+//               "left": 13.87987012987013,
+//               "comment": "dgdgs",
+//               "user": "Web Dev",
+//               "userId": 1
+//           },
+//           {
+//               "top": 11.077764388225994,
+//               "left": 61.36363636363637,
+//               "comment": "gjfjfj",
+//               "user": "Web Dev",
+//               "userId": 1
+//           }
+//       ],
+//       [
+//           {
+//               "top": 10.657596320999103,
+//               "left": 29.383116883116884,
+//               "comment": "gjgjgj",
+//               "user": "Web Dev",
+//               "userId": 1
+//           },
+//           {
+//               "top": 14.929305004472493,
+//               "left": 72.80844155844156,
+//               "comment": "fhhfhh",
+//               "user": "Web Dev",
+//               "userId": 1
+//           }
+//       ]
+//   ]
+// ]

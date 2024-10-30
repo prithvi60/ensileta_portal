@@ -1,6 +1,7 @@
 export const typeDefs = `#graphql
 
   scalar Upload
+  scalar JSON
 
   type User {
     id: Int
@@ -40,7 +41,7 @@ export const typeDefs = `#graphql
     version: Int
     userId: String
     createdAt: String
-    markerGroups: [MarkerGroup!]!
+    markerGroup2d: [MarkerGroup2D]
   }
 
   type Drawing3D {
@@ -50,7 +51,7 @@ export const typeDefs = `#graphql
     version: Int
     userId: String
     createdAt: String
-    markerGroups: [MarkerGroup]
+    markerGroup3d: [MarkerGroup3D]
   }
 
   type DrawingBOQ {
@@ -60,7 +61,7 @@ export const typeDefs = `#graphql
     version: Int
     userId: String
     createdAt: String
-    markerGroups: [MarkerGroup]
+    markerGroupBoq: [MarkerGroupBoq]
   }
 
 
@@ -138,6 +139,30 @@ type MarkerGroup {
   markers: [Marker!]!
 }
 
+type MarkerGroup2D {
+  id: ID!
+  data: JSON!
+  createdAt: String!
+  drawing2DId: Int
+  drawing2D: Drawing2D
+}
+
+type MarkerGroup3D {
+  id: ID!
+  data: JSON!
+  createdAt: String!
+  drawing3DId: Int
+  drawing3D: Drawing3D
+}
+
+type MarkerGroupBoq {
+  id: ID!
+  data: JSON!
+  createdAt: String!
+  drawingBoqId: Int
+  drawingBoq: DrawingBOQ
+}
+
   type Query {
     user: User
     users: [User]
@@ -150,6 +175,9 @@ type MarkerGroup {
     kanbanCards(userId: Int!): [KanbanCard]
     getAllMarkerGroups: [MarkerGroup!]!
     getMarkerGroupsByDrawing2D(drawing2DId: Int!): [MarkerGroup!]!
+    getMarkerGroupBy2DId(drawing2DId: Int!): MarkerGroup2D
+    getMarkerGroupBy3DId(drawing3DId: Int!): MarkerGroup3D
+    getMarkerGroupByBoqId(drawingBoqId: Int!): MarkerGroupBoq
   }
   
 
@@ -185,5 +213,8 @@ type MarkerGroup {
     deleteKanbanCard(id: Int!): DeleteKanbanCardResponse!
     updateKanbanCard(id: Int!, title: String!, column: String!): UpdateKanbanCardResponse!
     addMarkerGroups(drawing2DId: Int!,input: [[MarkerInput!]!]!): [MarkerGroup!]!
+    createMarkerGroup2D(data: JSON!, drawing2DId: Int!): MarkerGroup2D!
+    createMarkerGroup3D(data: JSON!, drawing3DId: Int!): MarkerGroup3D!
+    createMarkerGroupBOQ(data: JSON!, drawingBoqId: Int!): MarkerGroupBoq!
   }
 `;

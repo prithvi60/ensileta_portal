@@ -425,3 +425,65 @@ export const ADD_MARKER_GROUP = gql`
     }
   }
 `;
+
+// new
+
+export const GET_MARKER_GROUP_BY_ID_2D = gql`
+  query GetMarkerGroupBy2DId($drawing2DId: Int!) {
+    getMarkerGroupBy2DId(drawing2DId: $drawing2DId) {
+      id
+      data
+      createdAt
+      drawing2DId
+    }
+  }
+`;
+
+export const GET_MARKER_GROUP_BY_ID_3D = gql`
+  query GetMarkerGroupBy3DId($drawing3DId: Int!) {
+    getMarkerGroupBy3DId(drawing3DId: $drawing3DId) {
+      id
+      data
+      createdAt
+      drawing3DId
+    }
+  }
+`;
+
+export const GET_MARKER_GROUP_BY_ID_BOQ = gql`
+  query GetMarkerGroupByBOQId($drawingBoqId: Int!) {
+    getMarkerGroupByBoqId(drawingBoqId: $drawingBoqId) {
+      id
+      data
+      createdAt
+      drawingBoqId
+    }
+  }
+`;
+
+export const CREATE_MARKER_GROUP_2D = gql`
+  mutation CreateMarkerGroup2D($data: JSON!, $drawing2DId: Int!) {
+    createMarkerGroup2D(data: $data, drawing2DId: $drawing2DId) {
+      id
+      data
+    }
+  }
+`;
+
+export const CREATE_MARKER_GROUP_3D = gql`
+  mutation CreateMarkerGroup3D($data: JSON!, $drawing3DId: Int!) {
+    createMarkerGroup3D(data: $data, drawing3DId: $drawing3DId) {
+      id
+      data
+    }
+  }
+`;
+
+export const CREATE_MARKER_GROUP_BOQ = gql`
+  mutation CreateMarkerGroupBOQ($data: JSON!, $drawingBoqId: Int!) {
+    createMarkerGroupBOQ(data: $data, drawingBoqId: $drawingBoqId) {
+      id
+      data
+    }
+  }
+`;
