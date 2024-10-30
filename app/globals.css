@@ -17,3 +17,35 @@
 .scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+/* Custom scrollbar for Sidebar */
+
+.sidebar_scroll::-webkit-scrollbar {
+  width: 10px;
+  border-radius: 15px;
+}
+
+.sidebar_scroll::-webkit-scrollbar-track {
+  background: #1e3a8a;
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  border-radius: 5px;
+}
+
+.sidebar_scroll::-webkit-scrollbar-thumb {
+  background: #fafafa;
+  border-radius: 5px;
+}
+.scrollbar-hidden {
+  overflow: auto; /* Allow scrolling */
+}
+
+/* Hide scrollbar for WebKit browsers (Chrome, Safari, Opera) */
+.scrollbar-hidden::-webkit-scrollbar {
+  width: 0; /* Hide scrollbar width */
+  background: transparent; /* Optional: make background transparent */
+}
+
+/* Hide scrollbar for Firefox */
+.scrollbar-hidden {
+  scrollbar-width: none; /* Hide scrollbar for Firefox */
+}

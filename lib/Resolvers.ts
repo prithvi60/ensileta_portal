@@ -136,6 +136,96 @@ export const resolvers = {
         throw new Error("Failed to fetch employees lists");
       }
     },
+    getEmployeeUser: async (_: any, __: any, { userId }: any) => {
+      if (!userId) {
+        throw new Error("Unauthorized");
+      }
+
+      try {
+        const user = await prisma.accessControl.findUnique({
+          where: { id: userId },
+        });
+
+        // console.log("employee", user);
+
+        return user;
+      } catch (error) {
+        console.error("Error while fetching user:", error);
+        throw new Error("Failed to fetch user");
+      }
+    },
+    kanbanCards: async (_: any, { userId }: { userId: number }) => {
+      try {
+        const cards = await prisma.kanban_Cards.findMany({
+          where: { userId },
+        });
+        return cards;
+      } catch (error) {
+        console.error("Error fetching Kanban cards:", error);
+        throw new Error("Unable to fetch Kanban cards");
+      }
+    },
+    getMarkerGroupsByDrawing2D: async (
+      _: any,
+      { drawing2DId }: { drawing2DId: number }
+    ) => {
+      try {
+        const data = await prisma.markerGroup.findMany({
+          where: { drawing2DId },
+          include: { markers: true, drawing2D: true },
+        });
+        return data;
+      } catch (error) {
+        console.error("Error fetching Markers Data:", error);
+        throw new Error("Unable to fetch Markers Data");
+      }
+    },
+    getMarkerGroupBy2DId: async (
+      _: any,
+      { drawing2DId }: { drawing2DId: number }
+    ) => {
+      try {
+        const markerGroup = await prisma.markerGroup2D.findFirst({
+          where: { drawing2DId },
+        });
+
+        return markerGroup;
+      } catch (error) {
+        console.error("Error fetching marker group:", error);
+        throw new Error("Unable to fetch marker group.");
+      }
+    },
+    getMarkerGroupBy3DId: async (
+      _: any,
+      { drawing3DId }: { drawing3DId: number }
+    ) => {
+      try {
+        const markerGroup = await prisma.markerGroup3D.findFirst({
+          where: { drawing3DId },
+        });
+
+        return markerGroup;
+      } catch (error) {
+        console.error("Error fetching marker group:", error);
+        throw new Error("Unable to fetch marker group.");
+      }
+    },
+    getMarkerGroupByBoqId: async (
+      _: any,
+      { drawingBoqId }: { drawingBoqId: number }
+    ) => {
+      console.log("id get boq", drawingBoqId);
+      try {
+        const markerGroup = await prisma.markerGroupBoq.findFirst({
+          where: { drawingBoqId },
+        });
+
+        return markerGroup;
+      } catch (error) {
+        console.error("Error fetching marker group:", error);
+        throw new Error("Unable to fetch marker group.");
+      }
+    },
   },
   Mutation: {
     signUp: async (
@@ -282,8 +372,11 @@ export const resolvers = {
         throw new Error("Failed to update user");
       }
     },
-    uploadAccessControlUsers: async (_: any, { email, password }: any) => {
-      if (!email && !password) {
+    uploadAccessControlUsers: async (
+      _: any,
+      { username, email, password }: any
+    ) => {
+      if (!username && !email && !password) {
         throw new Error("All fields are mandatory");
       }
 
@@ -305,6 +398,7 @@ export const resolvers = {
       try {
         const employeeData = await prisma.accessControl.create({
           data: {
+            username,
             email,
             password: hashedPwd,
           },
@@ -393,6 +487,181 @@ export const resolvers = {
       });
 
       return createdFile;
+    },
+    saveKanbanCards: async (_: any, { userId, cards }: any) => {
+      try {
+        if (!userId) {
+          throw new Error("Unauthorized");
+        }
+
+        // First, delete all existing cards for the user
+        await prisma.kanban_Cards.deleteMany({
+          where: { userId },
+        });
+
+        // Insert updated cards
+        const cardData = cards.map((card: any) => ({
+          id: card.id || undefined,
+          title: card.title,
+          column: card.column,
+          userId,
+        }));
+
+        // console.log(cardData);
+
+        await prisma.kanban_Cards.createMany({
+          data: cardData,
+        });
+
+        return true;
+      } catch (error) {
+        console.error("Error saving Kanban cards:", error);
+        return false;
+      }
+    },
+    deleteKanbanCard: async (_: any, { id }: { id: number }) => {
+      try {
+        // Check if the card exists
+        const card = await prisma.kanban_Cards.findUnique({
+          where: { id },
+        });
+
+        if (!card) {
+          return {
+            success: false,
+            message: "Card not found",
+          };
+        }
+
+        // Delete the card
+        await prisma.kanban_Cards.delete({
+          where: { id },
+        });
+
+        return {
+          success: true,
+          message: "Card deleted successfully",
+        };
+      } catch (error) {
+        console.error("Error deleting card:", error);
+        return {
+          success: false,
+          message: "Failed to delete the card",
+        };
+      }
+    },
+    updateKanbanCard: async (_: any, { id, title, column }: any) => {
+      try {
+        const updatedCard = await prisma.kanban_Cards.update({
+          where: { id },
+          data: {
+            title,
+            column,
+          },
+        });
+        return {
+          success: true,
+          message: "Card updated successfully",
+          card: updatedCard,
+        };
+      } catch (error) {
+        return {
+          success: false,
+          message: "Failed to update card",
+          card: null,
+        };
+      }
+    },
+    addMarkerGroups: async (_: any, { drawing2DId, input }: any) => {
+      console.log("backend", { drawing2DId, input });
+      try {
+        const markerGroups = [];
+
+        for (const markersArray of input) {
+          const markerGroup = await prisma.markerGroup.create({
+            data: {
+              drawing2DId,
+              markers: {
+                create: markersArray.map((marker: any) => ({
+                  comment: marker.comment,
+                  left: marker.left,
+                  top: marker.top,
+                  user: marker.user,
+                  userId: marker.userId,
+                })),
+              },
+            },
+            include: { markers: true, drawing2D: true },
+          });
+
+          markerGroups.push(markerGroup);
+        }
+        // Return markerGroups only if populated
+        if (markerGroups.length === 0) {
+          throw new Error("No marker groups were created.");
+        }
+        return markerGroups;
+      } catch (error) {
+        console.error("Error in addMarkerGroups:", error);
+        throw new Error("Failed to create marker groups");
+      }
+    },
+    createMarkerGroup2D: async (_: any, { data, drawing2DId }: any) => {
+      const jsonData = JSON.stringify(data);
+      try {
+        await prisma.markerGroup2D.deleteMany({
+          where: { drawing2DId },
+        });
+        const newMarkerGroup = await prisma.markerGroup2D.create({
+          data: {
+            data: jsonData,
+            drawing2DId,
+          },
+        });
+
+        return newMarkerGroup;
+      } catch (error) {
+        console.error("Error creating marker group:", error);
+        throw new Error("Failed to create marker group");
+      }
+    },
+    createMarkerGroup3D: async (_: any, { data, drawing3DId }: any) => {
+      const jsonData = JSON.stringify(data);
+      try {
+        await prisma.markerGroup3D.deleteMany({
+          where: { drawing3DId },
+        });
+        const newMarkerGroup = await prisma.markerGroup3D.create({
+          data: {
+            data: jsonData,
+            drawing3DId,
+          },
+        });
+
+        return newMarkerGroup;
+      } catch (error) {
+        console.error("Error creating marker group:", error);
+        throw new Error("Failed to create marker group");
+      }
+    },
+    createMarkerGroupBOQ: async (_: any, { data, drawingBoqId }: any) => {
+      const jsonData = JSON.stringify(data);
+      try {
+        await prisma.markerGroupBoq.deleteMany({
+          where: { drawingBoqId },
+        });
+        const newMarkerGroup = await prisma.markerGroupBoq.create({
+          data: {
+            data: jsonData,
+            drawingBoqId,
+          },
+        });
+
+        return newMarkerGroup;
+      } catch (error) {
+        console.error("Error creating marker group:", error);
+        throw new Error("Failed to create marker group");
+      }
     },
   },
 };

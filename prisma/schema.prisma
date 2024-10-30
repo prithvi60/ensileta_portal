@@ -9,9 +9,9 @@ datasource db {
 }
 
 model users {
-  id              Int           @id @default(autoincrement())
-  username        String        @db.VarChar(50)
-  email           String        @unique @db.VarChar(20)
+  id              Int            @id @default(autoincrement())
+  username        String         @db.VarChar(50)
+  email           String         @unique @db.VarChar(20)
   password        String
   company_name    String?
   phone_number    String?
@@ -20,51 +20,97 @@ model users {
   drawing2Dfiles  Drawing_2D[]
   drawing3Dfiles  Drawing_3D[]
   drawingBOQfiles Drawing_BOQ[]
+  kanbanCards     Kanban_Cards[]
 }
 
 model Drawing_2D {
-  id        Int      @id @default(autoincrement())
-  filename  String
-  fileUrl   String
-  version   Int
-  createdAt DateTime @default(now())
-  userId    Int
-  user      users    @relation(fields: [userId], references: [id])
+  id            Int             @id @default(autoincrement())
+  filename      String
+  fileUrl       String
+  version       Int
+  createdAt     DateTime        @default(now())
+  userId        Int
+  user          users           @relation(fields: [userId], references: [id])
+  markerGroups  MarkerGroup[]
+  markerGroup2d MarkerGroup2D[]
 }
 
 model Drawing_3D {
-  id        Int      @id @default(autoincrement())
-  filename  String
-  fileUrl   String
-  version   Int
-  createdAt DateTime @default(now())
-  userId    Int
-  user      users    @relation(fields: [userId], references: [id])
+  id            Int             @id @default(autoincrement())
+  filename      String
+  fileUrl       String
+  version       Int
+  createdAt     DateTime        @default(now())
+  userId        Int
+  user          users           @relation(fields: [userId], references: [id])
+  markerGroup3d MarkerGroup3D[]
 }
 
 model Drawing_BOQ {
-  id        Int      @id @default(autoincrement())
-  filename  String
-  fileUrl   String
-  version   Int
-  createdAt DateTime @default(now())
-  userId    Int
-  user      users    @relation(fields: [userId], references: [id])
+  id             Int              @id @default(autoincrement())
+  filename       String
+  fileUrl        String
+  version        Int
+  createdAt      DateTime         @default(now())
+  userId         Int
+  user           users            @relation(fields: [userId], references: [id])
+  markerGroupBoq MarkerGroupBoq[]
+}
+
+model MarkerGroup2D {
+  id          Int         @id @default(autoincrement())
+  data        Json
+  createdAt   DateTime    @default(now())
+  drawing2DId Int?
+  drawing2D   Drawing_2D? @relation(fields: [drawing2DId], references: [id])
+}
+
+model MarkerGroup3D {
+  id          Int         @id @default(autoincrement())
+  data        Json
+  createdAt   DateTime    @default(now())
+  drawing3DId Int?
+  drawing3D   Drawing_3D? @relation(fields: [drawing3DId], references: [id])
+}
+
+model MarkerGroupBoq {
+  id           Int          @id @default(autoincrement())
+  data         Json
+  createdAt    DateTime     @default(now())
+  drawingBoqId Int?
+  drawingBoq   Drawing_BOQ? @relation(fields: [drawingBoqId], references: [id])
+}
+
+model Marker {
+  id            Int         @id @default(autoincrement())
+  top           Float
+  left          Float
+  comment       String
+  user          String
+  userId        Int
+  markerGroupId Int
+  markerGroup   MarkerGroup @relation(fields: [markerGroupId], references: [id])
+}
+
+model MarkerGroup {
+  id          Int         @id @default(autoincrement())
+  markers     Marker[]
+  drawing2DId Int?
+  drawing2D   Drawing_2D? @relation(fields: [drawing2DId], references: [id])
 }
 
 model accessControl {
   id       Int    @id @default(autoincrement())
+  username String @db.VarChar(50)
   email    String @unique @db.VarChar(20)
   password String
   role     String @default("employee")
 }
 
-// model File {
-//   id        Int      @id @default(autoincrement())
-//   filename  String
-//   fileUrl   String
-//   version   Int
-//   createdAt DateTime @default(now())
-//   userId    Int
-//   user      users    @relation(fields: [userId], references: [id])
-// }
+model Kanban_Cards {
+  id     Int    @id @default(autoincrement())
+  column String
+  title  String
+  userId Int
+  user   users  @relation(fields: [userId], references: [id])
+}

@@ -10,10 +10,10 @@ const Page = () => {
 
     return (
         <DefaultLayout>
-            <div className='w-full h-full overflow-auto flex justify-start items-center gap-10 relative flex-col'>
-                <h2 className='text-5xl font-semibold tracking-wide uppercase'>DashBoard</h2>
-                <p className='text-lg text-center font-medium tracking-normal font-satoshi '>Our home should tell the story of who you are, and be a collection of what you love 🛋️</p>
-                <Image src={"/cover/bg-cover.jpg"} width={450} height={450} alt='bg-image' />
+            <div className='w-full h-[70vh] overflow-auto flex flex-col items-center justify-center gap-6'>
+                <Image src={"/logo/newlogo.png"} width={450} height={450} alt='bg-image' />
+                <p className='text-lg sm:text-2xl font-semibold font-satoshi leading-6 sm:leading-snug tracking-wide italic text-primary w-full text-center sm:w-4/5'>Decorating is not about making stage sets, it’s not about making pretty pictures for the magazines; it’s really about creating a quality of life, a beauty that nourishes the soul.</p>
+
             </div>
         </DefaultLayout>
     )

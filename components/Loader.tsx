@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
     AnimationProps,
     DynamicAnimationOptions,
@@ -31,11 +31,7 @@ export const ShuffleLoader = () => {
     );
     const [scope, animate] = useAnimate();
 
-    useEffect(() => {
-        shuffle();
-    }, []);
-
-    const shuffle = async () => {
+    const shuffle = useCallback(async () => {
         while (true) {
             const [first, second] = pickTwoRandom();
             const firstElement = document.querySelector(`[data-block-id="${first.id}"]`);
@@ -48,11 +44,7 @@ export const ShuffleLoader = () => {
 
             animate(firstElement, { y: -BLOCK_SIZE }, TRANSITION);
 
-            await animate(
-                secondElement,
-                { y: BLOCK_SIZE },
-                TRANSITION
-            );
+            await animate(secondElement, { y: BLOCK_SIZE }, TRANSITION);
 
             await delay(DURATION_IN_MS);
 
@@ -76,7 +68,11 @@ export const ShuffleLoader = () => {
 
             await delay(DURATION_IN_MS);
         }
-    };
+    }, [setBlocks, animate]);
+
+    useEffect(() => {
+        shuffle();
+    }, [shuffle]);
 
     const pickTwoRandom = () => {
         const index1 = Math.floor(Math.random() * blocks.length);

@@ -1,5 +1,5 @@
 "use client";
-import { useSession } from "next-auth/react";
+
 import ModernCarousel from "./SwipeCarousal";
 import ShuffleSortTable from "./Table";
 import { GET_USER } from "@/lib/Queries";
@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { Marquee } from "../Header/Marquee";
 import Image from "next/image";
+import React from "react"
 
 interface FileData {
   id: number;
@@ -25,7 +26,10 @@ interface GetAll2DViewProps {
   title: string;
   allUsers: any;
   fileType: string;
-  refetchUsers:any;
+  refetchUsers: any;
+  lastItem: any
+  createMarkerGroup: any
+  markerData: any
 }
 
 export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
@@ -34,30 +38,37 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
   title,
   allUsers,
   fileType,
-  refetchUsers
+  refetchUsers,
+  createMarkerGroup,
+  lastItem,
+  markerData
 }) => {
   const { data: RoleBased } = useQuery(GET_USER);
   // const { data: session } = useSession()
   const [isApproved, setIsApproved] = useState(false);
   const [isApproving, setIsApproving] = useState(false);
-  // const superAdmin = allUsers.users.filter((val: any) => val.role === "super admin")
   const [filteredData, setFilteredData] = useState<Array<any>>([]);
 
   useEffect(() => {
     // Update filteredData whenever allUsers changes
-    const admins = allUsers.users.filter((val: any) => val.role === "admin");
-    console.log("refetched",admins)
-    setFilteredData(admins);
-  }, [allUsers]);
-  const SAfilteredData = allUsers.users.filter(
-    (val: any) => val.role === "super admin"
-  );
-  // console.log(SAfilteredData[0]?.email);
-  const userId = RoleBased?.user?.id;
-  // console.log(fileType);
+    if (allUsers && allUsers.users) {
+      const admins = allUsers.users.filter((val: any) => val.role === "admin") || [];
+      // Use the `admins` variable as needed
+      // console.log("Filtered admins:", admins);
+      setFilteredData(admins);
+    }
 
-  const lastItem = data?.[data?.length - 1] || null;
-//   console.log(data);
+    // console.log("refetched",admins)
+
+  }, [allUsers]);
+
+  const SAfilteredData = allUsers?.users?.filter(
+    (val: any) => val.role === "super admin"
+  ) || [];
+
+  const userId = RoleBased?.user?.id;
+  // console.log("last", lastItem);
+
 
   // Unique localStorage key for each user and file type
   const localStorageKey = `isApproved_${userId}_${fileType}`;
@@ -89,7 +100,7 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
         }
       }
     }
-  }, [lastItem?.id, lastItem?.version]);
+  }, [lastItem?.id, lastItem?.version, localStorageKey]);
 
   const handleSendEmail = async () => {
     try {
@@ -170,20 +181,35 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
             pdf={lastItem?.fileUrl || ""}
             version={data?.length || 0}
             id={lastItem?.id || 1}
+            createMarkerGroup={createMarkerGroup}
+            handleSendEmail={handleSendEmail} isApproved={isApproved} isApproving={isApproving}
+            userId={userId}
+            markerData={markerData}
           />
-          <div className="w-full sm:w-1/2 mx-auto">
+          <div className="w-full flex flex-col justify-between items-center text-justify">
             <button
               disabled={isApproved || isApproving}
               type="submit"
-              className="cursor-pointer w-full p-4 shadow-md select-none bg-secondary text-white hover:bg-primary disabled:bg-opacity-70 disabled:cursor-not-allowed"
+              className="cursor-pointer w-full sm:w-1/2 p-4 shadow-md select-none bg-secondary text-white hover:bg-primary disabled:bg-opacity-70 disabled:cursor-not-allowed"
               onClick={handleSendEmail}
             >
               {isApproving
                 ? "Approving..."
                 : isApproved
-                ? "Approved"
-                : `Approve`}
+                  ? "Approved"
+                  : `Approve`}
             </button>
+            <p className="mt-8">
+              Please review the drawings and click the &apos;Approve&apos; button to confirm if this version is acceptable. You can add comments in the &apos;Remarks&apos; section by viewing the drawing in fullscreen and annotating directly on the image.
+            </p>
+            {/* <button
+              type="button"
+              className="cursor-pointer w-max p-4 shadow-md select-none bg-secondary text-white hover:bg-primary"
+            // onClick={handleSendEmail}
+            >
+              Remarks
+            </button> */}
+            {/* <RemarkModal handleSave={handleSave} pdf={lastItem?.fileUrl || ""} handleSendEmail={handleSendEmail} isApproved={isApproved} isApproving={isApproving}/> */}
           </div>
         </>
       )}
