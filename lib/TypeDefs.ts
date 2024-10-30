@@ -136,10 +136,7 @@ input MarkerGroupInput {
 type MarkerGroup {
   id: Int!
   markers: [Marker!]!
-  drawing2DId: Int
-  drawing2D: Drawing2D
 }
-
 
   type Query {
     user: User
@@ -152,7 +149,7 @@ type MarkerGroup {
     getAllBOQFiles: [DrawingBOQ!]!
     kanbanCards(userId: Int!): [KanbanCard]
     getAllMarkerGroups: [MarkerGroup!]!
-  getMarkerGroupsByDrawing2D(drawing2DId: Int!): [MarkerGroup!]!
+    getMarkerGroupsByDrawing2D(drawing2DId: Int!): [MarkerGroup!]!
   }
   
 
@@ -187,6 +184,6 @@ type MarkerGroup {
     saveKanbanCards(userId: Int!, cards: [KanbanCardInput!]!): Boolean!
     deleteKanbanCard(id: Int!): DeleteKanbanCardResponse!
     updateKanbanCard(id: Int!, title: String!, column: String!): UpdateKanbanCardResponse!
-    addMarkerGroup(data: MarkerGroupInput!): MarkerGroup!
+    addMarkerGroups(drawing2DId: Int!,input: [[MarkerInput!]!]!): [MarkerGroup!]!
   }
 `;

@@ -412,16 +412,15 @@ export const GET_MARKER_GROUPS_BY_DRAWING_2D = gql`
 `;
 
 export const ADD_MARKER_GROUP = gql`
-  mutation AddMarkerGroup($data: MarkerGroupInput!) {
-    addMarkerGroup(data: $data) {
+  mutation AddMarkerGroups($drawing2DId: Int!, $input: [[MarkerInput!]!]!) {
+    addMarkerGroups(drawing2DId: $drawing2DId, input: $input) {
       id
       markers {
-        id
         comment
-      }
-      drawing2D {
         id
-        filename
+        left
+        top
+        user
       }
     }
   }

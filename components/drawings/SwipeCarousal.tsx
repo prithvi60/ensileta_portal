@@ -9,6 +9,8 @@ import Slider from "react-slick";
 import ImageMarker, { Marker, MarkerComponentProps } from "react-image-marker";
 import { FaCircleArrowUp } from "react-icons/fa6";
 import { useSession } from "next-auth/react";
+import { useMutation, useQuery } from "@apollo/client";
+import { ADD_MARKER_GROUP, GET_MARKER_GROUPS_BY_DRAWING_2D } from "@/lib/Queries";
 export default function ModernCarousel({
   pdf,
   version,
@@ -238,6 +240,10 @@ const SpringModal = ({
 }) => {
   const [isMarkerEnabled, setIsMarkerEnabled] = useState<boolean>(false);
   const [index, setIndex] = useState<number>(0);
+  const [addMarkerGroup1] = useMutation(ADD_MARKER_GROUP);
+  const { data, loading, error, refetch } = useQuery(GET_MARKER_GROUPS_BY_DRAWING_2D, {
+    variables: { drawing2DId: id },
+  });
 
   const [markers, setMarkers] = useState<
     Array<Array<Marker & { comment?: string }>>
@@ -252,16 +258,17 @@ const SpringModal = ({
               top: 45.12916772715704,
               left: 51.92,
               comment: "change colour",
-            },
-            {
-              top: 64.83901756172054,
-              left: 30.24,
-              comment: "remove this",
-            },
+              user: "Web Dev",
+              userId: 1
+            }
           ]
           : [] // Other arrays remain empty
     )
   );
+  if (loading) return <p>loading....</p>
+  // if (error) return <p>Error: {error.message}</p>;
+  console.log("get", data?.getMarkerGroupsByDrawing2D);
+
   const handleSliderChange = (newIndex: number) => {
     setIndex(newIndex); // Update the index when the slider changes
   };
@@ -286,8 +293,13 @@ const SpringModal = ({
 
   const handleClose = async () => {
     setIsOpen(false);
-    await addMarkerGroup({
-      variables: { data: { drawing2DId: id, markers: markers.flat() } },
+    const input = markers.map(markerArray =>
+      markerArray.map(marker => ({
+        ...marker,
+      }))
+    );
+    await addMarkerGroup1({
+      variables: { drawing2DId: id, input },
     });
     alert("Successfully saved!");
 
@@ -533,7 +545,8 @@ function PrevArrow(props: any) {
   );
 }
 
-// const arr = [
+// const arr =
+// [
 //   [
 //     {
 //       comment: "new",

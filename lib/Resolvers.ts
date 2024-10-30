@@ -537,24 +537,39 @@ export const resolvers = {
         };
       }
     },
-    addMarkerGroup: async (_: any, { data }: { data: any }) => {
-      const { drawing2DId, markers } = data;
-      const markerGroup = await prisma.markerGroup.create({
-        data: {
-          drawing2DId: drawing2DId,
-          markers: {
-            create: markers.map((marker: any) => ({
-              comment: marker.comment,
-              left: marker.left,
-              top: marker.top,
-              user: marker.user,
-              userId: marker.userId,
-            })),
-          },
-        },
-        include: { markers: true, drawing2D: true },
-      });
-      return markerGroup;
+    addMarkerGroups: async (_: any, { drawing2DId, input }: any) => {
+      console.log("backend", { drawing2DId, input });
+      try {
+        const markerGroups = [];
+
+        for (const markersArray of input) {
+          const markerGroup = await prisma.markerGroup.create({
+            data: {
+              drawing2DId,
+              markers: {
+                create: markersArray.map((marker: any) => ({
+                  comment: marker.comment,
+                  left: marker.left,
+                  top: marker.top,
+                  user: marker.user,
+                  userId: marker.userId,
+                })),
+              },
+            },
+            include: { markers: true, drawing2D: true },
+          });
+
+          markerGroups.push(markerGroup);
+        }
+        // Return markerGroups only if populated
+        if (markerGroups.length === 0) {
+          throw new Error("No marker groups were created.");
+        }
+        return markerGroups;
+      } catch (error) {
+        console.error("Error in addMarkerGroups:", error);
+        throw new Error("Failed to create marker groups");
+      }
     },
   },
 };

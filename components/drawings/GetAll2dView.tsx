@@ -50,7 +50,7 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
     if (allUsers && allUsers.users) {
       const admins = allUsers.users.filter((val: any) => val.role === "admin") || [];
       // Use the `admins` variable as needed
-      console.log("Filtered admins:", admins);
+      // console.log("Filtered admins:", admins);
       setFilteredData(admins);
     }
 
