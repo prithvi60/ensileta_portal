@@ -209,7 +209,7 @@ type MarkerGroupBoq {
       email: String!,
       password: String!
     ): AccessControl
-    saveKanbanCards(userId: Int!, cards: [KanbanCardInput!]!): Boolean!
+      saveKanbanCard(userId: Int!, card: KanbanCardInput!): Boolean!
     deleteKanbanCard(id: Int!): DeleteKanbanCardResponse!
     updateKanbanCard(id: Int!, title: String!, column: String!): UpdateKanbanCardResponse!
     addMarkerGroups(drawing2DId: Int!,input: [[MarkerInput!]!]!): [MarkerGroup!]!

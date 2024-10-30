@@ -170,6 +170,7 @@ export const resolvers = {
       { drawing2DId }: { drawing2DId: number }
     ) => {
       try {
+        // @ts-ignore
         const data = await prisma.markerGroup.findMany({
           where: { drawing2DId },
           include: { markers: true, drawing2D: true },
@@ -185,6 +186,7 @@ export const resolvers = {
       { drawing2DId }: { drawing2DId: number }
     ) => {
       try {
+        // @ts-ignore
         const markerGroup = await prisma.markerGroup2D.findFirst({
           where: { drawing2DId },
         });
@@ -200,6 +202,7 @@ export const resolvers = {
       { drawing3DId }: { drawing3DId: number }
     ) => {
       try {
+        // @ts-ignore
         const markerGroup = await prisma.markerGroup3D.findFirst({
           where: { drawing3DId },
         });
@@ -216,6 +219,7 @@ export const resolvers = {
     ) => {
       console.log("id get boq", drawingBoqId);
       try {
+        // @ts-ignore
         const markerGroup = await prisma.markerGroupBoq.findFirst({
           where: { drawingBoqId },
         });
@@ -488,34 +492,28 @@ export const resolvers = {
 
       return createdFile;
     },
-    saveKanbanCards: async (_: any, { userId, cards }: any) => {
+    saveKanbanCard: async (_: any, { userId, card }: any) => {
       try {
         if (!userId) {
           throw new Error("Unauthorized");
         }
 
-        // First, delete all existing cards for the user
-        await prisma.kanban_Cards.deleteMany({
-          where: { userId },
-        });
-
-        // Insert updated cards
-        const cardData = cards.map((card: any) => ({
+        // Construct the card data
+        const cardData = {
           id: card.id || undefined,
           title: card.title,
           column: card.column,
           userId,
-        }));
+        };
 
-        // console.log(cardData);
-
-        await prisma.kanban_Cards.createMany({
+        // Create the card in the database
+        await prisma.kanban_Cards.create({
           data: cardData,
         });
 
         return true;
       } catch (error) {
-        console.error("Error saving Kanban cards:", error);
+        console.error("Error saving Kanban card:", error);
         return false;
       }
     },
@@ -578,6 +576,7 @@ export const resolvers = {
         const markerGroups = [];
 
         for (const markersArray of input) {
+           // @ts-ignore
           const markerGroup = await prisma.markerGroup.create({
             data: {
               drawing2DId,
@@ -609,9 +608,11 @@ export const resolvers = {
     createMarkerGroup2D: async (_: any, { data, drawing2DId }: any) => {
       const jsonData = JSON.stringify(data);
       try {
+         // @ts-ignore
         await prisma.markerGroup2D.deleteMany({
           where: { drawing2DId },
         });
+         // @ts-ignore
         const newMarkerGroup = await prisma.markerGroup2D.create({
           data: {
             data: jsonData,
@@ -628,9 +629,11 @@ export const resolvers = {
     createMarkerGroup3D: async (_: any, { data, drawing3DId }: any) => {
       const jsonData = JSON.stringify(data);
       try {
+         // @ts-ignore
         await prisma.markerGroup3D.deleteMany({
           where: { drawing3DId },
         });
+         // @ts-ignore
         const newMarkerGroup = await prisma.markerGroup3D.create({
           data: {
             data: jsonData,
@@ -647,9 +650,11 @@ export const resolvers = {
     createMarkerGroupBOQ: async (_: any, { data, drawingBoqId }: any) => {
       const jsonData = JSON.stringify(data);
       try {
+         // @ts-ignore
         await prisma.markerGroupBoq.deleteMany({
           where: { drawingBoqId },
         });
+         // @ts-ignore
         const newMarkerGroup = await prisma.markerGroupBoq.create({
           data: {
             data: jsonData,
