@@ -3,13 +3,17 @@ import { FiPlus, FiTrash } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { FaFire } from "react-icons/fa";
 import { useMutation, useQuery } from "@apollo/client";
+import { MdEdit } from "react-icons/md";
 import {
-    CARDS,
+    CREATE_CARD,
     DELETE_KANBAN_CARDS,
     GET_KANBAN_CARDS,
+    SAVE_KANBAN_CARD,
     UPDATE_KANBAN_CARDS,
 } from "@/lib/Queries";
 import { Loader } from "../Loader";
+import toast from "react-hot-toast";
+import DeleteModal from "./Modal";
 
 export const CustomKanban = ({ userId }: { userId: any }) => {
     return (
@@ -26,58 +30,52 @@ const Board = ({ userId }: { userId: any }) => {
 
     const [cards, setCards] = useState<any[]>([]);
     const [isDisable, setIsDisable] = useState(false);
-    const [canEdit, setCanEdit] = useState(false);
 
-    const [saveKanbanCards] = useMutation(CARDS);
+    // const [saveKanbanCards] = useMutation(CARDS);
     const [updateKanbanCard] = useMutation(UPDATE_KANBAN_CARDS);
 
     useEffect(() => {
         if (data && data.kanbanCards) {
-            setCards(data.kanbanCards.map((card: any) => ({
-                ...card,
-                // isNew: false,  // Mark all cards fetched from DB as not new
-            })));
+            setCards(data.kanbanCards);
         }
     }, [data]);
 
-    useEffect(() => {
-        setIsDisable(cards.length > 0);
-    }, [cards]);
+    // useEffect(() => {
+    //     setIsDisable(cards.length > 0);
+    // }, [cards]);
 
     if (loading) return <Loader />;
     if (error) return <p>Error: {error.message}</p>;
 
-    const handleSave = async () => {
-        try {
-            if (cards.length === 0) {
-                return alert("Please add a new card before saving");
-            }
+    // const handleSave = async () => {
+    //     try {
+    //         if (cards.length === 0) {
+    //             return alert("Please add a new card before saving");
+    //         }
 
-            const updatedCards = cards.map((card: any) => ({
-                id: card.id ? parseInt(card.id, 10) : undefined,
-                title: card.title,
-                column: card.column,
-                userId: card.userId,
-                // isNew: false,
-            }));
+    //         const updatedCards = cards.map((card: any) => ({
+    //             id: card.id ? parseInt(card.id, 10) : undefined,
+    //             title: card.title,
+    //             column: card.column,
+    //             userId: card.userId,
+    //         }));
 
-            // Execute the mutation to save cards to the database
-            const result = await saveKanbanCards({
-                variables: {
-                    userId,
-                    cards: updatedCards,
-                },
-            });
+    //         // Execute the mutation to save cards to the database
+    //         const result = await saveKanbanCards({
+    //             variables: {
+    //                 userId,
+    //                 cards: updatedCards,
+    //             },
+    //         });
 
-            if (result) {
-                refetch();
-                setCanEdit(true);
-                console.log("Cards saved successfully!");
-            }
-        } catch (error) {
-            console.error("Error saving cards:", error);
-        }
-    };
+    //         if (result) {
+    //             refetch();
+    //             console.log("Cards saved successfully!");
+    //         }
+    //     } catch (error) {
+    //         console.error("Error saving cards:", error);
+    //     }
+    // };
 
     const handleCardUpdate = async (
         cardId: number,
@@ -92,9 +90,35 @@ const Board = ({ userId }: { userId: any }) => {
             if (data.updateKanbanCard.success) {
                 refetch(); // To update the client-side with the latest data
                 console.log("Card updated successfully!");
+                toast.success("Card updated successfully!", {
+                    position: "top-right",
+                    duration: 3000,
+                    style: {
+                        border: "1px solid #499d49",
+                        padding: "16px",
+                        color: "#499d49",
+                    },
+                    iconTheme: {
+                        primary: "#499d49",
+                        secondary: "#FFFAEE",
+                    },
+                });
             }
         } catch (error) {
             console.error("Error updating card:", error);
+            toast.error("Error updating card", {
+                position: "top-right",
+                duration: 3000,
+                style: {
+                    border: "1px solid #EB1C23",
+                    padding: "16px",
+                    color: "#EB1C23",
+                },
+                iconTheme: {
+                    primary: "#EB1C23",
+                    secondary: "#FFFAEE",
+                },
+            });
         }
     };
 
@@ -110,7 +134,7 @@ const Board = ({ userId }: { userId: any }) => {
                         setCards={setCards}
                         userId={userId}
                         handleCardUpdate={handleCardUpdate}
-                        canEdit={canEdit}
+                        refetch={refetch}
                     />
                 </div>
                 <div className="flex flex-col items-center">
@@ -122,7 +146,7 @@ const Board = ({ userId }: { userId: any }) => {
                         setCards={setCards}
                         userId={userId}
                         handleCardUpdate={handleCardUpdate}
-                        canEdit={canEdit}
+                        refetch={refetch}
                     />
                 </div>
                 <div className="flex flex-col items-center">
@@ -134,19 +158,12 @@ const Board = ({ userId }: { userId: any }) => {
                         setCards={setCards}
                         userId={userId}
                         handleCardUpdate={handleCardUpdate}
-                        canEdit={canEdit}
+                        refetch={refetch}
                     />
                 </div>
             </div>
             <div className="flex gap-3 items-center">
                 <BurnBarrel setCards={setCards} refetch={refetch} />
-                <button
-                    onClick={handleSave}
-                    disabled={!isDisable}
-                    className={`w-full py-8 mt-10 cursor-pointer px-5 text-white bg-secondary text-sm hover:bg-opacity-80 disabled:bg-opacity-50 disabled:cursor-not-allowed`}
-                >
-                    Save Comments
-                </button>
             </div>
         </div>
     );
@@ -159,7 +176,7 @@ const Column = ({
     setCards,
     userId,
     handleCardUpdate,
-    canEdit
+    refetch
 }: any) => {
     const [active, setActive] = useState(false);
 
@@ -283,7 +300,6 @@ const Column = ({
                             {...c}
                             handleDragStart={handleDragStart}
                             handleCardUpdate={handleCardUpdate}
-                            canEdit={canEdit}
                         />
                     );
                 })}
@@ -293,19 +309,19 @@ const Column = ({
                     userId={userId}
                     setCards={setCards}
                     cards={cards}
+                    refetch={refetch}
                 />
             </div>
         </div>
     );
 };
 
-const Card = ({ title, id, column, handleDragStart, handleCardUpdate, canEdit }: any) => {
+const Card = ({ title, id, column, handleDragStart, handleCardUpdate }: any) => {
     const [isEditing, setIsEditing] = useState(false);
     const [newTitle, setNewTitle] = useState(title);
-    // const cardId = id ? parseInt(id, 10) : undefined
+    const stringId = id !== undefined ? id.toString() : '';
 
     const handleEdit = () => {
-        if (!canEdit) return;
         setIsEditing(true);
     };
 
@@ -315,17 +331,8 @@ const Card = ({ title, id, column, handleDragStart, handleCardUpdate, canEdit }:
     };
     return (
         <>
-            <DropIndicator beforeId={id.toString()} column={column} />
+            <DropIndicator beforeId={stringId} column={column} />
             {isEditing ? (
-                // <div className="cursor-grab rounded border border-primary/60 bg-primary p-3">
-                //     <input
-                //         value={newTitle}
-                //         onChange={(e) => setNewTitle(e.target.value)}
-                //         className="bg-primary text-white w-full p-2"
-                //     />
-                //     <button onClick={handleSaveEdit} className="text-success">Save</button>
-                //     <button onClick={() => setIsEditing(false)} className="text-warning">Cancel</button>
-                // </div>
                 <motion.div>
                     <textarea
                         value={newTitle}
@@ -354,13 +361,14 @@ const Card = ({ title, id, column, handleDragStart, handleCardUpdate, canEdit }:
             ) : (
                 <motion.div
                     layout
-                    layoutId={id.toString()}
+                    layoutId={stringId}
                     draggable="true"
                     onDragStart={(e) => handleDragStart(e, { title, id, column })}
                     onClick={handleEdit}
-                    className="cursor-grab rounded border border-primary/60 bg-primary p-3 active:cursor-grabbing"
+                    className="cursor-grab rounded border border-primary/60 bg-primary p-3 active:cursor-grabbing relative"
                 >
                     <p className="text-sm text-neutral-100">{title}</p>
+                    <MdEdit className="text-white text-xl absolute top-[12px] right-2" />
                 </motion.div>
             )}
         </>
@@ -368,9 +376,10 @@ const Card = ({ title, id, column, handleDragStart, handleCardUpdate, canEdit }:
 };
 
 const DropIndicator = ({ beforeId, column }: any) => {
+    const id = beforeId
     return (
         <div
-            data-before={beforeId || "-1"}
+            data-before={id || "-1"}
             data-column={column}
             className="my-0.5 h-0.5 w-full bg-secondary opacity-0"
         />
@@ -380,6 +389,9 @@ const DropIndicator = ({ beforeId, column }: any) => {
 const BurnBarrel = ({ setCards, refetch }: any) => {
     const [active, setActive] = useState(false);
     const [deleteKanbanCard] = useMutation(DELETE_KANBAN_CARDS);
+    const [isOpen, setIsOpen] = useState(false);
+    const [deleteCardId, setDeleteCardId] = useState("");
+    console.log("id", deleteCardId);
 
     const handleDragOver = (e: any) => {
         e.preventDefault();
@@ -390,73 +402,151 @@ const BurnBarrel = ({ setCards, refetch }: any) => {
         setActive(false);
     };
 
-    // const handleDragEnd = (e: any) => {
-    //     const cardId = e.dataTransfer.getData("cardId");
-    //     // console.log(e.dataTransfer);
-
-    //     setCards((pv: any) => pv.filter((c: any) => c.id !== cardId));
-
-    //     setActive(false);
-    // };
-
     const handleDragEnd = async (e: any) => {
         const cardId = e.dataTransfer.getData("cardId");
+        setIsOpen(true)
+        setDeleteCardId(cardId)
+    };
 
+    const confirmDeleteCard = async () => {
         try {
-            // Call the mutation to delete the card from the database
             const { data } = await deleteKanbanCard({
-                variables: { id: parseInt(cardId, 10) },
+                variables: { id: parseInt(deleteCardId, 10) },
             });
 
             if (data.deleteKanbanCard.success) {
-                // Remove the card from the state
-                setCards((prev: any) => prev.filter((c: any) => c.id !== cardId));
+                setCards((prev: any) => prev.filter((c: any) => c.id !== deleteCardId));
                 refetch();
-                console.log("Card deleted successfully!");
+                toast.success("Card deleted successfully!", {
+                    position: "top-right",
+                    duration: 3000,
+                    style: {
+                        border: "1px solid #499d49",
+                        padding: "16px",
+                        color: "#499d49",
+                    },
+                    iconTheme: {
+                        primary: "#499d49",
+                        secondary: "#FFFAEE",
+                    },
+                });
             } else {
                 console.error("Failed to delete card:", data.deleteKanbanCard.message);
+                toast.error("Failed to delete card", {
+                    position: "top-right",
+                    duration: 3000,
+                    style: {
+                        border: "1px solid #EB1C23",
+                        padding: "16px",
+                        color: "#EB1C23",
+                    },
+                    iconTheme: {
+                        primary: "#EB1C23",
+                        secondary: "#FFFAEE",
+                    },
+                });
             }
         } catch (error) {
             console.error("Error deleting card:", error);
         }
 
+        setIsOpen(false);
         setActive(false);
     };
 
     return (
-        // <div className="text-center w-full gap-2 flex flex-col justify-center items-center">
-        <div
-            onDrop={handleDragEnd}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            className={`mt-10 grid py-3 px-5 shrink-0 place-items-center gap-3 place-content-center rounded border text-3xl ${active
-                ? "border-red-800 bg-warning/50 text-warning/80"
-                : "border-neutral-500 bg-primary text-white"
-                }`}
-        >
-            <h4 className="text-center">{active ? <FaFire className="animate-bounce text-xl" /> : <FiTrash />}</h4>
-            <p
-                className={`text-xs w-full ${active ? " text-warning/65" : "text-white whitespace-normal"
+        <>
+            <div
+                onDrop={handleDragEnd}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                className={`mt-10 grid py-3 px-5 shrink-0 place-items-center gap-3 place-content-center rounded border text-3xl ${active
+                    ? "border-red-800 bg-warning/50 text-warning/80"
+                    : "border-neutral-500 bg-primary text-white"
                     }`}
             >
-                Drag & Drop to delete
-            </p>
-        </div>
-        // {/* <div
-        //     className={`text-xs ${active ? " text-warning/65" : "text-neutral-500"
-        //         }`}
-        // >
-        //     Drag & Drop to delete
-        // </div> */}
-        // </div>
+                <h4 className="text-center">{active ? <FaFire className="animate-bounce text-xl" /> : <FiTrash />}</h4>
+                <p
+                    className={`text-xs w-full ${active ? " text-warning/65" : "text-white whitespace-normal"
+                        }`}
+                >
+                    Drag & Drop to delete
+                </p>
+            </div>
+            <DeleteModal isOpen={isOpen} setIsOpen={setIsOpen} setActive={setActive} confirmDeleteCard={confirmDeleteCard} />
+        </>
     );
 };
 
-const AddCard = ({ column, setCards, cards, userId }: any) => {
+const AddCard = ({ column, setCards, cards, userId, refetch }: any) => {
+
     const [text, setText] = useState("");
     const [adding, setAdding] = useState(false);
+    // const [createCard] = useMutation(SAVE_KANBAN_CARD);
+    const [saveKanbanCard] = useMutation(SAVE_KANBAN_CARD);
+    // console.log(userId);
 
-    const handleSubmit = (e: any) => {
+
+    // const handleSubmit = async (e: any) => {
+    //     e.preventDefault();
+
+    //     if (!text.trim().length) return;
+
+    //     const newCard = {
+    //         column,
+    //         title: text.trim(),
+    //         userId,
+    //     };
+
+    //     try {
+    //         // Save the new card to the database
+    //         const { data } = await createCard({
+    //             variables: { userId, card: newCard },
+    //         });
+
+    //         console.log(data);
+
+
+    //         // Update local state if mutation is successful
+    //         if (data?.createKanbanCard) {
+    //             setCards((pv: any) => [...pv, newCard]);
+    //             refetch()
+    //             // console.log("");
+    //             toast.success("Card added successfully!", {
+    //                 position: "top-right",
+    //                 duration: 3000,
+    //                 style: {
+    //                     border: "1px solid #499d49",
+    //                     padding: "16px",
+    //                     color: "#499d49",
+    //                 },
+    //                 iconTheme: {
+    //                     primary: "#499d49",
+    //                     secondary: "#FFFAEE",
+    //                 },
+    //             });
+    //         }
+    //     } catch (error) {
+    //         console.error("Error adding card:", error);
+    //         toast.error("Failed to add card", {
+    //             position: "top-right",
+    //             duration: 3000,
+    //             style: {
+    //                 border: "1px solid #EB1C23",
+    //                 padding: "16px",
+    //                 color: "#EB1C23",
+    //             },
+    //             iconTheme: {
+    //                 primary: "#EB1C23",
+    //                 secondary: "#FFFAEE",
+    //             },
+    //         });
+    //     }
+
+    //     setAdding(false);
+    // };
+
+    const handleSubmit = async (e: any) => {
         e.preventDefault();
 
         if (!text.trim().length) return;
@@ -464,13 +554,50 @@ const AddCard = ({ column, setCards, cards, userId }: any) => {
         const newCard = {
             column,
             title: text.trim(),
-            id: (Math.floor(Math.random() * 100) + 1).toString(),
             userId,
         };
 
-        setCards((pv: any) => [...pv, newCard]);
+        try {
+            const { data } = await saveKanbanCard({
+                variables: { userId, card: newCard }, // Ensure variables align
+            });
+
+            if (data?.saveKanbanCard) {
+                setCards((prevCards: any) => [...prevCards, newCard]);
+                refetch();
+                toast.success("Card added successfully!", {
+                    position: "top-right",
+                    duration: 3000,
+                    style: {
+                        border: "1px solid #499d49",
+                        padding: "16px",
+                        color: "#499d49",
+                    },
+                    iconTheme: {
+                        primary: "#499d49",
+                        secondary: "#FFFAEE",
+                    },
+                });
+            }
+        } catch (error) {
+            console.error("Error adding card:", error);
+            toast.error("Failed to add card", {
+                position: "top-right",
+                duration: 3000,
+                style: {
+                    border: "1px solid #EB1C23",
+                    padding: "16px",
+                    color: "#EB1C23",
+                },
+                iconTheme: {
+                    primary: "#EB1C23",
+                    secondary: "#FFFAEE",
+                },
+            });
+        }
 
         setAdding(false);
+        setText("");
     };
 
     return (
