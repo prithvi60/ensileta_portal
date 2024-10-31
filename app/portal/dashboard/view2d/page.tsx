@@ -60,7 +60,7 @@ const Page = () => {
           drawing2DId: lastItem?.id,
         },
       });
-      console.log("Created Marker Group:", data);
+      // console.log("Created Marker Group:", data);
       // alert("Successfully saved!");
     } catch (error) {
       console.error("Error creating marker group:", error);

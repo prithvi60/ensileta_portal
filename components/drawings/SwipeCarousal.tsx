@@ -265,7 +265,7 @@ const SpringModal = ({
     if (markerData) {
       const parsedMarkers = JSON.parse(markerData);
       setMarkers(parsedMarkers);
-      console.log("Markers set from data:", parsedMarkers);
+      // console.log("Markers set from data:", parsedMarkers);
     }
   }, [markerData]);
 
