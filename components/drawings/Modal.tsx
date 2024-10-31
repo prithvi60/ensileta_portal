@@ -436,8 +436,8 @@ const CustomMarker = ({
       className="relative"
     >
       {isHovered ? (
-        <div className="relative">
-          <label className="mb-.5 block font-medium text-black">{user}</label>
+        <div className="relative bg-primary bg-opacity-30 rounded-lg p-2">
+          <label className="mb-.5 block font-extrabold text-white drop-shadow-lg">{user}</label>
           <div className="relative">
             <textarea
               value={inputValue}
@@ -449,9 +449,9 @@ const CustomMarker = ({
           </div>
         </div>
       ) : (
-        <div className="absolute top-0 left-0 flex items-center">
-          <GiVirtualMarker className="text-4xl sm:text-5xl text-secondary shadow-md" />
-        </div>
+        <div className="absolute top-0 left-0 flex items-center bg-white rounded-full">
+        <GiVirtualMarker className="text-4xl sm:text-5xl text-secondary shadow-md" />
+      </div>
       )}
     </div>
   );

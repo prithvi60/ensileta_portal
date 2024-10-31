@@ -12,7 +12,7 @@
   });
   export async function POST(req: Request) {
     const { recipientEmail, subject, message, attachments } = await req.json();
-console.log("attach" ,attachments)
+// console.log("attach" ,attachments)
     if (!recipientEmail) {
       return NextResponse.json(
         { success: false, message: "No recipient email provided" },

@@ -28,7 +28,7 @@ const Page = () => {
         data?.getAll3DFiles[data?.getAll3DFiles.length - 1] ||
         data?.getAll3DFiles[0] ||
         null;
-    console.log(lastItem?.id);
+    // console.log(lastItem?.id);
 
     const [createMarkerGroup] = useMutation(CREATE_MARKER_GROUP_3D, {
         refetchQueries: [
@@ -51,7 +51,7 @@ const Page = () => {
                     drawing3DId: lastItem?.id,
                 },
             });
-            console.log("Created Marker Group:", data);
+            // console.log("Created Marker Group:", data);
             // alert("Successfully saved!");
         } catch (error) {
             console.error("Error creating marker group:", error);

@@ -213,7 +213,7 @@ const TableRows2 = ({ data, refetchUsers }: { data: any, refetchUsers: any }) =>
         variables: { drawingBoqId: drawingBoq?.id },
     });
 
-    console.log(drawing2d);
+    // console.log(drawing2d);
 
 
     return (

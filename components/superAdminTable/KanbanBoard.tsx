@@ -89,7 +89,7 @@ const Board = ({ userId }: { userId: any }) => {
 
             if (data.updateKanbanCard.success) {
                 refetch(); // To update the client-side with the latest data
-                console.log("Card updated successfully!");
+                // console.log("Card updated successfully!");
                 toast.success("Card updated successfully!", {
                     position: "top-right",
                     duration: 3000,
@@ -391,7 +391,7 @@ const BurnBarrel = ({ setCards, refetch }: any) => {
     const [deleteKanbanCard] = useMutation(DELETE_KANBAN_CARDS);
     const [isOpen, setIsOpen] = useState(false);
     const [deleteCardId, setDeleteCardId] = useState("");
-    console.log("id", deleteCardId);
+    // console.log("id", deleteCardId);
 
     const handleDragOver = (e: any) => {
         e.preventDefault();
