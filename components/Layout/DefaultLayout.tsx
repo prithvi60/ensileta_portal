@@ -13,7 +13,7 @@ export default function DefaultLayout({
     <>
       {/* <!-- ===== Page Wrapper Start ===== --> */}
       {/* overflow-hidden */}
-      <div className="h-screen ">
+      <div className="h-screen">
         {/* <!-- ===== Sidebar Start ===== --> */}
         <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
         {/* <!-- ===== Sidebar End ===== --> */}

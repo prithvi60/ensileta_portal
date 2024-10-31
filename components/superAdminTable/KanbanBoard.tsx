@@ -44,7 +44,7 @@ const Board = ({ userId }: { userId: any }) => {
     //     setIsDisable(cards.length > 0);
     // }, [cards]);
 
-    if (loading) return <Loader />;
+    if (loading) return <div className="flex justify-center font-medium">Loading Customer notes...</div>;
     if (error) return <p>Error: {error.message}</p>;
 
     // const handleSave = async () => {

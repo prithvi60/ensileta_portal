@@ -30,7 +30,7 @@ const menuGroups = [
             <SiLibreofficedraw className="text-4xl sm:text-5xl text-white" />
           </div>
         ),
-        label: "Your 2D drawings",
+        label: "2D drawings",
         route: "/portal/dashboard/view2d",
       },
       {
@@ -39,7 +39,7 @@ const menuGroups = [
             <GiCardDraw className="text-4xl sm:text-5xl text-white" />
           </div>
         ),
-        label: "Your 3D drawings",
+        label: "3D drawings",
         route: "/portal/dashboard/view3d",
       },
       {
@@ -48,7 +48,7 @@ const menuGroups = [
             <FaFileInvoice className="text-4xl sm:text-5xl text-white" />
           </div>
         ),
-        label: "Your BOQ",
+        label: "BOQ",
         route: "/portal/dashboard/viewboq",
       },
       {
@@ -57,7 +57,7 @@ const menuGroups = [
             <IoPeopleSharp className="text-4xl sm:text-5xl text-white" />
           </div>
         ),
-        label: "Your Employee",
+        label: "Employee",
         route: "/portal/dashboard/accessControl",
       },
       {
@@ -66,7 +66,7 @@ const menuGroups = [
             <GoOrganization className="text-4xl sm:text-5xl text-white" />
           </div>
         ),
-        label: "Your Organisation",
+        label: "Organisation",
         route: "/portal/dashboard/customerProfile",
       },
       {
@@ -92,7 +92,7 @@ const menuGroups = [
 //             <SiLibreofficedraw className="text-4xl sm:text-5xl text-white" />
 //           </div>
 //         ),
-//         label: "Your 2D drawings",
+//         label: "2D drawings",
 //         route: "/portal/dashboard/view2d",
 //       },
 //       {
@@ -101,7 +101,7 @@ const menuGroups = [
 //             <GiCardDraw className="text-4xl sm:text-5xl text-white" />
 //           </div>
 //         ),
-//         label: "Your 3D drawings",
+//         label: "3D drawings",
 //         route: "/portal/dashboard/view3d",
 //       },
 //       {
@@ -110,7 +110,7 @@ const menuGroups = [
 //             <FaFileInvoice className="text-4xl sm:text-5xl text-white" />
 //           </div>
 //         ),
-//         label: "Your BOQ",
+//         label: "BOQ",
 //         route: "/portal/dashboard/viewboq",
 
 //       }
@@ -155,8 +155,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   return (
     <ClickOutside onClick={() => setSidebarOpen(false)}>
       <aside
-        className={`fixed left-0 top-0 z-[1001] flex h-screen w-72.5 flex-col overflow-y-hidden bg-primary duration-300 ease-linear lg:translate-x-0 gap-4 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
-          }`}
+        className={`fixed left-0 top-0 z-[1001] flex h-screen w-72.5 flex-col overflow-y-hidden bg-primary duration-300 ease-linear lg:translate-x-0 gap-4 ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
       >
         {/* <!-- SIDEBAR HEADER --> */}
         <div className="flex  flex-col gap-8 px-6 pt-5.5 pb-3.5 lg:pb-4.5 lg:pt-6.5">
@@ -171,7 +172,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                 <div className="relative">
                   <input
                     type="email"
-                    placeholder="Search your company"
+                    placeholder="Search customer"
                     onChange={(e) => setSearch(e.target.value)}
                     className="w-full border border-stroke bg-white rounded-lg py-2 pl-3 pr-7 text-[#0E132A] text-sm outline-none focus:border-primary focus-visible:shadow-none placeholder:text-sm"
                   />
@@ -179,8 +180,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                   <span className="absolute right-2 top-2">
                     <svg
                       // className="fill-current"
-                      width="24"
-                      height="24"
+                      width="20"
+                      height="20"
                       viewBox="0 0 24 24"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
@@ -188,8 +189,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                       <g opacity="0.5">
                         <path
                           d="M11 6C13.7614 6 16 8.23858 16 11M16.6588 16.6549L21 21M19 11C19 15.4183 15.4183 19 11 19C6.58172 19 3 15.4183 3 11C3 6.58172 6.58172 3 11 3C15.4183 3 19 6.58172 19 11Z"
-                          stroke="#000000"
-                          strokeWidth="2"
+                          stroke="#394b7a"
+                          strokeWidth="3"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
@@ -204,12 +205,14 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         </div>
         {/* <!-- SIDEBAR HEADER --> */}
 
-        <div className="no-scrollbar flex flex-col overflow-y-auto sidebar_scroll duration-300 ease-linear h-full max-h-[480px]">
+        <div className="no-scrollbar flex flex-col overflow-y-auto sidebar_scroll duration-300 ease-linear h-full max-h-[65vh]">
           {/* <!-- Sidebar Menu --> */}
           {role === "super admin" ? (
             <>
               {loading ? (
-                <div className="flex justify-center items-center gap-2.5 h-full w-full px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out text-xl capitalize line-clamp-2">Loading...</div>
+                <div className="flex justify-center items-center gap-2.5 h-full w-full px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out text-xl capitalize line-clamp-2">
+                  Loading...
+                </div>
               ) : (
                 <nav className="px-4 py-4 lg:px-6">
                   {filteredData?.map((group: any, groupIndex: number) => (
@@ -253,7 +256,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
           )}
           {/* <!-- Sidebar Menu --> */}
         </div>
-        <MarqueeSidebar />
+        {role !== "super admin" && <MarqueeSidebar />}
       </aside>
     </ClickOutside>
   );

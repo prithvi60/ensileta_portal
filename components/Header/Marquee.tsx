@@ -9,13 +9,16 @@ export const Marquee = () => {
 
 export const MarqueeSidebar = () => {
     return (
+        <section className="fixed bottom-0 my-2">
+        <div className="text-2xl ml-5 capitalize font-semibold tracking-wider text-white mb-8" >Our Partners</div>
         <DoubleScrollingLogosSidebar />
+        </section>
     )
 }
 
 const DoubleScrollingLogos = () => {
     return (
-        <section className="bg-white">
+        <section className="">
             <div className="flex  overflow-hidden">
                 <TranslateWrapper>
                     <LogoItemsTop />
@@ -27,7 +30,7 @@ const DoubleScrollingLogos = () => {
 
 const DoubleScrollingLogosSidebar = () => {
     return (
-        <section className="bg-[#fafafa] px-5">
+        <section className=" px-5">
             <div className="flex  overflow-hidden">
                 <TranslateWrapper>
                     <LogoItemsSidebar />
@@ -76,12 +79,14 @@ const LogoItemsTop = () => (
         <LogoItem img={"/logo/kfc.svg"} />
         <LogoItem img={"/logo/hyundai.svg"} />
         <LogoItem img={"/logo/valeo.svg"} />
+        {/* <div className="text-primary text-center font-bold text-sm">{" Clientel <-->"} </div> */}
         <LogoItem img={"/logo/british-airways.svg"} />
         <LogoItem img={"/logo/tcl.svg"} />
         <LogoItem img={"/logo/kfc.svg"} />
         <LogoItem img={"/logo/hyundai.svg"} />
         <LogoItem img={"/logo/valeo.svg"} />
         <LogoItem img={"/logo/british-airways.svg"} />
+
     </>
 );
 
@@ -97,6 +102,7 @@ const LogoItemsSidebar = () => (
         <LogoItemSidebar img={"/logo/hyundai.svg"} />
         <LogoItemSidebar img={"/logo/valeo.svg"} />
         <LogoItemSidebar img={"/logo/british-airways.svg"} />
+        {/* <div className="text-black">Clients</div> */}
     </>
 );
 
