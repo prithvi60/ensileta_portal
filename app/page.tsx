@@ -1,5 +1,6 @@
 "use server"
 import { getServerSession } from "next-auth";
+import Image from "next/image";
 import Link from "next/link";
 
 export default async function Home() {
@@ -9,9 +10,15 @@ export default async function Home() {
   return (
     <main className="w-full h-full">
       <div className="flex flex-col gap-6 items-center bg-cover justify-center w-full h-screen  bg-no-repeat bg-center" style={{ backgroundImage: "url('/cover/banner-img.jpg')" }}>
-        <h2 className="font-serif text-4xl sm:text-6xl text-center font-bold tracking-widest caption-top text-secondary">Ensileta Portal Dashboard</h2>
-        <p className="text-lg sm:text-2xl md:w-1/2 font-satoshi text-center text-white font-semibold tracking-wide p-2 bg-[#3D2C22] bg-opacity-50 rounded-lg">The best rooms have something to say about the people who live in them</p>
-        <Link href={data?.user ? "/portal/dashboard/customerProfile" : "/api/auth/signin"} title="signin" className="px-3 py-1.5 rounded-md bg-secondary font-semibold tracking-wide text-sm sm:text-lg hover:bg-opacity-70 text-white fixed top-5 right-6 sm:right-14">Portal</Link>
+      <Image
+          src={"/logo/newlogo.png"}
+          width={450}
+          height={450}
+          alt="bg-image"
+        />
+        <h2 className="font-serif text-2xl sm:text-4xl text-center font-bold tracking-widest caption-top text-white">Customer Portal</h2>
+        <p className="text-lg sm:text-xl md:w-1/2 font-satoshi  text-white font-semibold tracking-wide p-2  drop-shadow-md rounded-lg text-justify"> Easily review and provide feedback on your 2D, 3D  design mockups in one place. Send remarks to refine designs and approve changes seamlessly through our project portal.</p>
+        <Link href={data?.user ? "/portal/dashboard/customerProfile" : "/api/auth/signin"} title="signin" className="px-6 py-2 rounded-md bg-secondary font-semibold tracking-wide text-sm sm:text-lg hover:bg-opacity-70 text-white ">Go to Portal</Link>
       </div>
     </main>
   );

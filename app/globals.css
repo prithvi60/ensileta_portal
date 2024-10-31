@@ -21,7 +21,7 @@
 /* Custom scrollbar for Sidebar */
 
 .sidebar_scroll::-webkit-scrollbar {
-  width: 10px;
+  width: 6px;
   border-radius: 15px;
 }
 
@@ -32,7 +32,7 @@
 }
 
 .sidebar_scroll::-webkit-scrollbar-thumb {
-  background: #fafafa;
+  background: #65a34e;
   border-radius: 5px;
 }
 .scrollbar-hidden {

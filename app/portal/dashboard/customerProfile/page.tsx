@@ -12,11 +12,11 @@ const Page = () => {
 
     return (
         <DefaultLayout>
-            <div className="mx-auto max-w-242.5">
+            <div className="mx-auto max-w-242.5 overflow-y-auto">
                 {loading ? (<div className='w-full h-screen flex justify-center mt-32'>
                     <ShuffleLoader />
                 </div>) : (<>
-                    {data?.user?.role === "admin" || data?.user?.role === "super admin" ? (<div className="overflow-hidden rounded-sm border border-stroke bg-white shadow-default">
+                    {data?.user?.role === "admin" || data?.user?.role === "super admin" ? (<div className="rounded-sm border border-stroke bg-white shadow-default">
                         <div className="relative z-20 h-35 md:h-65">
                             <Image
                                 src={"/cover/banner-img.jpg"}
@@ -49,7 +49,7 @@ const Page = () => {
                         </div>
                     </div>) : (
                         <div className='w-full h-full shadow-md rounded-md p-5 font-medium tracking-wide text-rose-500 text-xl'>
-                            <p className='text-center'>Hey team, just a friendly reminder that employees should avoid visiting this page. Thanks for your cooperation!</p>
+                            <p className='text-center'>Hey team, just a friendly reminder this page is for the admin user. Thanks for your cooperation!</p>
                         </div>
                     )}
                 </>)}

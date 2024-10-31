@@ -296,6 +296,8 @@ const SpringModal = ({
       await createMarkerGroup(markers);
     } finally {
       setIsOpen(false); // Close the modal
+      toggleFullScreen()
+
     }
   };
 
@@ -322,6 +324,12 @@ const SpringModal = ({
       document.exitFullscreen();
     }
   };
+  useEffect(()=>{
+    if(isOpen){
+
+      toggleFullScreen()
+    }
+  },[isOpen])
   // const parse = JSON.stringify(markers)
   // console.log("markers",);
   // console.log("markers parse", { markers, IsChanged });
@@ -379,18 +387,18 @@ const SpringModal = ({
               </Slider>
             </div>
           </motion.div>
-          <div className="fixed top-0 left-0 flex bg-white">
-            <div>
+          <div className="fixed top-0 left-0 flex" >
+            <div className="p-2 text-white bg-secondary">
               {index + 1} / {images.length}
             </div>
             <button
               onClick={(e) => {
                 e.stopPropagation(); // Prevent event from bubbling up
-                toggleFullScreen();
+               handleClose()
               }}
               className="bg-secondary hover:bg-primary transition-colors text-white p-2 ml-4"
             >
-              Fullscreen
+              Close Screen
             </button>
           </div>
 
@@ -401,13 +409,13 @@ const SpringModal = ({
             }}
           >
             {isMarkerEnabled && (
-              <div className="text-black">
-                Click anywhere to type and Enter / use button to comment
+              <div className="text-black text-sm p-2 text-justify items-center flex">
+                Click anywhere to add comment. Please Enter/ click Arrow button to save.
               </div>
             )}
             <button
               type="submit"
-              className="cursor-pointer w-full  p-4 shadow-md select-none bg-secondary text-white hover:bg-primary"
+              className="cursor-pointer w-max-xontent  p-4 shadow-md select-none bg-secondary text-white hover:bg-primary"
               onClick={(e) => {
                 e.stopPropagation(); // Prevent event from bubbling up
                 setIsMarkerEnabled((o) => !o);
@@ -488,8 +496,8 @@ const CustomMarker = ({
       className="relative"
     >
       {isHovered ? (
-        <div className="relative">
-          <label className="mb-.5 block font-medium text-black">{user}</label>
+        <div className="relative bg-primary bg-opacity-30 rounded-lg p-2">
+          <label className="mb-.5 block font-extrabold text-white drop-shadow-lg">{user}</label>
           <div className="relative">
             <textarea
               ref={inputRef}
@@ -513,7 +521,7 @@ const CustomMarker = ({
           </div>
         </div>
       ) : (
-        <div className="absolute top-0 left-0 flex items-center">
+        <div className="absolute top-0 left-0 flex items-center bg-white rounded-full">
           <GiVirtualMarker className="text-4xl sm:text-5xl text-secondary shadow-md" />
         </div>
       )}
@@ -526,7 +534,7 @@ function NextArrow(props: any) {
   return (
     <div
       className={
-        "p-1.5 md:p-2 xl:p-3 rounded-full bg-primary absolute top-1/2 cursor-pointer -right-5 md:-right-10 xl:-right-14 group"
+        "p-1.5 md:p-2 xl:p-3 rounded-full bg-primary absolute top-[25%] cursor-pointer -right-5 md:-right-10 xl:-right-14 group"
       }
       onClick={onClick}
     >
@@ -540,7 +548,7 @@ function PrevArrow(props: any) {
   return (
     <div
       className={
-        "p-1.5 md:p-2 xl:p-3 rounded-full bg-primary absolute top-1/2 cursor-pointer -left-5 md:-left-10 xl:-left-14 group"
+        "p-1.5 md:p-2 xl:p-3 rounded-full bg-primary absolute top-[25%] cursor-pointer -left-5 md:-left-10 xl:-left-14 group"
       }
       onClick={onClick}
     >

@@ -81,7 +81,7 @@ export const SignIn = () => {
   useEffect(() => {
     if (session?.user) {
       if (session?.user?.role === "admin") {
-        router.push("/portal/dashboard/customerProfile");
+        router.push("/portal/dashboard/view2d");
       } else {
         router.push("/portal/dashboard");
       }
