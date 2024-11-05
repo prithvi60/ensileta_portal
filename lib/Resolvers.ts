@@ -234,9 +234,27 @@ export const resolvers = {
   Mutation: {
     signUp: async (
       _: any,
-      { username, email, company_name, password, confirmPassword }: any
+      {
+        username,
+        email,
+        company_name,
+        phone_number,
+        address,
+        department,
+        password,
+        confirmPassword,
+      }: any
     ) => {
-      console.log({ username, email, company_name, password, confirmPassword });
+      console.log({
+        username,
+        email,
+        company_name,
+        password,
+        confirmPassword,
+        phone_number,
+        address,
+        department,
+      });
       try {
         // Validate password match
         if (password !== confirmPassword) {
@@ -263,6 +281,9 @@ export const resolvers = {
             company_name,
             password: hashedPwd,
             role: "admin",
+            phone_number,
+            address,
+            department,
           },
         });
 
@@ -378,7 +399,7 @@ export const resolvers = {
     },
     uploadAccessControlUsers: async (
       _: any,
-      { username, email, password }: any
+      { username, email, department, password }: any
     ) => {
       if (!username && !email && !password) {
         throw new Error("All fields are mandatory");
@@ -404,6 +425,7 @@ export const resolvers = {
           data: {
             username,
             email,
+            department,
             password: hashedPwd,
           },
         });
@@ -576,7 +598,7 @@ export const resolvers = {
         const markerGroups = [];
 
         for (const markersArray of input) {
-           // @ts-ignore
+          // @ts-ignore
           const markerGroup = await prisma.markerGroup.create({
             data: {
               drawing2DId,
@@ -608,11 +630,11 @@ export const resolvers = {
     createMarkerGroup2D: async (_: any, { data, drawing2DId }: any) => {
       const jsonData = JSON.stringify(data);
       try {
-         // @ts-ignore
+        // @ts-ignore
         await prisma.markerGroup2D.deleteMany({
           where: { drawing2DId },
         });
-         // @ts-ignore
+        // @ts-ignore
         const newMarkerGroup = await prisma.markerGroup2D.create({
           data: {
             data: jsonData,
@@ -629,11 +651,11 @@ export const resolvers = {
     createMarkerGroup3D: async (_: any, { data, drawing3DId }: any) => {
       const jsonData = JSON.stringify(data);
       try {
-         // @ts-ignore
+        // @ts-ignore
         await prisma.markerGroup3D.deleteMany({
           where: { drawing3DId },
         });
-         // @ts-ignore
+        // @ts-ignore
         const newMarkerGroup = await prisma.markerGroup3D.create({
           data: {
             data: jsonData,
@@ -650,11 +672,11 @@ export const resolvers = {
     createMarkerGroupBOQ: async (_: any, { data, drawingBoqId }: any) => {
       const jsonData = JSON.stringify(data);
       try {
-         // @ts-ignore
+        // @ts-ignore
         await prisma.markerGroupBoq.deleteMany({
           where: { drawingBoqId },
         });
-         // @ts-ignore
+        // @ts-ignore
         const newMarkerGroup = await prisma.markerGroupBoq.create({
           data: {
             data: jsonData,

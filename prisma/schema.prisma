@@ -13,9 +13,10 @@ model users {
   username        String         @db.VarChar(50)
   email           String         @unique @db.VarChar(20)
   password        String
-  company_name    String?
+  company_name    String?        @unique @db.VarChar(40)
   phone_number    String?
   address         String?
+  department      String?
   role            String?
   drawing2Dfiles  Drawing_2D[]
   drawing3Dfiles  Drawing_3D[]
@@ -100,11 +101,12 @@ model MarkerGroup {
 }
 
 model accessControl {
-  id       Int    @id @default(autoincrement())
-  username String @db.VarChar(50)
-  email    String @unique @db.VarChar(20)
-  password String
-  role     String @default("employee")
+  id         Int    @id @default(autoincrement())
+  username   String @db.VarChar(50)
+  email      String @unique @db.VarChar(20)
+  department String
+  password   String
+  role       String @default("employee")
 }
 
 model Kanban_Cards {

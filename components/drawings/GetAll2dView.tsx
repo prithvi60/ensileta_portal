@@ -8,7 +8,8 @@ import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { Marquee } from "../Header/Marquee";
 import Image from "next/image";
-import React from "react"
+import React from "react";
+import { MarqueeSb } from "../Header/MarqueeUpdated";
 
 interface FileData {
   id: number;
@@ -27,9 +28,9 @@ interface GetAll2DViewProps {
   allUsers: any;
   fileType: string;
   refetchUsers: any;
-  lastItem: any
-  createMarkerGroup: any
-  markerData: any
+  lastItem: any;
+  createMarkerGroup: any;
+  markerData: any;
 }
 
 export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
@@ -41,7 +42,7 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
   refetchUsers,
   createMarkerGroup,
   lastItem,
-  markerData
+  markerData,
 }) => {
   const { data: RoleBased } = useQuery(GET_USER);
   // const { data: session } = useSession()
@@ -52,23 +53,20 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
   useEffect(() => {
     // Update filteredData whenever allUsers changes
     if (allUsers && allUsers.users) {
-      const admins = allUsers.users.filter((val: any) => val.role === "admin") || [];
+      const admins =
+        allUsers.users.filter((val: any) => val.role === "admin") || [];
       // Use the `admins` variable as needed
       // console.log("Filtered admins:", admins);
       setFilteredData(admins);
     }
 
     // console.log("refetched",admins)
-
   }, [allUsers]);
 
-  const SAfilteredData = allUsers?.users?.filter(
-    (val: any) => val.role === "super admin"
-  ) || [];
+  const SAfilteredData =
+    allUsers?.users?.filter((val: any) => val.role === "super admin") || [];
 
   const userId = RoleBased?.user?.id;
-  // console.log("last", lastItem);
-
 
   // Unique localStorage key for each user and file type
   const localStorageKey = `isApproved_${userId}_${fileType}`;
@@ -110,11 +108,11 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
         headers: {
           "Content-Type": "application/json",
         },
-        // Session info not changing based after update
         body: JSON.stringify({
-          recipientEmail: `${SAfilteredData[0]?.email}`,
-          subject: "Version Changed",
-          message: "New Change",
+          recipientEmail: `${RoleBased?.user?.email}`,
+          subject: "Version Approved",
+          message: `The newest version of the ${fileType} drawing has been approved by 
+          ${RoleBased?.user?.username} - < ${RoleBased?.user?.email}>, and we're excited to move forward!`,
         }),
       });
 
@@ -160,7 +158,6 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
     }
   };
 
-
   return (
     <div className="h-full w-full pt-6 md:p-10 space-y-5">
       <h2 className="text-3xl w-full text-center font-semibold caption-bottom tracking-wide mb-10">
@@ -182,7 +179,9 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
             version={data?.length || 0}
             id={lastItem?.id || 1}
             createMarkerGroup={createMarkerGroup}
-            handleSendEmail={handleSendEmail} isApproved={isApproved} isApproving={isApproving}
+            handleSendEmail={handleSendEmail}
+            isApproved={isApproved}
+            isApproving={isApproving}
             userId={userId}
             markerData={markerData}
           />
@@ -200,7 +199,10 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
                   : `Approve`}
             </button>
             <p className="mt-8">
-              Please review the drawings and click the &apos;Approve&apos; button to confirm if this version is acceptable. You can add comments in the &apos;Remarks&apos; section by viewing the drawing in fullscreen and annotating directly on the image.
+              Please review the drawings and click the &apos;Approve&apos;
+              button to confirm if this version is acceptable. You can add
+              comments in the &apos;Remarks&apos; section by viewing the drawing
+              in fullscreen and annotating directly on the image.
             </p>
             {/* <button
               type="button"
@@ -213,11 +215,11 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
           </div>
         </>
       )}
-      <div className="fixed bottom-0 z-[1000] flex flex-col justify-center  w-full bg-white drop-shadow-1 sm:hidden px-4 py-4 items-center shadow-2 md:px-6 2xl:px-11">
+      <div className="fixed left-0 bottom-0 z-[1000] flex flex-col justify-center  w-full bg-white drop-shadow-1 sm:hidden px-4 py-4 items-center shadow-2 md:px-6 2xl:px-11">
         <div className="w-64 h-8 relative">
           <Image alt="logo" src={"/logo/newlogo.png"} fill />
         </div>
-        <Marquee />
+        <MarqueeSb />
       </div>
     </div>
   );

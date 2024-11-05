@@ -68,7 +68,7 @@ const Page = () => {
                         data={data?.getAll3DFiles}
                         allUsers={AllUsers}
                         uploadFile={uploadFile}
-                        fileType={fileType || "view2d"}
+                        fileType={fileType || ""}
                         title={"Your 3D Drawings"}
                         refetchUsers={refetch}
                         lastItem={lastItem}

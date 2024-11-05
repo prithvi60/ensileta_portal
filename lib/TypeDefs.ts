@@ -10,6 +10,7 @@ export const typeDefs = `#graphql
     company_name: String
     phone_number: String
     address: String
+    department: String
     role: String
     drawing2Dfiles: [Drawing2D]
     drawing3Dfiles: [Drawing3D]
@@ -21,6 +22,7 @@ export const typeDefs = `#graphql
     id: Int!
     username: String
     email: String!
+    department: String
     role: String
   }
 
@@ -186,6 +188,9 @@ type MarkerGroupBoq {
       username: String!,
       email: String!,
       company_name: String!,
+      phone_number: String!,
+      address: String!,
+      department: String!,
       password: String!,
       confirmPassword: String!
     ): User
@@ -207,6 +212,7 @@ type MarkerGroupBoq {
     uploadAccessControlUsers(
       username: String!,
       email: String!,
+      department: String!,
       password: String!
     ): AccessControl
       saveKanbanCard(userId: Int!, card: KanbanCardInput!): Boolean!

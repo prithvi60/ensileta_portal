@@ -8,7 +8,7 @@ const Page = () => {
 
 
     return (
-        <main className="flex items-center justify-center w-full h-screen shadow-xl bg-primary">
+        <main className="flex justify-center w-full h-full shadow-xl bg-primary">
             <SignUp />
         </main>
     )

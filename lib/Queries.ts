@@ -7,6 +7,9 @@ export const SIGN_UP = gql`
     $username: String!
     $email: String!
     $company_name: String!
+    $phone_number: String!
+    $address: String!
+    $department: String!
     $password: String!
     $confirmPassword: String!
   ) {
@@ -14,6 +17,9 @@ export const SIGN_UP = gql`
       username: $username
       email: $email
       company_name: $company_name
+      phone_number: $phone_number
+      address: $address
+      department: $department
       password: $password
       confirmPassword: $confirmPassword
     ) {
@@ -254,11 +260,13 @@ export const ADD_EMPLOYEE = gql`
   mutation UploadAccessControlUsers(
     $username: String!
     $email: String!
+    $department: String!
     $password: String!
   ) {
     uploadAccessControlUsers(
       username: $username
       email: $email
+      department: $department
       password: $password
     ) {
       id
@@ -290,19 +298,6 @@ export const GET_EMPLOYEE = gql`
   }
 `;
 
-// export const UPLOAD_FILE_MUTATION = gql`
-//   mutation createFileForBOQ($fileUrl: String!, $filename: String!) {
-//     createFileForBOQ(fileUrl: $fileUrl, filename: $filename) {
-//       id
-//       filename
-//       fileUrl
-//       userId
-//       version
-//       createdAt
-//     }
-//   }
-// `;
-
 // S3 Bucket
 
 export const UPLOAD_S3_STORAGE = gql`
@@ -327,11 +322,6 @@ export const UPLOAD_S3_STORAGE = gql`
 `;
 
 // Kanban Cards
-// export const CARDS = gql`
-//   mutation SaveKanbanCards($userId: Int!, $cards: [KanbanCardInput!]!) {
-//     saveKanbanCards(userId: $userId, cards: $cards)
-//   }
-// `;
 export const CREATE_CARD = gql`
   mutation CreateKanbanCard($userId: Int!, $card: KanbanCardInput!) {
     createKanbanCard(userId: $userId, card: $card)
