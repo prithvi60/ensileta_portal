@@ -62,6 +62,11 @@ export const GET_USER = gql`
         filename
         fileUrl
       }
+      drawingMBfiles {
+        id
+        filename
+        fileUrl
+      }
       drawingBOQfiles {
         id
         filename
@@ -126,6 +131,13 @@ export const GET_USERS = gql`
         createdAt
       }
       drawing3Dfiles {
+        id
+        filename
+        fileUrl
+        version
+        createdAt
+      }
+      drawingMBfiles {
         id
         filename
         fileUrl
@@ -216,6 +228,34 @@ export const ADD_3D_FILENAME = gql`
 export const GET_ALL_3D_VIEW = gql`
   query GetAll3DFiles {
     getAll3DFiles {
+      id
+      filename
+      fileUrl
+      userId
+      version
+      createdAt
+    }
+  }
+`;
+
+// View Mood Board queries
+
+export const ADD_MB_FILENAME = gql`
+  mutation UploadMBFile($fileUrl: String!, $filename: String!, $userId: Int!) {
+    uploadMBFile(fileUrl: $fileUrl, filename: $filename, userId: $userId) {
+      id
+      filename
+      fileUrl
+      userId
+      version
+      createdAt
+    }
+  }
+`;
+
+export const GET_ALL_MB_VIEW = gql`
+  query GetAllMBFiles {
+    getAllMBFiles {
       id
       filename
       fileUrl
@@ -369,65 +409,6 @@ export const UPDATE_KANBAN_CARDS = gql`
 
 // Markers
 
-export const GET_ALL_MARKER_GROUPS = gql`
-  query GetAllMarkerGroups {
-    getAllMarkerGroups {
-      id
-      drawing2DId
-      drawing2D {
-        id
-        filename
-      }
-      markers {
-        id
-        comment
-        left
-        top
-        user
-        userId
-      }
-    }
-  }
-`;
-
-export const GET_MARKER_GROUPS_BY_DRAWING_2D = gql`
-  query GetMarkerGroupsByDrawing2D($drawing2DId: Int!) {
-    getMarkerGroupsByDrawing2D(drawing2DId: $drawing2DId) {
-      id
-      drawing2DId
-      drawing2D {
-        id
-        filename
-      }
-      markers {
-        id
-        comment
-        left
-        top
-        user
-        userId
-      }
-    }
-  }
-`;
-
-export const ADD_MARKER_GROUP = gql`
-  mutation AddMarkerGroups($drawing2DId: Int!, $input: [[MarkerInput!]!]!) {
-    addMarkerGroups(drawing2DId: $drawing2DId, input: $input) {
-      id
-      markers {
-        comment
-        id
-        left
-        top
-        user
-      }
-    }
-  }
-`;
-
-// new
-
 export const GET_MARKER_GROUP_BY_ID_2D = gql`
   query GetMarkerGroupBy2DId($drawing2DId: Int!) {
     getMarkerGroupBy2DId(drawing2DId: $drawing2DId) {
@@ -446,6 +427,17 @@ export const GET_MARKER_GROUP_BY_ID_3D = gql`
       data
       createdAt
       drawing3DId
+    }
+  }
+`;
+
+export const GET_MARKER_GROUP_BY_ID_MB = gql`
+  query GetMarkerGroupByMBId($drawingMbId: Int!) {
+    getMarkerGroupByMBId(drawingMbId: $drawingMbId) {
+      id
+      data
+      createdAt
+      drawingMbId
     }
   }
 `;
@@ -473,6 +465,15 @@ export const CREATE_MARKER_GROUP_2D = gql`
 export const CREATE_MARKER_GROUP_3D = gql`
   mutation CreateMarkerGroup3D($data: JSON!, $drawing3DId: Int!) {
     createMarkerGroup3D(data: $data, drawing3DId: $drawing3DId) {
+      id
+      data
+    }
+  }
+`;
+
+export const CREATE_MARKER_GROUP_MB = gql`
+  mutation CreateMarkerGroupMB($data: JSON!, $drawingMbId: Int!) {
+    createMarkerGroupMB(data: $data, drawingMbId: $drawingMbId) {
       id
       data
     }

@@ -10,7 +10,8 @@ declare module "next-auth" {
   interface Session {
     user: {
       role?: string; // Add role property
-      name?:string
+      name?: string;
+      email?: string;
     };
   }
   interface User {
@@ -112,14 +113,14 @@ const handler = NextAuth({
     maxAge: 24 * 60 * 60, // 1 day
   },
   callbacks: {
-    async jwt({ token, user }:{user:User,token:JWT}) {
+    async jwt({ token, user }: { user: User; token: JWT }) {
       if (user) {
         token.role = user.role;
         token.accessToken = user.accessToken;
       }
       return token;
     },
-    async session({ session, token }:{session:Session,token:JWT}) {
+    async session({ session, token }: { session: Session; token: JWT }) {
       session.user.role = token.role;
       session.accessToken = token.accessToken;
       return session;

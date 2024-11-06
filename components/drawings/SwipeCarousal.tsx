@@ -1,15 +1,13 @@
 import React, { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePDFJS } from "@/hooks/usePdfJS";
-import toast from "react-hot-toast";
-import Image from "next/image";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
 import { GiVirtualMarker } from "react-icons/gi";
 import Slider from "react-slick";
 import ImageMarker, { Marker, MarkerComponentProps } from "react-image-marker";
 import { FaCircleArrowUp } from "react-icons/fa6";
 import { useSession } from "next-auth/react";
-import { useMutation, useQuery } from "@apollo/client";
+import { BiSolidMessageRoundedDots } from "react-icons/bi";
 export default function ModernCarousel({
   pdf,
   version,
@@ -20,6 +18,7 @@ export default function ModernCarousel({
   createMarkerGroup,
   userId,
   markerData,
+  fileType
 }: {
   pdf: string;
   version: number;
@@ -30,6 +29,7 @@ export default function ModernCarousel({
   isApproving: any;
   userId: number;
   markerData: any;
+  fileType: string
 }) {
   const [idx, setIdx] = useState(0);
   const [prevIdx, setPrevIdx] = useState(idx);
@@ -194,6 +194,7 @@ export default function ModernCarousel({
         userId={userId}
         id={id}
         markerData={markerData}
+        fileType={fileType}
       />
     </div>
   );
@@ -232,6 +233,7 @@ const SpringModal = ({
   userName,
   userId,
   id,
+  fileType
 }: {
   isOpen: boolean;
   setIsOpen: Function;
@@ -241,6 +243,7 @@ const SpringModal = ({
   userId: number;
   id: number;
   markerData: any;
+  fileType: string
 }) => {
   const [isMarkerEnabled, setIsMarkerEnabled] = useState<boolean>(false);
   const [index, setIndex] = useState<number>(0);
@@ -313,7 +316,7 @@ const SpringModal = ({
     prevArrow: <PrevArrow />,
   };
   const toggleFullScreen = () => {
-    const element = document.documentElement; // Get the document element
+    const element = document.documentElement;
     if (!document.fullscreenElement) {
       element.requestFullscreen().catch((err) => {
         console.error(
@@ -324,12 +327,12 @@ const SpringModal = ({
       document.exitFullscreen();
     }
   };
-  useEffect(()=>{
-    if(isOpen){
+  useEffect(() => {
+    if (isOpen) {
 
       toggleFullScreen()
     }
-  },[isOpen])
+  }, [isOpen])
   // const parse = JSON.stringify(markers)
   // console.log("markers",);
   // console.log("markers parse", { markers, IsChanged });
@@ -394,15 +397,14 @@ const SpringModal = ({
             <button
               onClick={(e) => {
                 e.stopPropagation(); // Prevent event from bubbling up
-               handleClose()
+                handleClose()
               }}
               className="bg-secondary hover:bg-primary transition-colors text-white p-2 ml-4"
             >
               Close Screen
             </button>
           </div>
-
-          <div
+          {fileType !== "viewboq" && (<div
             className="fixed top-0 right-0 flex bg-white"
             onClick={(e) => {
               e.stopPropagation(); // Prevent event from bubbling up
@@ -417,13 +419,14 @@ const SpringModal = ({
               type="submit"
               className="cursor-pointer w-max-xontent  p-4 shadow-md select-none bg-secondary text-white hover:bg-primary"
               onClick={(e) => {
-                e.stopPropagation(); // Prevent event from bubbling up
+                e.stopPropagation();
                 setIsMarkerEnabled((o) => !o);
               }}
             >
               {isMarkerEnabled ? "Close Remarks" : "Add Remarks"}
             </button>
-          </div>
+          </div>)}
+
         </motion.div>
       )}
     </AnimatePresence>
@@ -521,8 +524,8 @@ const CustomMarker = ({
           </div>
         </div>
       ) : (
-        <div className="absolute top-0 left-0 flex items-center bg-white rounded-full">
-          <GiVirtualMarker className="text-4xl sm:text-5xl text-secondary shadow-md" />
+        <div className="absolute top-0 left-0 flex items-center ">
+          <BiSolidMessageRoundedDots className="bg-white rounded-full text-5xl sm:text-6xl text-secondary shadow-md p-2" />
         </div>
       )}
     </div>
@@ -557,89 +560,3 @@ function PrevArrow(props: any) {
   );
 }
 
-// const arr =
-// [
-//   [
-//     {
-//       comment: "new",
-//       left: 28.45927379784102,
-//       top: 30.830272907716967,
-//       user: "Web Dev",
-//       userId: 2,
-//     },
-//     {
-//       comment: "new",
-//       left: 28.45927379784102,
-//       top: 30.830272907716967,
-//       user: "Web Dev",
-//       userId: 2,
-//     },
-//   ],[
-//     {
-//       comment: "new",
-//       left: 28.45927379784102,
-//       top: 30.830272907716967,
-//       user: "Web Dev",
-//       userId: 2,
-//     },
-//     {
-//       comment: "new",
-//       left: 28.45927379784102,
-//       top: 30.830272907716967,
-//       user: "Web Dev",
-//       userId: 2,
-//     },
-//   ],[
-//     {
-//       comment: "new",
-//       left: 28.45927379784102,
-//       top: 30.830272907716967,
-//       user: "Web Dev",
-//       userId: 2,
-//     },
-//     {
-//       comment: "new",
-//       left: 28.45927379784102,
-//       top: 30.830272907716967,
-//       user: "Web Dev",
-//       userId: 2,
-//     },
-//   ],
-// ];
-
-// [
-//   [
-//       [
-//           {
-//               "top": 8.62678399606913,
-//               "left": 13.87987012987013,
-//               "comment": "dgdgs",
-//               "user": "Web Dev",
-//               "userId": 1
-//           },
-//           {
-//               "top": 11.077764388225994,
-//               "left": 61.36363636363637,
-//               "comment": "gjfjfj",
-//               "user": "Web Dev",
-//               "userId": 1
-//           }
-//       ],
-//       [
-//           {
-//               "top": 10.657596320999103,
-//               "left": 29.383116883116884,
-//               "comment": "gjgjgj",
-//               "user": "Web Dev",
-//               "userId": 1
-//           },
-//           {
-//               "top": 14.929305004472493,
-//               "left": 72.80844155844156,
-//               "comment": "fhhfhh",
-//               "user": "Web Dev",
-//               "userId": 1
-//           }
-//       ]
-//   ]
-// ]

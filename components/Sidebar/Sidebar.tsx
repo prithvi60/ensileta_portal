@@ -13,8 +13,8 @@ import { SiLibreofficedraw } from "react-icons/si";
 import { GET_EMPLOYEE, GET_USERS } from "@/lib/Queries";
 import { useQuery } from "@apollo/client";
 import { useParams } from "next/navigation";
-import { MarqueeSidebar } from "../Header/Marquee";
 import { MarqueeSb } from "../Header/MarqueeUpdated";
+import { FaFlipboard } from "react-icons/fa";
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -64,6 +64,15 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
           ),
           label: "3D drawings",
           route: "/portal/dashboard/view3d",
+        },
+        {
+          icon: (
+            <div className="p-1 rounded-md bg-secondary">
+              <FaFlipboard className="text-4xl sm:text-5xl text-white" />
+            </div>
+          ),
+          label: "Mood Board",
+          route: "/portal/dashboard/moodBoard",
         },
         {
           icon: (
@@ -169,9 +178,11 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         </div>
         {/* <!-- SIDEBAR HEADER --> */}
 
-        <div className="no-scrollbar flex flex-col overflow-y-auto sidebar_scroll duration-300 ease-linear h-full max-h-[65vh]">
+        <div className="no-scrollbar flex flex-col overflow-y-auto sidebar_scroll duration-300 ease-linear h-full max-h-[75vh]">
           {/* <!-- Sidebar Menu --> */}
-          {role === "super admin" ? (
+          {role === "super admin" ||
+            role === "contact admin" ||
+            role === "design admin" ? (
             <>
               {loading ? (
                 <div className="flex justify-center items-center gap-2.5 h-full w-full px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out text-xl capitalize line-clamp-2">
@@ -235,4 +246,4 @@ export default Sidebar;
 
 // john@ensileta.com
 // contact@ensileta.com
-// design@ensileta.com 
+// design@ensileta.com

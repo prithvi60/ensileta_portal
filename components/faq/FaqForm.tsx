@@ -7,6 +7,7 @@ export const FaqForm = () => {
     const [msg, setMsg] = useState<string>("")
     const { data: session } = useSession();
     const email = session?.user?.email
+    // console.log(email);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -20,13 +21,14 @@ export const FaqForm = () => {
                 },
                 body: JSON.stringify({
                     recipientEmail: email,
+                    recipientType: "client",
                     subject: "New Message from User",
                     message: `User Email: ${email}\nMessage: ${msg}`,
                 }),
             });
 
             if (!res.ok) {
-                throw new Error("Failed to upload file");
+                throw new Error("Error: please reload and try again");
             }
 
             const data = await res.json();

@@ -1,9 +1,6 @@
 "use client"
 
-import { SignUp } from '@/components/SignUp';
-import { SIGN_UP } from '@/lib/Queries';
-import { useMutation } from '@apollo/client';
-import { useState } from 'react';
+import { SignUp } from '@/components/SignUp'
 const Page = () => {
 
 

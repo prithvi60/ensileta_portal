@@ -1,6 +1,5 @@
 import DropdownNotification from "./DropdownNotification";
 import Image from "next/image";
-import { Marquee } from "./Marquee";
 import { useSession } from "next-auth/react";
 import { MarqueeSb } from "./MarqueeUpdated";
 
@@ -61,11 +60,12 @@ const Header = (props: {
             <Image alt="logo" src={"/logo/newlogo.png"} fill />
           </div>
           {/* <div className=""> */}
-          {role !== "super admin" && (
-            <div className="hidden sm:block sm:max-w-48 md:max-w-72 xl:max-w-xl w-full">
-              <MarqueeSb />
-            </div>
-          )}
+          {role !== "super admin" && role !== "contact admin" &&
+            role !== "design admin" && (
+              <div className="hidden sm:block sm:max-w-48 md:max-w-72 xl:max-w-xl w-full">
+                <MarqueeSb />
+              </div>
+            )}
           {/* </div> */}
         </div>
 

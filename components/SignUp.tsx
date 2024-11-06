@@ -18,16 +18,16 @@ const schema = z
         username: z
             .string()
             .min(3, { message: "Username must be at least 3 characters long" })
-            .max(30, { message: "Username must be less than 30 characters" }),
+            .max(70, { message: "Username must be less than 30 characters" }),
         email: z.string().email({ message: "Invalid email address" }),
         company_name: z
             .string()
             .min(3, { message: "Company name must be at least 3 characters long" })
-            .max(30, { message: "Company name must be less than 30 characters" }),
+            .max(50, { message: "Company name must be less than 30 characters" }),
         department: z
             .string()
             .min(2, { message: "Department name must be at least 2 characters long" })
-            .max(20, { message: "Department name must be less than 30 characters" }),
+            .max(50, { message: "Department name must be less than 30 characters" }),
         phone_number: z
             .string()
             .min(10, "Phone number must be at least 10 digits")
@@ -90,6 +90,7 @@ export const SignUp = () => {
                 // Session info not changing based after update
                 body: JSON.stringify({
                     recipientEmail: `${data.email}`,
+                    recipientType: "client",
                     subject: "New Client Form Submission",
                     message: `
                     <div className="block space-y-10 font-merriWeather">
@@ -113,8 +114,8 @@ export const SignUp = () => {
             });
 
             if (!response.ok) {
-                const errorData = await response.text();
-                throw new Error(`Error: ${response.status} ${errorData}`);
+                // const errorData = await response.text();
+                throw new Error(`Error: please reload and try again`);
             }
             const allData = await response.json();
 

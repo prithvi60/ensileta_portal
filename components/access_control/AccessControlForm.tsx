@@ -12,12 +12,12 @@ const schema = z.object({
     username: z
         .string()
         .min(3, { message: "Username must be at least 3 characters long" })
-        .max(30, { message: "Username must be less than 30 characters" }),
+        .max(100, { message: "Username must be less than 30 characters" }),
     email: z.string().email({ message: "Invalid email address" }),
     department: z
         .string()
         .min(2, { message: "Department name must be at least 2 characters long" })
-        .max(20, { message: "Department name must be less than 30 characters" }),
+        .max(50, { message: "Department name must be less than 30 characters" }),
     password: z.string().min(6),
 });
 
@@ -56,15 +56,16 @@ const AccessControlForm = () => {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    recipientEmail: `prithvi@webibee.com`,
+                    recipientEmail: "prithvi@webibee.com",
+                    recipientType: "client",
                     subject: "New team member Added",
-                    message: `New team member successfully added to Ensileta Portal - ${data.email}`,
+                    message: `New team member successfully added to Ensileta Interiors - ${data.email}`,
                 }),
             });
 
             if (!response.ok) {
                 const errorData = await response.text();
-                throw new Error(`Error: ${response.status} ${errorData}`);
+                throw new Error(`Error: Error: please reload and try again`);
             }
 
             const allData = await response.json();

@@ -188,9 +188,15 @@ const SpringModal2D = ({
 export const ViewModalWrapper = ({
   pdf,
   markerData,
+  refetchUsers,
+  id,
+  markerId
 }: {
   pdf: string;
   markerData: any;
+  refetchUsers: any
+  id: any
+  markerId: any
 }) => {
   const [toggle, setToggle] = useState(false);
   const [imgs, setImgs] = useState<string[]>([]);
@@ -214,8 +220,8 @@ export const ViewModalWrapper = ({
       });
     }
   };
+
   useEffect(() => {
-    // console.log("current pdf",pdf)
     setPdfFile(pdf);
   }, [pdf]);
 
@@ -279,6 +285,8 @@ export const ViewModalWrapper = ({
         isOpen={toggle}
         setIsOpen={setToggle}
         markerData={markerData}
+        id={id}
+        markerId={markerId}
         images={imgs.length > 0 ? imgs : []}
       />
     </div>
@@ -290,14 +298,19 @@ const SpringModal2 = ({
   setIsOpen,
   markerData,
   images,
+  id,
+  markerId
 }: {
   isOpen: boolean;
   setIsOpen: Function;
   images: string[];
   markerData: any;
+  id: any
+  markerId: any
 }) => {
   const [isMarkerEnabled, setIsMarkerEnabled] = useState<boolean>(false);
   const [index, setIndex] = useState<number>(0);
+  const [prevDrawingBoqId, setPrevDrawingBoqId] = useState(null);
 
   const [markers, setMarkers] = useState<
     Array<Array<Marker & { comment?: string }>>
@@ -307,15 +320,31 @@ const SpringModal2 = ({
       (_, index) => (index === 0 ? [] : []) // Other arrays remain empty
     )
   );
+  // console.log(markerData);
 
   useEffect(() => {
-    if (markerData) {
+    if (markerData && id === markerId) {
       const parsedMarkers = JSON.parse(markerData);
       setMarkers(parsedMarkers);
-      console.log("Markers set from data:", parsedMarkers);
+    } else {
+      setMarkers([]);
     }
-  }, [markerData]);
-  console.log("markers", markers);
+  }, [markerData, id, markerId]);
+
+  // useEffect(() => {
+  //   if (markerData) {
+  //     // Only parse and set markers if the id has not changed
+  //     if (id === prevDrawingBoqId) {
+  //       const parsedMarkers = JSON.parse(markerData);
+  //       setMarkers(parsedMarkers);
+  //     }
+  //   }
+  // }, [markerData, id, prevDrawingBoqId]);
+
+  // useEffect(() => {
+  //   // Update prevDrawingBoqId whenever drawingBoq.id changes
+  //   setPrevDrawingBoqId(id);
+  // }, [id]);
 
   const handleSliderChange = (newIndex: number) => {
     setIndex(newIndex); // Update the index when the slider changes
@@ -349,12 +378,12 @@ const SpringModal2 = ({
       document.exitFullscreen();
     }
   };
-  useEffect(()=>{
-    if(isOpen){
+  useEffect(() => {
+    if (isOpen) {
 
       toggleFullScreen()
     }
-  },[isOpen])
+  }, [isOpen])
   return (
     <AnimatePresence>
       {isOpen && (
@@ -384,9 +413,8 @@ const SpringModal2 = ({
                       markerComponent={(props) => (
                         <CustomMarker {...props} markers={markers[idx] || []} />
                       )}
-                      extraClass={`cursor-crosshair ${
-                        !isMarkerEnabled ? "pointer-events-none" : ""
-                      }`}
+                      extraClass={`cursor-crosshair ${!isMarkerEnabled ? "pointer-events-none" : ""
+                        }`}
                     />
                   );
                 })}
@@ -450,8 +478,8 @@ const CustomMarker = ({
         </div>
       ) : (
         <div className="absolute top-0 left-0 flex items-center bg-white rounded-full">
-        <GiVirtualMarker className="text-4xl sm:text-5xl text-secondary shadow-md" />
-      </div>
+          <GiVirtualMarker className="text-4xl sm:text-5xl text-secondary shadow-md" />
+        </div>
       )}
     </div>
   );

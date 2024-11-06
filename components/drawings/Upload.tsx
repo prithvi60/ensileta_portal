@@ -74,30 +74,36 @@ export default function UploadFile({
                 },
                 body: JSON.stringify({
                     recipientEmail: `liwoc58139@sgatra.com`,
+                    recipientType: "admin",
                     subject:
                         fileType === "view2d"
                             ? "2D Drawing File Upload Notification"
                             : fileType === "view3d"
                                 ? "3D Drawing File Upload Notification"
                                 : fileType === "viewboq"
-                                    ? "BOQ File Upload Notification"
-                                    : "Unknown File Type Notification",
+                                    ? "BOQ File Upload Notification" :
+                                    fileType === "moodBoard"
+                                        ? "Mood Board File Upload Notification"
+                                        : "Unknown File Type Notification",
                     message:
                         fileType === "view2d"
                             ? "2D Drawing File Upload Successfully"
                             : fileType === "view3d"
                                 ? "3D Drawing File Upload Successfully"
                                 : fileType === "viewboq"
-                                    ? "BOQ File Upload Successfully"
-                                    : "Unknown File Type Successfully",
+                                    ? "BOQ File Upload Successfully" :
+                                    fileType === "moodBoard"
+                                        ? "Mood Board File Upload Successfully" : "Unknown File Type Successfully",
                 }),
             });
 
             if (!response.ok && !res.ok) {
-                throw new Error("Failed to upload file");
+                const errorData = await response.text();
+                throw new Error(`Error: Error: please reload and try again`);
             }
 
             const data = await response.json();
+            const result2 = await res.json();
             const fileUrl = data.fileUrl;
             // console.log("uploading....");
 
@@ -105,10 +111,8 @@ export default function UploadFile({
                 variables: { fileUrl, filename: file.name, userId },
             });
 
-            // console.log('File uploaded successfully:', response);
-            // call query for new files
-            if (response && result) {
-                toast.success("successfully Created", {
+            if (response && result && result2) {
+                toast.success("successfully Uploaded", {
                     position: "top-right",
                     duration: 3000,
                     style: {

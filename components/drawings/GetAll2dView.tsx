@@ -6,10 +6,10 @@ import { GET_USER } from "@/lib/Queries";
 import { useQuery } from "@apollo/client";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
-import { Marquee } from "../Header/Marquee";
 import Image from "next/image";
 import React from "react";
 import { MarqueeSb } from "../Header/MarqueeUpdated";
+import { BiSolidMessageRoundedDots } from "react-icons/bi";
 
 interface FileData {
   id: number;
@@ -110,6 +110,7 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
         },
         body: JSON.stringify({
           recipientEmail: `${RoleBased?.user?.email}`,
+          recipientType: "client",
           subject: "Version Approved",
           message: `The newest version of the ${fileType} drawing has been approved by 
           ${RoleBased?.user?.username} - < ${RoleBased?.user?.email}>, and we're excited to move forward!`,
@@ -117,7 +118,7 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
       });
 
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        throw new Error("Error: please reload and try again");
       }
 
       const data = await response.json();
@@ -163,7 +164,9 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
       <h2 className="text-3xl w-full text-center font-semibold caption-bottom tracking-wide mb-10">
         {title}
       </h2>
-      {RoleBased?.user?.role === "super admin" ? (
+      {RoleBased?.user?.role === "super admin" ||
+        RoleBased?.user?.role === "contact admin" ||
+        RoleBased?.user?.role === "design admin" ? (
         // Table format User Details for super admin
         <ShuffleSortTable
           uploadFile={uploadFile}
@@ -184,6 +187,7 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
             isApproving={isApproving}
             userId={userId}
             markerData={markerData}
+            fileType={fileType}
           />
           <div className="w-full flex flex-col justify-between items-center text-justify">
             <button
@@ -198,12 +202,15 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
                   ? "Approved"
                   : `Approve`}
             </button>
-            <p className="mt-8">
-              Please review the drawings and click the &apos;Approve&apos;
-              button to confirm if this version is acceptable. You can add
-              comments in the &apos;Remarks&apos; section by viewing the drawing
-              in fullscreen and annotating directly on the image.
-            </p>
+            <div className="mt-8 flex gap-2">
+              <span>
+                <BiSolidMessageRoundedDots className="text-xl md:text-2xl text-secondary" />
+              </span>
+              <p>Please review the drawings and click the &apos;Approve&apos;
+                button to confirm if this version is acceptable. You can add
+                comments in the &apos;Remarks&apos; section by viewing the drawing
+                in fullscreen and annotating directly on the image.</p>
+            </div>
             {/* <button
               type="button"
               className="cursor-pointer w-max p-4 shadow-md select-none bg-secondary text-white hover:bg-primary"
@@ -215,12 +222,6 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
           </div>
         </>
       )}
-      <div className="fixed left-0 bottom-0 z-[1000] flex flex-col justify-center  w-full bg-white drop-shadow-1 sm:hidden px-4 py-4 items-center shadow-2 md:px-6 2xl:px-11">
-        <div className="w-64 h-8 relative">
-          <Image alt="logo" src={"/logo/newlogo.png"} fill />
-        </div>
-        <MarqueeSb />
-      </div>
     </div>
   );
 };
