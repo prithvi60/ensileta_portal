@@ -15,23 +15,21 @@ import { Loader } from "../Loader";
 import toast from "react-hot-toast";
 import DeleteModal from "./Modal";
 
-export const CustomKanban = ({ userId }: { userId: any }) => {
+export const CustomKanban = ({ userId, role }: { userId: any, role: any }) => {
     return (
         <div className="h-auto w-full shadow-xl rounded-lg">
-            <Board userId={userId} />
+            <Board userId={userId} role={role} />
         </div>
     );
 };
 
-const Board = ({ userId }: { userId: any }) => {
+const Board = ({ userId, role }: { userId: any, role: any }) => {
     const { data, loading, error, refetch } = useQuery(GET_KANBAN_CARDS, {
         variables: { userId },
     });
 
     const [cards, setCards] = useState<any[]>([]);
-    const [isDisable, setIsDisable] = useState(false);
 
-    // const [saveKanbanCards] = useMutation(CARDS);
     const [updateKanbanCard] = useMutation(UPDATE_KANBAN_CARDS);
 
     useEffect(() => {
@@ -40,42 +38,8 @@ const Board = ({ userId }: { userId: any }) => {
         }
     }, [data]);
 
-    // useEffect(() => {
-    //     setIsDisable(cards.length > 0);
-    // }, [cards]);
-
     if (loading) return <div className="flex justify-center font-medium">Loading Customer notes...</div>;
     if (error) return <p>Error: {error.message}</p>;
-
-    // const handleSave = async () => {
-    //     try {
-    //         if (cards.length === 0) {
-    //             return alert("Please add a new card before saving");
-    //         }
-
-    //         const updatedCards = cards.map((card: any) => ({
-    //             id: card.id ? parseInt(card.id, 10) : undefined,
-    //             title: card.title,
-    //             column: card.column,
-    //             userId: card.userId,
-    //         }));
-
-    //         // Execute the mutation to save cards to the database
-    //         const result = await saveKanbanCards({
-    //             variables: {
-    //                 userId,
-    //                 cards: updatedCards,
-    //             },
-    //         });
-
-    //         if (result) {
-    //             refetch();
-    //             console.log("Cards saved successfully!");
-    //         }
-    //     } catch (error) {
-    //         console.error("Error saving cards:", error);
-    //     }
-    // };
 
     const handleCardUpdate = async (
         cardId: number,
@@ -88,8 +52,7 @@ const Board = ({ userId }: { userId: any }) => {
             });
 
             if (data.updateKanbanCard.success) {
-                refetch(); // To update the client-side with the latest data
-                // console.log("Card updated successfully!");
+                refetch();
                 toast.success("Card updated successfully!", {
                     position: "top-right",
                     duration: 3000,
@@ -123,8 +86,8 @@ const Board = ({ userId }: { userId: any }) => {
     };
 
     return (
-        <div className="px-6 py-8 md:p-12 overflow-scroll scrollbar flex flex-col justify-center items-center">
-            <div className="flex justify-between h-auto scrollbar w-full gap-3 overflow-scroll p-12">
+        <div className="px-6 py-8 md:py-12 overflow-scroll scrollbar flex flex-col justify-center items-center">
+            <div className="flex justify-between h-auto sidebar_scroll_2 w-full gap-3 overflow-x-scroll xl:overflow-hidden py-12">
                 <div className="flex flex-col items-center">
                     <Column
                         title="2D Note"
@@ -151,6 +114,18 @@ const Board = ({ userId }: { userId: any }) => {
                 </div>
                 <div className="flex flex-col items-center">
                     <Column
+                        title="Mood Board Note"
+                        column="Mood Board Note"
+                        headingColor="text-yellow-200"
+                        cards={cards}
+                        setCards={setCards}
+                        userId={userId}
+                        handleCardUpdate={handleCardUpdate}
+                        refetch={refetch}
+                    />
+                </div>
+                {role !== "design admin" && (<div className="flex flex-col items-center">
+                    <Column
                         title="BOQ Note"
                         column="BOQ Note"
                         headingColor="text-blue-200"
@@ -160,7 +135,8 @@ const Board = ({ userId }: { userId: any }) => {
                         handleCardUpdate={handleCardUpdate}
                         refetch={refetch}
                     />
-                </div>
+                </div>)}
+
             </div>
             <div className="flex gap-3 items-center">
                 <BurnBarrel setCards={setCards} refetch={refetch} />
@@ -365,10 +341,10 @@ const Card = ({ title, id, column, handleDragStart, handleCardUpdate }: any) => 
                     draggable="true"
                     onDragStart={(e) => handleDragStart(e, { title, id, column })}
                     onClick={handleEdit}
-                    className="cursor-grab rounded border border-primary/60 bg-primary p-3 active:cursor-grabbing relative"
+                    className="cursor-grab rounded border border-primary/60 bg-primary p-3 active:cursor-grabbing relative w-full max-w-52  xl:max-w-60"
                 >
-                    <p className="text-sm text-neutral-100">{title}</p>
-                    <MdEdit className="text-white text-xl absolute top-[12px] right-2" />
+                    <p className="text-sm text-neutral-100 w-11/12">{title}</p>
+                    <MdEdit className="text-white bg-primary text-xl absolute top-[12px] right-2" />
                 </motion.div>
             )}
         </>
@@ -482,69 +458,7 @@ const AddCard = ({ column, setCards, cards, userId, refetch }: any) => {
 
     const [text, setText] = useState("");
     const [adding, setAdding] = useState(false);
-    // const [createCard] = useMutation(SAVE_KANBAN_CARD);
     const [saveKanbanCard] = useMutation(SAVE_KANBAN_CARD);
-    // console.log(userId);
-
-
-    // const handleSubmit = async (e: any) => {
-    //     e.preventDefault();
-
-    //     if (!text.trim().length) return;
-
-    //     const newCard = {
-    //         column,
-    //         title: text.trim(),
-    //         userId,
-    //     };
-
-    //     try {
-    //         // Save the new card to the database
-    //         const { data } = await createCard({
-    //             variables: { userId, card: newCard },
-    //         });
-
-    //         console.log(data);
-
-
-    //         // Update local state if mutation is successful
-    //         if (data?.createKanbanCard) {
-    //             setCards((pv: any) => [...pv, newCard]);
-    //             refetch()
-    //             // console.log("");
-    //             toast.success("Card added successfully!", {
-    //                 position: "top-right",
-    //                 duration: 3000,
-    //                 style: {
-    //                     border: "1px solid #499d49",
-    //                     padding: "16px",
-    //                     color: "#499d49",
-    //                 },
-    //                 iconTheme: {
-    //                     primary: "#499d49",
-    //                     secondary: "#FFFAEE",
-    //                 },
-    //             });
-    //         }
-    //     } catch (error) {
-    //         console.error("Error adding card:", error);
-    //         toast.error("Failed to add card", {
-    //             position: "top-right",
-    //             duration: 3000,
-    //             style: {
-    //                 border: "1px solid #EB1C23",
-    //                 padding: "16px",
-    //                 color: "#EB1C23",
-    //             },
-    //             iconTheme: {
-    //                 primary: "#EB1C23",
-    //                 secondary: "#FFFAEE",
-    //             },
-    //         });
-    //     }
-
-    //     setAdding(false);
-    // };
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
@@ -559,7 +473,7 @@ const AddCard = ({ column, setCards, cards, userId, refetch }: any) => {
 
         try {
             const { data } = await saveKanbanCard({
-                variables: { userId, card: newCard }, // Ensure variables align
+                variables: { userId, card: newCard },
             });
 
             if (data?.saveKanbanCard) {

@@ -13,110 +13,13 @@ import { SiLibreofficedraw } from "react-icons/si";
 import { GET_EMPLOYEE, GET_USERS } from "@/lib/Queries";
 import { useQuery } from "@apollo/client";
 import { useParams } from "next/navigation";
-import { MarqueeSidebar } from "../Header/Marquee";
+import { MarqueeSb } from "../Header/MarqueeUpdated";
+import { FaFlipboard } from "react-icons/fa";
 
 interface SidebarProps {
   sidebarOpen: boolean;
   setSidebarOpen: (arg: boolean) => void;
 }
-
-const menuGroups = [
-  {
-    name: "Ensileta Info",
-    menuItems: [
-      {
-        icon: (
-          <div className="p-1 rounded-md bg-secondary">
-            <SiLibreofficedraw className="text-4xl sm:text-5xl text-white" />
-          </div>
-        ),
-        label: "2D drawings",
-        route: "/portal/dashboard/view2d",
-      },
-      {
-        icon: (
-          <div className="p-1 rounded-md bg-secondary">
-            <GiCardDraw className="text-4xl sm:text-5xl text-white" />
-          </div>
-        ),
-        label: "3D drawings",
-        route: "/portal/dashboard/view3d",
-      },
-      {
-        icon: (
-          <div className="p-1 rounded-md bg-secondary">
-            <FaFileInvoice className="text-4xl sm:text-5xl text-white" />
-          </div>
-        ),
-        label: "BOQ",
-        route: "/portal/dashboard/viewboq",
-      },
-      {
-        icon: (
-          <div className="p-1 rounded-md bg-secondary">
-            <IoPeopleSharp className="text-4xl sm:text-5xl text-white" />
-          </div>
-        ),
-        label: "Employee",
-        route: "/portal/dashboard/accessControl",
-      },
-      {
-        icon: (
-          <div className="p-1 rounded-md bg-secondary">
-            <GoOrganization className="text-4xl sm:text-5xl text-white" />
-          </div>
-        ),
-        label: "Organisation",
-        route: "/portal/dashboard/customerProfile",
-      },
-      {
-        icon: (
-          <div className="p-1 rounded-md bg-secondary">
-            <IoCallSharp className="text-4xl sm:text-5xl text-white" />
-          </div>
-        ),
-        label: "Support",
-        route: "/portal/dashboard/faq",
-      },
-    ],
-  },
-];
-
-// const SAMenuGroups = [
-//   {
-//     name: "Ensileta Info",
-//     menuItems: [
-//       {
-//         icon: (
-//           <div className="p-1 rounded-md bg-secondary">
-//             <SiLibreofficedraw className="text-4xl sm:text-5xl text-white" />
-//           </div>
-//         ),
-//         label: "2D drawings",
-//         route: "/portal/dashboard/view2d",
-//       },
-//       {
-//         icon: (
-//           <div className="p-1 rounded-md bg-secondary">
-//             <GiCardDraw className="text-4xl sm:text-5xl text-white" />
-//           </div>
-//         ),
-//         label: "3D drawings",
-//         route: "/portal/dashboard/view3d",
-//       },
-//       {
-//         icon: (
-//           <div className="p-1 rounded-md bg-secondary">
-//             <FaFileInvoice className="text-4xl sm:text-5xl text-white" />
-//           </div>
-//         ),
-//         label: "BOQ",
-//         route: "/portal/dashboard/viewboq",
-
-//       }
-//     ],
-//   },
-// ];
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const [pageName, setPageName] = useLocalStorage("selectedMenu", "");
@@ -130,6 +33,77 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const role = session?.user?.role;
   const userName = session?.user?.name;
   const employeeUserName = employee?.getEmployeeUser?.username;
+
+  const menuGroups = [
+    {
+      name: "Ensileta Info",
+      menuItems: [
+        role !== "employee" && {
+          icon: (
+            <div className="p-1 rounded-md bg-secondary">
+              <IoPeopleSharp className="text-4xl sm:text-5xl text-white" />
+            </div>
+          ),
+          label: "Add Team",
+          route: "/portal/dashboard/accessControl",
+        },
+        {
+          icon: (
+            <div className="p-1 rounded-md bg-secondary">
+              <SiLibreofficedraw className="text-4xl sm:text-5xl text-white" />
+            </div>
+          ),
+          label: "2D drawings",
+          route: "/portal/dashboard/view2d",
+        },
+        {
+          icon: (
+            <div className="p-1 rounded-md bg-secondary">
+              <GiCardDraw className="text-4xl sm:text-5xl text-white" />
+            </div>
+          ),
+          label: "3D drawings",
+          route: "/portal/dashboard/view3d",
+        },
+        {
+          icon: (
+            <div className="p-1 rounded-md bg-secondary">
+              <FaFlipboard className="text-4xl sm:text-5xl text-white" />
+            </div>
+          ),
+          label: "Mood Board",
+          route: "/portal/dashboard/moodBoard",
+        },
+        {
+          icon: (
+            <div className="p-1 rounded-md bg-secondary">
+              <FaFileInvoice className="text-4xl sm:text-5xl text-white" />
+            </div>
+          ),
+          label: "BOQ",
+          route: "/portal/dashboard/viewboq",
+        },
+        // {
+        //   icon: (
+        //     <div className="p-1 rounded-md bg-secondary">
+        //       <GoOrganization className="text-4xl sm:text-5xl text-white" />
+        //     </div>
+        //   ),
+        //   label: "Organisation",
+        //   route: "/portal/dashboard/customerProfile",
+        // },
+        {
+          icon: (
+            <div className="p-1 rounded-md bg-secondary">
+              <IoCallSharp className="text-4xl sm:text-5xl text-white" />
+            </div>
+          ),
+          label: "Support",
+          route: "/portal/dashboard/faq",
+        },
+      ].filter(Boolean),
+    },
+  ];
 
   const admins = useMemo(() => {
     return allUsers?.users?.filter((val: any) => val.role === "admin") || [];
@@ -155,9 +129,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   return (
     <ClickOutside onClick={() => setSidebarOpen(false)}>
       <aside
-        className={`fixed left-0 top-0 z-[1001] flex h-screen w-72.5 flex-col overflow-y-hidden bg-primary duration-300 ease-linear lg:translate-x-0 gap-4 ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed left-0 top-0 z-[1001] flex h-screen w-72.5 flex-col overflow-y-hidden bg-primary duration-300 ease-linear lg:translate-x-0 gap-4 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
       >
         {/* <!-- SIDEBAR HEADER --> */}
         <div className="flex  flex-col gap-8 px-6 pt-5.5 pb-3.5 lg:pb-4.5 lg:pt-6.5">
@@ -205,9 +178,11 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         </div>
         {/* <!-- SIDEBAR HEADER --> */}
 
-        <div className="no-scrollbar flex flex-col overflow-y-auto sidebar_scroll duration-300 ease-linear h-full max-h-[65vh]">
+        <div className="no-scrollbar flex flex-col overflow-y-auto sidebar_scroll duration-300 ease-linear h-full max-h-[75vh]">
           {/* <!-- Sidebar Menu --> */}
-          {role === "super admin" ? (
+          {role === "super admin" ||
+            role === "contact admin" ||
+            role === "design admin" ? (
             <>
               {loading ? (
                 <div className="flex justify-center items-center gap-2.5 h-full w-full px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out text-xl capitalize line-clamp-2">
@@ -256,10 +231,19 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
           )}
           {/* <!-- Sidebar Menu --> */}
         </div>
-        {role !== "super admin" && <MarqueeSidebar />}
+        {/* {role !== "super admin" && (
+          <section className="fixed bottom-0 my-2 sm:max-w-48 md:max-w-72 xl:max-w-xl w-full space-y-2">
+            <h4 className="text-2xl ml-5 capitalize font-semibold tracking-wider text-white mb-8" >Our Partners</h4>
+            <MarqueeSb />
+          </section>
+        )} */}
       </aside>
     </ClickOutside>
   );
 };
 
 export default Sidebar;
+
+// john@ensileta.com
+// contact@ensileta.com
+// design@ensileta.com

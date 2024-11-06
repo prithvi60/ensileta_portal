@@ -90,7 +90,7 @@ export const ShuffleLoader = () => {
     };
 
     return (
-        <div ref={scope} className="flex gap-0.5">
+        <div ref={scope} className="flex justify-center items-center gap-0.5 h-[70vh]">
             {blocks.map((b) => {
                 return (
                     <motion.div

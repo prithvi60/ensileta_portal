@@ -9,7 +9,7 @@ const Page = () => {
 
     return (
         <DefaultLayout>
-            <section className='h-screen w-full space-y-10'>
+            <section className='h-full w-full space-y-10'>
                 <AccessControlForm />
                 <EmployeeLists />
             </section>

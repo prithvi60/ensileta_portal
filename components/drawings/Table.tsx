@@ -1,9 +1,9 @@
 "use client";
 import { motion } from "framer-motion";
-import React from "react";
+import React, { useEffect } from "react";
 import ModalWrapper, { ModalWrapper2D, ViewModalWrapper } from "./Modal";
 import { useMutation, useQuery } from "@apollo/client";
-import { ADD_2D_FILENAME, ADD_3D_FILENAME, ADD_BOQ_FILENAME, GET_MARKER_GROUP_BY_ID_2D, GET_MARKER_GROUP_BY_ID_3D, GET_MARKER_GROUP_BY_ID_BOQ } from "@/lib/Queries";
+import { ADD_2D_FILENAME, ADD_3D_FILENAME, ADD_BOQ_FILENAME, ADD_MB_FILENAME, GET_MARKER_GROUP_BY_ID_2D, GET_MARKER_GROUP_BY_ID_3D, GET_MARKER_GROUP_BY_ID_BOQ, GET_MARKER_GROUP_BY_ID_MB } from "@/lib/Queries";
 
 interface Data {
     uploadFile: any;
@@ -102,6 +102,10 @@ const TableRows = ({
                                     <span className="block mb-1 font-medium">
                                         {user.drawing3Dfiles.length}
                                     </span>
+                                ) : fileType === "moodBoard" ? (
+                                    <span className="block mb-1 font-medium">
+                                        {user.drawingMBfiles.length}
+                                    </span>
                                 ) : fileType === "viewboq" ? (
                                     <span className="block mb-1 font-medium">
                                         {user.drawingBOQfiles.length}
@@ -156,14 +160,13 @@ const TableRows = ({
 export default ShuffleSortTable;
 
 export const SuperAdminTable = ({
-    // uploadFile,
     data,
-    // fileType,
     refetchUsers,
-}: { data: any, refetchUsers: any }) => {
+    role
+}: { data: any, refetchUsers: any, role: any }) => {
     return (
         <div className="md:w-full w-[90vw] overflow-hidden">
-            <div className="w-full bg-white shadow-lg rounded-lg overflow-x-auto">
+            <div className="w-full bg-white shadow-lg rounded-lg overflow-x-scroll xl:overflow-hidden sidebar_scroll_2">
                 <table className="w-full min-w-[500px]">
                     <thead>
                         <tr className="border-b-[1px] border-slate-200 text-slate-400 text-sm uppercase">
@@ -177,12 +180,9 @@ export const SuperAdminTable = ({
 
                     <tbody>
                         <TableRows2
-                            // uploadFile={uploadFile}
                             refetchUsers={refetchUsers}
-                            // // pdf={pdf}
-                            // // id={id}
                             data={data}
-                        // fileType={fileType}
+                            role={role}
                         />
                     </tbody>
                 </table>
@@ -191,30 +191,32 @@ export const SuperAdminTable = ({
     );
 };
 
-const TableRows2 = ({ data, refetchUsers }: { data: any, refetchUsers: any }) => {
+const TableRows2 = ({ data, refetchUsers, role }: { data: any, refetchUsers: any, role: any }) => {
     const [uploadFile2D] = useMutation(ADD_2D_FILENAME);
     const [uploadFile3D] = useMutation(ADD_3D_FILENAME);
+    const [uploadFileMB] = useMutation(ADD_MB_FILENAME);
     const [uploadFileBOQ] = useMutation(ADD_BOQ_FILENAME);
     const drawing2d =
         data?.drawing2Dfiles[data.drawing2Dfiles.length - 1];
     const drawing3d =
         data?.drawing3Dfiles[data.drawing3Dfiles.length - 1];
+    const drawingMb =
+        data?.drawingMBfiles[data.drawingMBfiles.length - 1];
     const drawingBoq =
         data?.drawingBOQfiles[data.drawingBOQfiles.length - 1];
 
-    const { data: marker2d } = useQuery(GET_MARKER_GROUP_BY_ID_2D, {
+    const { data: marker2d, refetch } = useQuery(GET_MARKER_GROUP_BY_ID_2D, {
         variables: { drawing2DId: drawing2d?.id },
     });
-    const { data: marker3d } = useQuery(GET_MARKER_GROUP_BY_ID_3D, {
+    const { data: marker3d, refetch: fetch3D } = useQuery(GET_MARKER_GROUP_BY_ID_3D, {
         variables: { drawing3DId: drawing3d?.id },
     });
-
-    const { data: markerBoq } = useQuery(GET_MARKER_GROUP_BY_ID_BOQ, {
+    const { data: markerMb, refetch: fetchMB } = useQuery(GET_MARKER_GROUP_BY_ID_MB, {
+        variables: { drawingMbId: drawingMb?.id },
+    });
+    const { data: markerBoq, refetch: fetchBoq } = useQuery(GET_MARKER_GROUP_BY_ID_BOQ, {
         variables: { drawingBoqId: drawingBoq?.id },
     });
-
-    // console.log(drawing2d);
-
 
     return (
         <>
@@ -248,6 +250,9 @@ const TableRows2 = ({ data, refetchUsers }: { data: any, refetchUsers: any }) =>
                             drawing2d?.fileUrl
                         }
                         markerData={marker2d?.getMarkerGroupBy2DId?.data}
+                        refetchUsers={refetch}
+                        id={drawing2d?.id}
+                        markerId={marker2d?.getMarkerGroupBy2DId?.drawing2DId}
                     />
                 </td>
             </motion.tr>
@@ -281,10 +286,50 @@ const TableRows2 = ({ data, refetchUsers }: { data: any, refetchUsers: any }) =>
                             drawing3d?.fileUrl
                         }
                         markerData={marker3d?.getMarkerGroupBy3DId?.data}
+                        refetchUsers={fetch3D}
+                        id={drawing3d?.id}
+                        markerId={marker3d?.getMarkerGroupBy3DId?.drawing3DId}
                     />
                 </td>
             </motion.tr>
             <motion.tr className="text-xs sm:text-sm">
+                <td className="p-2 sm:p-4 mx-auto">
+                    <span className="block mb-1 font-medium text-center w-3/5">
+                        Mood Board
+                    </span>
+                </td>
+                <td className="p-2 sm:p-4">
+                    <span className="block text-xs text-slate-500">
+                        {data?.email}
+                    </span>
+                </td>
+                <td className="p-2 sm:p-4">
+                    <span className="block mb-1 font-medium text-center w-3/5">
+                        {data?.drawingMBfiles.length}
+                    </span>
+                </td>
+                <td className="p-2 sm:p-4">
+                    <ModalWrapper2D
+                        email={data?.email}
+                        uploadFile={uploadFileMB}
+                        userId={data?.id}
+                        refetchUsers={refetchUsers}
+
+                    />
+                </td>
+                <td className="p-2 sm:p-4">
+                    <ViewModalWrapper
+                        pdf={
+                            drawingMb?.fileUrl
+                        }
+                        markerData={markerMb?.getMarkerGroupByMBId?.data}
+                        refetchUsers={fetchMB}
+                        id={drawingMb?.id}
+                        markerId={markerMb?.getMarkerGroupByMBId?.drawingMbId}
+                    />
+                </td>
+            </motion.tr>
+            {role !== "design admin" && (<motion.tr className="text-xs sm:text-sm">
                 <td className="p-2 sm:p-4">
                     <span className="block mb-1 font-medium text-center w-3/5">
                         BOQ
@@ -314,9 +359,13 @@ const TableRows2 = ({ data, refetchUsers }: { data: any, refetchUsers: any }) =>
                             drawingBoq?.fileUrl
                         }
                         markerData={markerBoq?.getMarkerGroupByBoqId?.data}
+                        refetchUsers={fetchBoq}
+                        id={drawingBoq?.id}
+                        markerId={markerBoq?.getMarkerGroupByBoqId?.drawingBoqId}
                     />
                 </td>
-            </motion.tr>
+            </motion.tr>)}
+
         </>
     );
 };

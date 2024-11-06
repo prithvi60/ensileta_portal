@@ -7,6 +7,9 @@ export const SIGN_UP = gql`
     $username: String!
     $email: String!
     $company_name: String!
+    $phone_number: String!
+    $address: String!
+    $department: String!
     $password: String!
     $confirmPassword: String!
   ) {
@@ -14,6 +17,9 @@ export const SIGN_UP = gql`
       username: $username
       email: $email
       company_name: $company_name
+      phone_number: $phone_number
+      address: $address
+      department: $department
       password: $password
       confirmPassword: $confirmPassword
     ) {
@@ -52,6 +58,11 @@ export const GET_USER = gql`
         fileUrl
       }
       drawing3Dfiles {
+        id
+        filename
+        fileUrl
+      }
+      drawingMBfiles {
         id
         filename
         fileUrl
@@ -120,6 +131,13 @@ export const GET_USERS = gql`
         createdAt
       }
       drawing3Dfiles {
+        id
+        filename
+        fileUrl
+        version
+        createdAt
+      }
+      drawingMBfiles {
         id
         filename
         fileUrl
@@ -220,6 +238,34 @@ export const GET_ALL_3D_VIEW = gql`
   }
 `;
 
+// View Mood Board queries
+
+export const ADD_MB_FILENAME = gql`
+  mutation UploadMBFile($fileUrl: String!, $filename: String!, $userId: Int!) {
+    uploadMBFile(fileUrl: $fileUrl, filename: $filename, userId: $userId) {
+      id
+      filename
+      fileUrl
+      userId
+      version
+      createdAt
+    }
+  }
+`;
+
+export const GET_ALL_MB_VIEW = gql`
+  query GetAllMBFiles {
+    getAllMBFiles {
+      id
+      filename
+      fileUrl
+      userId
+      version
+      createdAt
+    }
+  }
+`;
+
 // View BOQ queries
 
 export const ADD_BOQ_FILENAME = gql`
@@ -254,11 +300,13 @@ export const ADD_EMPLOYEE = gql`
   mutation UploadAccessControlUsers(
     $username: String!
     $email: String!
+    $department: String!
     $password: String!
   ) {
     uploadAccessControlUsers(
       username: $username
       email: $email
+      department: $department
       password: $password
     ) {
       id
@@ -290,19 +338,6 @@ export const GET_EMPLOYEE = gql`
   }
 `;
 
-// export const UPLOAD_FILE_MUTATION = gql`
-//   mutation createFileForBOQ($fileUrl: String!, $filename: String!) {
-//     createFileForBOQ(fileUrl: $fileUrl, filename: $filename) {
-//       id
-//       filename
-//       fileUrl
-//       userId
-//       version
-//       createdAt
-//     }
-//   }
-// `;
-
 // S3 Bucket
 
 export const UPLOAD_S3_STORAGE = gql`
@@ -327,11 +362,6 @@ export const UPLOAD_S3_STORAGE = gql`
 `;
 
 // Kanban Cards
-// export const CARDS = gql`
-//   mutation SaveKanbanCards($userId: Int!, $cards: [KanbanCardInput!]!) {
-//     saveKanbanCards(userId: $userId, cards: $cards)
-//   }
-// `;
 export const CREATE_CARD = gql`
   mutation CreateKanbanCard($userId: Int!, $card: KanbanCardInput!) {
     createKanbanCard(userId: $userId, card: $card)
@@ -379,65 +409,6 @@ export const UPDATE_KANBAN_CARDS = gql`
 
 // Markers
 
-export const GET_ALL_MARKER_GROUPS = gql`
-  query GetAllMarkerGroups {
-    getAllMarkerGroups {
-      id
-      drawing2DId
-      drawing2D {
-        id
-        filename
-      }
-      markers {
-        id
-        comment
-        left
-        top
-        user
-        userId
-      }
-    }
-  }
-`;
-
-export const GET_MARKER_GROUPS_BY_DRAWING_2D = gql`
-  query GetMarkerGroupsByDrawing2D($drawing2DId: Int!) {
-    getMarkerGroupsByDrawing2D(drawing2DId: $drawing2DId) {
-      id
-      drawing2DId
-      drawing2D {
-        id
-        filename
-      }
-      markers {
-        id
-        comment
-        left
-        top
-        user
-        userId
-      }
-    }
-  }
-`;
-
-export const ADD_MARKER_GROUP = gql`
-  mutation AddMarkerGroups($drawing2DId: Int!, $input: [[MarkerInput!]!]!) {
-    addMarkerGroups(drawing2DId: $drawing2DId, input: $input) {
-      id
-      markers {
-        comment
-        id
-        left
-        top
-        user
-      }
-    }
-  }
-`;
-
-// new
-
 export const GET_MARKER_GROUP_BY_ID_2D = gql`
   query GetMarkerGroupBy2DId($drawing2DId: Int!) {
     getMarkerGroupBy2DId(drawing2DId: $drawing2DId) {
@@ -456,6 +427,17 @@ export const GET_MARKER_GROUP_BY_ID_3D = gql`
       data
       createdAt
       drawing3DId
+    }
+  }
+`;
+
+export const GET_MARKER_GROUP_BY_ID_MB = gql`
+  query GetMarkerGroupByMBId($drawingMbId: Int!) {
+    getMarkerGroupByMBId(drawingMbId: $drawingMbId) {
+      id
+      data
+      createdAt
+      drawingMbId
     }
   }
 `;
@@ -483,6 +465,15 @@ export const CREATE_MARKER_GROUP_2D = gql`
 export const CREATE_MARKER_GROUP_3D = gql`
   mutation CreateMarkerGroup3D($data: JSON!, $drawing3DId: Int!) {
     createMarkerGroup3D(data: $data, drawing3DId: $drawing3DId) {
+      id
+      data
+    }
+  }
+`;
+
+export const CREATE_MARKER_GROUP_MB = gql`
+  mutation CreateMarkerGroupMB($data: JSON!, $drawingMbId: Int!) {
+    createMarkerGroupMB(data: $data, drawingMbId: $drawingMbId) {
       id
       data
     }

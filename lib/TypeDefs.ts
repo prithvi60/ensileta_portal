@@ -10,9 +10,11 @@ export const typeDefs = `#graphql
     company_name: String
     phone_number: String
     address: String
+    department: String
     role: String
     drawing2Dfiles: [Drawing2D]
     drawing3Dfiles: [Drawing3D]
+    drawingMBfiles: [DrawingMB]
     drawingBOQfiles: [DrawingBOQ]
     kanbanCards:     [KanbanCard]
   }
@@ -21,6 +23,7 @@ export const typeDefs = `#graphql
     id: Int!
     username: String
     email: String!
+    department: String
     role: String
   }
 
@@ -54,6 +57,16 @@ export const typeDefs = `#graphql
     markerGroup3d: [MarkerGroup3D]
   }
 
+  type DrawingMB {
+    id: Int
+    filename: String
+    fileUrl: String
+    version: Int
+    userId: String
+    createdAt: String
+    markerGroupMb: [MarkerGroupMB]
+  }
+
   type DrawingBOQ {
     id: Int
     filename: String
@@ -64,6 +77,37 @@ export const typeDefs = `#graphql
     markerGroupBoq: [MarkerGroupBoq]
   }
 
+  type MarkerGroup2D {
+  id: ID!
+  data: JSON!
+  createdAt: String!
+  drawing2DId: Int
+  drawing2D: Drawing2D
+}
+
+type MarkerGroup3D {
+  id: ID!
+  data: JSON!
+  createdAt: String!
+  drawing3DId: Int
+  drawing3D: Drawing3D
+}
+
+type MarkerGroupMB {
+  id: ID!
+  data: JSON!
+  createdAt: String!
+  drawingMbId: Int
+  drawingMB: DrawingMB
+}
+
+type MarkerGroupBoq {
+  id: ID!
+  data: JSON!
+  createdAt: String!
+  drawingBoqId: Int
+  drawingBoq: DrawingBOQ
+}
 
   type UploadS3{
     file: String!
@@ -111,58 +155,6 @@ input UpdateKanbanCardInput {
   column: String!
 }
 
-type Marker {
-  id: Int!
-  comment: String!
-  left: Float!
-  top: Float!
-  user: String!
-  userId: Int!
-  markerGroupId: Int!
-}
-
-input MarkerInput {
-  comment: String!
-  left: Float!
-  top: Float!
-  user: String!
-  userId: Int!
-}
-
-input MarkerGroupInput {
-  drawing2DId: Int
-  markers: [MarkerInput!]!
-}
-
-type MarkerGroup {
-  id: Int!
-  markers: [Marker!]!
-}
-
-type MarkerGroup2D {
-  id: ID!
-  data: JSON!
-  createdAt: String!
-  drawing2DId: Int
-  drawing2D: Drawing2D
-}
-
-type MarkerGroup3D {
-  id: ID!
-  data: JSON!
-  createdAt: String!
-  drawing3DId: Int
-  drawing3D: Drawing3D
-}
-
-type MarkerGroupBoq {
-  id: ID!
-  data: JSON!
-  createdAt: String!
-  drawingBoqId: Int
-  drawingBoq: DrawingBOQ
-}
-
   type Query {
     user: User
     users: [User]
@@ -171,12 +163,13 @@ type MarkerGroupBoq {
     getEmployeeUser: AccessControl!
     getAll2DFiles: [Drawing2D!]!
     getAll3DFiles: [Drawing3D!]!
+    getAllMBFiles: [DrawingMB!]!
     getAllBOQFiles: [DrawingBOQ!]!
     kanbanCards(userId: Int!): [KanbanCard]
-    getAllMarkerGroups: [MarkerGroup!]!
-    getMarkerGroupsByDrawing2D(drawing2DId: Int!): [MarkerGroup!]!
     getMarkerGroupBy2DId(drawing2DId: Int!): MarkerGroup2D
     getMarkerGroupBy3DId(drawing3DId: Int!): MarkerGroup3D
+    getMarkerGroupByMBId(drawingMbId: Int!): MarkerGroupMB
+    # excess one
     getMarkerGroupByBoqId(drawingBoqId: Int!): MarkerGroupBoq
   }
   
@@ -186,6 +179,9 @@ type MarkerGroupBoq {
       username: String!,
       email: String!,
       company_name: String!,
+      phone_number: String!,
+      address: String!,
+      department: String!,
       password: String!,
       confirmPassword: String!
     ): User
@@ -203,18 +199,21 @@ type MarkerGroupBoq {
     uploadFileToS3Storage(file: String!, filename: String!, userName: String!) : File!
     upload2DFile(fileUrl: String!, filename: String!, userId: Int!) : Drawing2D!
     upload3DFile(fileUrl: String!, filename: String!, userId: Int!) : Drawing3D!
+    uploadMBFile(fileUrl: String!, filename: String!, userId: Int!) : DrawingMB!
     uploadBOQFile(fileUrl: String!, filename: String!, userId: Int!) : DrawingBOQ! 
     uploadAccessControlUsers(
       username: String!,
       email: String!,
+      department: String!,
       password: String!
     ): AccessControl
       saveKanbanCard(userId: Int!, card: KanbanCardInput!): Boolean!
     deleteKanbanCard(id: Int!): DeleteKanbanCardResponse!
     updateKanbanCard(id: Int!, title: String!, column: String!): UpdateKanbanCardResponse!
-    addMarkerGroups(drawing2DId: Int!,input: [[MarkerInput!]!]!): [MarkerGroup!]!
     createMarkerGroup2D(data: JSON!, drawing2DId: Int!): MarkerGroup2D!
     createMarkerGroup3D(data: JSON!, drawing3DId: Int!): MarkerGroup3D!
+    createMarkerGroupMB(data: JSON!, drawingMbId: Int!): MarkerGroupMB!
+    # excess one
     createMarkerGroupBOQ(data: JSON!, drawingBoqId: Int!): MarkerGroupBoq!
   }
 `;

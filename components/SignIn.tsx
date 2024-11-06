@@ -111,7 +111,7 @@ export const SignIn = () => {
           <div className="w-full p-4 sm:p-12.5 xl:p-17.5 text-[#0E132A]">
             {/* <span className="mb-1.5 block font-medium ">Start for free</span> */}
             <h2 className="text-2xl font-bold text-[#0E132A] sm:text-title-xl2 mb-2">
-              Welcome to Ensileta Portal
+              Welcome to Ensileta Interiors
             </h2>
             {/* <h4 className='mb-7 text-xl font-semibold'>Sign in</h4> */}
             {/* Form with validation */}
