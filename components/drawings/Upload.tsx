@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
+import Loader2 from "../Loader2";
 
 export default function UploadFile({
     uploadFile,
@@ -21,11 +22,11 @@ export default function UploadFile({
 }) {
     const [file, setFile] = useState<File | null>(null);
     const [size, setSize] = useState<boolean>(false);
-    const [loadingButton, setLoadingButton] = useState<string>("Upload File");
+    const [loadingButton, setLoadingButton] = useState<boolean>(false);
     const { data: session } = useSession();
     // console.log({ email, fileType });
-
     const userName = session?.user?.name || "anonymous";
+    // const email = session?.user?.email
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const uploadedFile = e.target.files?.[0] || null;
@@ -56,7 +57,7 @@ export default function UploadFile({
         }
 
         try {
-            setLoadingButton("Uploading...");
+            setLoadingButton(true);
             const formData = new FormData();
             formData.append("file", file);
             formData.append("filename", file.name);
@@ -73,27 +74,30 @@ export default function UploadFile({
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    recipientEmail: `liwoc58139@sgatra.com`,
+                    recipientEmail: `${email}`,
                     recipientType: "admin",
-                    subject:
+                    subject3:
                         fileType === "view2d"
-                            ? "2D Drawing File Upload Notification"
+                            ? `ENSILETA INTERIORS -                            New version - 2D Drawing`
                             : fileType === "view3d"
-                                ? "3D Drawing File Upload Notification"
+                                ? `ENSILETA INTERIORS -                            New version - 3D Drawing`
                                 : fileType === "viewboq"
-                                    ? "BOQ File Upload Notification" :
-                                    fileType === "moodBoard"
-                                        ? "Mood Board File Upload Notification"
-                                        : "Unknown File Type Notification",
-                    message:
-                        fileType === "view2d"
-                            ? "2D Drawing File Upload Successfully"
+                                    ? `ENSILETA INTERIORS -                            New version - BOQ Drawing`
+                                    : fileType === "moodBoard"
+                                        ? `ENSILETA INTERIORS -                            New version - Mood Board Drawing`
+                                        : `ENSILETA INTERIORS -                            New version - Unknown Filetype Drawing`,
+                    message3: `<p>
+        We have updated the new version of ${fileType === "view2d"
+                            ? "2D Drawing"
                             : fileType === "view3d"
-                                ? "3D Drawing File Upload Successfully"
+                                ? "3D Drawing"
                                 : fileType === "viewboq"
-                                    ? "BOQ File Upload Successfully" :
-                                    fileType === "moodBoard"
-                                        ? "Mood Board File Upload Successfully" : "Unknown File Type Successfully",
+                                    ? "BOQ Drawing"
+                                    : fileType === "moodBoard"
+                                        ? "Mood Board Drawing"
+                                        : "Unknown File Type"
+                        }, based on your inputs. Please review it and add your valuable remarks
+      </p>`,
                 }),
             });
 
@@ -145,7 +149,7 @@ export default function UploadFile({
                 },
             });
         } finally {
-            setLoadingButton("Upload");
+            setLoadingButton(false);
         }
     };
 
@@ -168,9 +172,9 @@ export default function UploadFile({
             <button
                 disabled={file === null ? true : false}
                 type="submit"
-                className="cursor-pointer w-full p-4 shadow-md select-none bg-secondary text-white hover:bg-[#0E122B] disabled:bg-opacity-60 disabled:cursor-not-allowed"
+                className="cursor-pointer w-full p-4 shadow-md select-none bg-secondary text-white hover:bg-[#0E122B] disabled:bg-opacity-60 disabled:cursor-not-allowed mx-auto transition-all duration-300 ease-in-out"
             >
-                {loadingButton}
+                {!loadingButton ? "Upload File" : <Loader2 />}
             </button>
         </form>
     );

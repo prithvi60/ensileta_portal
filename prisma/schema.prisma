@@ -102,12 +102,13 @@ model MarkerGroupBoq {
 }
 
 model accessControl {
-  id         Int    @id @default(autoincrement())
-  username   String @db.VarChar(100)
-  email      String @unique @db.VarChar(50)
-  department String
-  password   String
-  role       String @default("employee")
+  id           Int     @id @default(autoincrement())
+  username     String  @db.VarChar(100)
+  email        String  @unique @db.VarChar(50)
+  department   String
+  password     String
+  role         String  @default("employee")
+  company_name String?
 }
 
 model Kanban_Cards {

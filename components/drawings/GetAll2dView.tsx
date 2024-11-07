@@ -10,6 +10,7 @@ import Image from "next/image";
 import React from "react";
 import { MarqueeSb } from "../Header/MarqueeUpdated";
 import { BiSolidMessageRoundedDots } from "react-icons/bi";
+import Loader2 from "../Loader2";
 
 interface FileData {
   id: number;
@@ -55,12 +56,9 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
     if (allUsers && allUsers.users) {
       const admins =
         allUsers.users.filter((val: any) => val.role === "admin") || [];
-      // Use the `admins` variable as needed
-      // console.log("Filtered admins:", admins);
       setFilteredData(admins);
     }
 
-    // console.log("refetched",admins)
   }, [allUsers]);
 
   const SAfilteredData =
@@ -111,8 +109,8 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
         body: JSON.stringify({
           recipientEmail: `${RoleBased?.user?.email}`,
           recipientType: "client",
-          subject: "Version Approved",
-          message: `The newest version of the ${fileType} drawing has been approved by 
+          subject1: `Client Version Approved by ${RoleBased?.user?.username}`,
+          message1: `The newest version of the <strong>${fileType}</strong> drawing has been approved by 
           ${RoleBased?.user?.username} - < ${RoleBased?.user?.email}>, and we're excited to move forward!`,
         }),
       });
@@ -160,6 +158,7 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
   };
 
   return (
+
     <div className="h-full w-full pt-6 md:p-10 space-y-5">
       <h2 className="text-3xl w-full text-center font-semibold caption-bottom tracking-wide mb-10">
         {title}
@@ -182,9 +181,6 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
             version={data?.length || 0}
             id={lastItem?.id || 1}
             createMarkerGroup={createMarkerGroup}
-            handleSendEmail={handleSendEmail}
-            isApproved={isApproved}
-            isApproving={isApproving}
             userId={userId}
             markerData={markerData}
             fileType={fileType}
@@ -197,7 +193,7 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
               onClick={handleSendEmail}
             >
               {isApproving
-                ? "Approving..."
+                ? <Loader2 />
                 : isApproved
                   ? "Approved"
                   : `Approve`}

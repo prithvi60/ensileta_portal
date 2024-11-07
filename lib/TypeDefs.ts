@@ -25,6 +25,7 @@ export const typeDefs = `#graphql
     email: String!
     department: String
     role: String
+    company_name: String
   }
 
   enum SortOrder {
@@ -159,7 +160,7 @@ input UpdateKanbanCardInput {
     user: User
     users: [User]
     getUser(email: String!): User
-    getAllAccessControlUsers: [AccessControl]!
+    getAccessControlUsers(company_name: String!): [AccessControl]!
     getEmployeeUser: AccessControl!
     getAll2DFiles: [Drawing2D!]!
     getAll3DFiles: [Drawing3D!]!
@@ -205,7 +206,8 @@ input UpdateKanbanCardInput {
       username: String!,
       email: String!,
       department: String!,
-      password: String!
+      password: String!,
+      company_name: String!
     ): AccessControl
       saveKanbanCard(userId: Int!, card: KanbanCardInput!): Boolean!
     deleteKanbanCard(id: Int!): DeleteKanbanCardResponse!

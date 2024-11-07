@@ -61,7 +61,6 @@ export const resolvers = {
             drawingBOQfiles: true,
           },
         });
-        // console.log(users);
 
         return users;
       } catch (error) {
@@ -70,7 +69,6 @@ export const resolvers = {
       }
     },
     getUser: async (_: any, { email }: { email: string }) => {
-      console.log(email);
       const emailId = prisma.users.findUnique({ where: { email } });
 
       return emailId;
@@ -136,7 +134,6 @@ export const resolvers = {
             userId: userId,
           },
         });
-        // console.log(user);
 
         return user;
       } catch (error) {
@@ -144,9 +141,14 @@ export const resolvers = {
         throw new Error("Failed to fetch user");
       }
     },
-    getAllAccessControlUsers: async (_: any, args: { orderBy?: any }) => {
+    getAccessControlUsers: async (
+      _: any,
+      { company_name }: { company_name: string }
+    ) => {
       try {
-        const employees = await prisma.accessControl.findMany();
+        const employees = await prisma.accessControl.findMany({
+          where: { company_name: company_name },
+        });
         return employees;
       } catch (error) {
         console.error(error);
@@ -162,8 +164,6 @@ export const resolvers = {
         const user = await prisma.accessControl.findUnique({
           where: { id: userId },
         });
-
-        // console.log("employee", user);
 
         return user;
       } catch (error) {
@@ -234,7 +234,6 @@ export const resolvers = {
       _: any,
       { drawingBoqId }: { drawingBoqId: number }
     ) => {
-      console.log("id get boq", drawingBoqId);
       try {
         // @ts-ignore
         const markerGroup = await prisma.markerGroupBoq.findFirst({
@@ -262,16 +261,6 @@ export const resolvers = {
         confirmPassword,
       }: any
     ) => {
-      console.log({
-        username,
-        email,
-        company_name,
-        password,
-        confirmPassword,
-        phone_number,
-        address,
-        department,
-      });
       try {
         // Validate password match
         if (password !== confirmPassword) {
@@ -416,9 +405,9 @@ export const resolvers = {
     },
     uploadAccessControlUsers: async (
       _: any,
-      { username, email, department, password }: any
+      { username, email, department, password, company_name }: any
     ) => {
-      if (!username && !email && !password) {
+      if (!username && !email && !password && !company_name) {
         throw new Error("All fields are mandatory");
       }
 
@@ -444,6 +433,7 @@ export const resolvers = {
             email,
             department,
             password: hashedPwd,
+            company_name,
           },
         });
 

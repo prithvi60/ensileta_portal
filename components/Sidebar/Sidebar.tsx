@@ -15,6 +15,7 @@ import { useQuery } from "@apollo/client";
 import { useParams } from "next/navigation";
 import { MarqueeSb } from "../Header/MarqueeUpdated";
 import { FaFlipboard } from "react-icons/fa";
+import Loader2 from "../Loader2";
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -109,6 +110,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     return allUsers?.users?.filter((val: any) => val.role === "admin") || [];
   }, [allUsers]);
 
+  const admins2 = useMemo(() => {
+    return allUsers?.users?.filter((val: any) => val.username === userName) || [];
+  }, [allUsers, userName]);
+
   const sortedCompanies = admins.sort((a: any, b: any) =>
     a?.company_name.localeCompare(b?.company_name, undefined, {
       sensitivity: "base",
@@ -133,12 +138,19 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
           }`}
       >
         {/* <!-- SIDEBAR HEADER --> */}
-        <div className="flex  flex-col gap-8 px-6 pt-5.5 pb-3.5 lg:pb-4.5 lg:pt-6.5">
+        <div className="flex flex-col gap-8 px-6 pt-5.5 pb-3.5 lg:pb-4.5 lg:pt-6.5">
           <>
             {role === "employee" ? (
-              <h2 className="text-2xl ml-5 capitalize font-semibold tracking-wider text-white ">{`Hi, ${employeeUserName}`}</h2>
+              <div className="space-y-1 text-white ">
+                <h2 className="text-2xl ml-5 capitalize font-semibold tracking-wider">{`Hi, ${employeeUserName}`}</h2>
+                {loading ? (<Loader2 />) : (<p className="text-sm md:text-base tracking-wide capitalize font-medium">{admins2[0]?.company_name}</p>)}
+
+              </div>
             ) : (
-              <h2 className="text-2xl capitalize font-semibold tracking-wider text-white ">{`Hi, ${userName}`}</h2>
+              <div className="space-y-1 text-white ">
+                <h2 className="text-2xl capitalize font-semibold tracking-wider">{`Hi, ${userName}`}</h2>
+                {loading ? (<Loader2 />) : (<p className="text-sm md:text-base tracking-wide capitalize font-medium">{admins2[0]?.company_name}</p>)}
+              </div>
             )}
             {role === "super admin" && (
               <div className="mb-4">

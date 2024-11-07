@@ -11,6 +11,7 @@ import { GET_USERS, SIGN_UP } from "@/lib/Queries";
 import Link from "next/link";
 import Image from "next/image";
 import { FaPhoneVolume, FaRegAddressBook } from "react-icons/fa6";
+import Loader2 from "./Loader2";
 
 // Define the validation schema using Zod
 const schema = z
@@ -62,6 +63,8 @@ export const SignUp = () => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const router = useRouter();
     const [signUp] = useMutation(SIGN_UP);
+    const imageUrl =
+        "https://ik.imagekit.io/webibee/newlogo2.png?updatedAt=1730964119061";
     // const { data: AllUsers } = useQuery(GET_USERS);
     // const SAfilteredData = AllUsers.users.filter((val: any) => val.role === "super admin")
     // console.log(SAfilteredData);
@@ -87,17 +90,26 @@ export const SignUp = () => {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                // Session info not changing based after update
                 body: JSON.stringify({
                     recipientEmail: `${data.email}`,
                     recipientType: "client",
-                    subject: "New Client Form Submission",
-                    message: `
-                    <div className="block space-y-10 font-merriWeather">
-                    <h4 className="!text-lg !capitalize">Hi,</h4>
+                    employeeId: `${data.email}`,
+                    subject2: `ENSILETA INTERIORS- Welcome ${data.username}`,
+                    message2: `<h4>Hello ${data.username},</h4>
+      <p>
+        Congratulations on successfully signing up for ${data.company_name}! Your account is now active, and you can begin exploring our services and resources. You can seamlessly review the drawings and obtain approval, all in one place.
+      </p>
+      <p>
+        If you need assistance or have any questions about your account, feel free to contact our support team.
+      </p>
+      <p>Thank you for joining us. We’re excited to have you on board!</p>`,
+                    subject1: `New Client Form Submitted - ${data.company_name}`,
+                    message1: `
+                    <div class="block space-y-10 font-merriWeather">
+                    <h4 class="!text-lg !capitalize">Hi,</h4>
                     <p>You have a new Client Form Submission</p>
-                    <p className="!flex !items-center !justify-center !gap-3">
-                    <span className="!capitalize !font-bold">Name:</span> 
+                    <p class="!flex !items-center !justify-center !gap-3">
+                    <span class="!capitalize !font-bold">Name:</span> 
                     ${data.username}
                     </p>
                     <p>Company: ${data.company_name}</p>
@@ -574,7 +586,7 @@ export const SignUp = () => {
                                         : "hover:bg-opacity-90"
                                         }`}
                                 >
-                                    {isSubmitting ? "Submitting..." : "Sign up"}
+                                    {isSubmitting ? <Loader2 /> : "Sign up"}
                                 </button>
                             </div>
 

@@ -84,35 +84,6 @@ export const GET_USER_ROLE = gql`
   }
 `;
 
-// export const GET_USERS = gql`
-//   query GetUsers {
-//     users {
-//       id
-//       username
-//       email
-//       company_name
-//       phone_number
-//       address
-//       role
-//       drawing2Dfiles {
-//         id
-//         filename
-//         fileUrl
-//       }
-//       drawing3Dfiles {
-//         id
-//         filename
-//         fileUrl
-//       }
-//       drawingBOQfiles {
-//         id
-//         filename
-//         fileUrl
-//       }
-//     }
-//   }
-// `;
-
 export const GET_USERS = gql`
   query GetUsers {
     users {
@@ -302,27 +273,31 @@ export const ADD_EMPLOYEE = gql`
     $email: String!
     $department: String!
     $password: String!
+    $company_name: String!
   ) {
     uploadAccessControlUsers(
       username: $username
       email: $email
       department: $department
       password: $password
+      company_name: $company_name
     ) {
       id
       username
       email
       role
+      company_name
     }
   }
 `;
 
-export const GET_ALL_EMPLOYEE_LISTS = gql`
-  query getAllEmployeeLists {
-    getAllAccessControlUsers {
+export const GET_EMPLOYEE_LISTS = gql`
+  query GetAccessControlUsers($company_name: String!) {
+    getAccessControlUsers(company_name: $company_name) {
       id
       email
       role
+      company_name
     }
   }
 `;

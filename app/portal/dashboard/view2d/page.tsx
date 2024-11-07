@@ -27,12 +27,10 @@ interface GetAll2DViewResponse {
 
 const Page = () => {
   const [uploadFile] = useMutation(ADD_2D_FILENAME);
-  const { data } = useQuery<GetAll2DViewResponse>(GET_ALL_2D_VIEW);
-  const { data: AllUsers, loading, refetch } = useQuery(GET_USERS);
+  const { data, loading } = useQuery<GetAll2DViewResponse>(GET_ALL_2D_VIEW);
+  const { data: AllUsers, refetch } = useQuery(GET_USERS);
   const pathname = usePathname();
   const fileType = pathname.split("/").pop();
-  const { data: RoleBased } = useQuery(GET_USER);
-  const userId = RoleBased?.user?.id;
 
   // ID
   const lastItem =

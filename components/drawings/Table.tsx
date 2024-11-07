@@ -242,6 +242,7 @@ const TableRows2 = ({ data, refetchUsers, role }: { data: any, refetchUsers: any
                         uploadFile={uploadFile2D}
                         userId={data?.id}
                         refetchUsers={refetchUsers}
+                        fileType={"view2d"}
                     />
                 </td>
                 <td className="p-2 sm:p-4">
@@ -278,6 +279,7 @@ const TableRows2 = ({ data, refetchUsers, role }: { data: any, refetchUsers: any
                         uploadFile={uploadFile3D}
                         userId={data?.id}
                         refetchUsers={refetchUsers}
+                        fileType={"view3d"}
                     />
                 </td>
                 <td className="p-2 sm:p-4">
@@ -314,7 +316,7 @@ const TableRows2 = ({ data, refetchUsers, role }: { data: any, refetchUsers: any
                         uploadFile={uploadFileMB}
                         userId={data?.id}
                         refetchUsers={refetchUsers}
-
+                        fileType={"moodBoard"}
                     />
                 </td>
                 <td className="p-2 sm:p-4">
@@ -351,6 +353,7 @@ const TableRows2 = ({ data, refetchUsers, role }: { data: any, refetchUsers: any
                         uploadFile={uploadFileBOQ}
                         userId={data?.id}
                         refetchUsers={refetchUsers}
+                        fileType={"viewboq"}
                     />
                 </td>
                 <td className="p-2 sm:p-4">

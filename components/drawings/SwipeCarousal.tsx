@@ -12,9 +12,6 @@ export default function ModernCarousel({
   pdf,
   version,
   id,
-  handleSendEmail,
-  isApproved,
-  isApproving,
   createMarkerGroup,
   userId,
   markerData,
@@ -24,9 +21,6 @@ export default function ModernCarousel({
   version: number;
   id: number;
   createMarkerGroup: any;
-  handleSendEmail: any;
-  isApproved: any;
-  isApproving: any;
   userId: number;
   markerData: any;
   fileType: string
@@ -298,7 +292,7 @@ const SpringModal = ({
     try {
       await createMarkerGroup(markers);
     } finally {
-      setIsOpen(false); // Close the modal
+      setIsOpen(false);
       toggleFullScreen()
 
     }
@@ -327,15 +321,14 @@ const SpringModal = ({
       document.exitFullscreen();
     }
   };
+
   useEffect(() => {
     if (isOpen) {
 
       toggleFullScreen()
     }
   }, [isOpen])
-  // const parse = JSON.stringify(markers)
-  // console.log("markers",);
-  // console.log("markers parse", { markers, IsChanged });
+
   return (
     <AnimatePresence>
       {isOpen && (

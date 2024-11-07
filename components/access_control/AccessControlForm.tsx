@@ -6,7 +6,8 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import toast from "react-hot-toast";
 import { useMutation, useQuery } from "@apollo/client";
-import { ADD_EMPLOYEE, GET_ALL_EMPLOYEE_LISTS, GET_USER } from "@/lib/Queries";
+import { ADD_EMPLOYEE, GET_EMPLOYEE_LISTS, GET_USER } from "@/lib/Queries";
+import Loader2 from "../Loader2";
 
 const schema = z.object({
     username: z
@@ -24,11 +25,12 @@ const schema = z.object({
 type FormFields = z.infer<typeof schema>;
 
 const AccessControlForm = () => {
+    const { data: RoleBased, loading } = useQuery(GET_USER);
     const [showPassword, setShowPassword] = useState(false);
     const [employeeData] = useMutation(ADD_EMPLOYEE, {
-        refetchQueries: [{ query: GET_ALL_EMPLOYEE_LISTS }],
+        refetchQueries: [{ query: GET_EMPLOYEE_LISTS, variables: { company_name: RoleBased?.user?.company_name } }],
+        awaitRefetchQueries: true,
     });
-    const { data: RoleBased, loading } = useQuery(GET_USER);
     const {
         register,
         handleSubmit,
@@ -39,6 +41,7 @@ const AccessControlForm = () => {
         resolver: zodResolver(schema),
     });
 
+
     const onSubmit: SubmitHandler<FormFields> = async (data) => {
         try {
             const result = await employeeData({
@@ -47,6 +50,7 @@ const AccessControlForm = () => {
                     email: data.email,
                     department: data.department,
                     password: data.password,
+                    company_name: RoleBased?.user?.company_name
                 },
             });
 
@@ -56,10 +60,33 @@ const AccessControlForm = () => {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    recipientEmail: "prithvi@webibee.com",
+                    recipientEmail: `${RoleBased?.user?.email}`,
                     recipientType: "client",
-                    subject: "New team member Added",
-                    message: `New team member successfully added to Ensileta Interiors - ${data.email}`,
+                    employeeId: `${data.email}`,
+                    subject2: `ENSILETA INTERIORS- Welcome ${data.username}`,
+                    message2: `
+                    <h2>Hello ${data.username},</h2>
+      <p>
+        We are pleased to inform you that a new email and password have been successfully created for your account. You can now use this login information to access your employee portal.
+      </p>
+      <div>
+      <p><strong>Email Id:</strong> ${data.email}</p>
+          <p><strong>Password:</strong> ${data.password}</p>
+      </div>
+      <p>
+        For security reasons, please ensure that you change your password upon first login. If you encounter any issues or have questions, don’t hesitate to reach out to us.
+      </p>
+      <p>Thank you, and welcome aboard!</p>
+                `,
+                    subject1: `New Team Member Added by ${RoleBased?.user?.company_name}`,
+                    message1: `
+      <p>
+        We are pleased to inform you that a new email and password have been successfully created by <strong> ${RoleBased?.user?.company_name}</strong> for new Team member.
+      </p>
+      <div>
+      <p><strong>Email Id:</strong> ${data.email}</p>
+      </div>
+                `
                 }),
             });
 
@@ -343,9 +370,9 @@ const AccessControlForm = () => {
                                 <button
                                     disabled={isSubmitting}
                                     type="submit"
-                                    className="w-full cursor-pointer p-4 text-white transition hover:bg-opacity-90 bg-secondary mb-5"
+                                    className="w-full cursor-pointer p-4 text-white hover:bg-opacity-90 bg-secondary mb-5 transition-all duration-500 ease-in-out"
                                 >
-                                    {isSubmitting ? "Submitting..." : "Submit"}
+                                    {isSubmitting ? <Loader2 /> : "Submit"}
                                 </button>
                                 {/* </div> */}
 

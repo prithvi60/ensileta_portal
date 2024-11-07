@@ -22,8 +22,8 @@ export const FaqForm = () => {
                 body: JSON.stringify({
                     recipientEmail: email,
                     recipientType: "client",
-                    subject: "New Message from User",
-                    message: `User Email: ${email}\nMessage: ${msg}`,
+                    subject1: "New Message from User",
+                    message1: `User Email: ${email}\nMessage: ${msg}`,
                 }),
             });
 
