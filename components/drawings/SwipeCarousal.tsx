@@ -8,6 +8,7 @@ import ImageMarker, { Marker, MarkerComponentProps } from "react-image-marker";
 import { FaCircleArrowUp } from "react-icons/fa6";
 import { useSession } from "next-auth/react";
 import { BiSolidMessageRoundedDots } from "react-icons/bi";
+import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
 export default function ModernCarousel({
   pdf,
   version,
@@ -242,13 +243,7 @@ const SpringModal = ({
   const [isMarkerEnabled, setIsMarkerEnabled] = useState<boolean>(false);
   const [index, setIndex] = useState<number>(0);
   const [IsChanged, setIsChanged] = useState<boolean>(false);
-
-  // if (data) {
-  //   const parse = JSON.parse(data?.getMarkerGroupById.data)
-  //   // setMarkers()
-  //   console.log("get", parse);
-  // }
-
+  const transformWrapperRef = useRef<any>(null);
   const [markers, setMarkers] = useState<
     Array<Array<Marker & { comment?: string }>>
   >(
@@ -262,9 +257,14 @@ const SpringModal = ({
     if (markerData) {
       const parsedMarkers = JSON.parse(markerData);
       setMarkers(parsedMarkers);
-      // console.log("Markers set from data:", parsedMarkers);
     }
   }, [markerData]);
+
+  useEffect(() => {
+    if (transformWrapperRef.current) {
+      transformWrapperRef.current.resetTransform();
+    }
+  }, [index]);
 
   const handleSliderChange = (newIndex: number) => {
     setIndex(newIndex); // Update the index when the slider changes
@@ -351,33 +351,46 @@ const SpringModal = ({
               <Slider {...settings} afterChange={handleSliderChange}>
                 {images.map((src, idx) => {
                   return (
-                    <ImageMarker
-                      key={idx}
-                      src={src}
-                      markers={markers[idx] || []} // Pass markers for the current image
-                      onAddMarker={
-                        (marker: Marker) =>
-                          handleAddMarker(idx, marker, "", userName, userId) // Pass the current image index
-                      }
-                      markerComponent={(props) => (
-                        <CustomMarker
-                          setIsChanged={setIsChanged}
-                          {...props}
-                          onAddComment={(marker, comment) =>
-                            handleAddMarker(
-                              idx,
-                              marker,
-                              comment,
-                              userName,
-                              userId
-                            )
-                          } // Pass the current image index
-                          markers={markers[idx] || []} // Pass markers for the current image
-                        />
-                      )}
-                      extraClass={`cursor-crosshair ${!isMarkerEnabled ? "pointer-events-none" : ""
-                        }`}
-                    />
+                    <div key={idx} className="w-full h-full">
+                      <TransformWrapper
+                        maxScale={4}
+                        minScale={1}
+                        initialScale={1}
+                        ref={transformWrapperRef}
+                      >
+                        <TransformComponent
+                          wrapperStyle={{ width: '100%', height: '100%' }}
+                          contentStyle={{ width: '100%', height: '100%' }}>
+                          <ImageMarker
+                            key={idx}
+                            src={src}
+                            markers={markers[idx] || []} // Pass markers for the current image
+                            onAddMarker={
+                              (marker: Marker) =>
+                                handleAddMarker(idx, marker, "", userName, userId) // Pass the current image index
+                            }
+                            markerComponent={(props) => (
+                              <CustomMarker
+                                setIsChanged={setIsChanged}
+                                {...props}
+                                onAddComment={(marker, comment) =>
+                                  handleAddMarker(
+                                    idx,
+                                    marker,
+                                    comment,
+                                    userName,
+                                    userId
+                                  )
+                                } // Pass the current image index
+                                markers={markers[idx] || []} // Pass markers for the current image
+                              />
+                            )}
+                            extraClass={`cursor-crosshair ${!isMarkerEnabled ? "pointer-events-none" : ""
+                              }`}
+                          />
+                        </TransformComponent>
+                      </TransformWrapper>
+                    </div>
                   );
                 })}
               </Slider>
