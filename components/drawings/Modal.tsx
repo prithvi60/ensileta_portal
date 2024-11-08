@@ -9,6 +9,7 @@ import { FaArrowLeft, FaArrowRight, FaCircleArrowUp } from "react-icons/fa6";
 import { GiVirtualMarker } from "react-icons/gi";
 import Slider from "react-slick";
 import ImageMarker, { Marker, MarkerComponentProps } from "react-image-marker";
+import { BiSolidMessageRoundedDots } from "react-icons/bi";
 
 const ModalWrapper = ({
   uploadFile,
@@ -106,11 +107,13 @@ export const ModalWrapper2D = ({
   uploadFile,
   email,
   refetchUsers,
+  fileType
 }: {
   uploadFile: any;
   userId: number;
   email: string;
   refetchUsers: any;
+  fileType:string
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
@@ -128,6 +131,7 @@ export const ModalWrapper2D = ({
         email={email}
         refetchUsers={refetchUsers}
         uploadFile={uploadFile}
+        fileType={fileType}
       />
     </div>
   );
@@ -140,6 +144,7 @@ const SpringModal2D = ({
   userId,
   email,
   refetchUsers,
+  fileType
 }: {
   isOpen: boolean;
   setIsOpen: Function;
@@ -147,6 +152,7 @@ const SpringModal2D = ({
   uploadFile: any;
   email: string;
   refetchUsers: any;
+  fileType: string
 }) => {
   return (
     <AnimatePresence>
@@ -174,7 +180,7 @@ const SpringModal2D = ({
                 userId={userId}
                 setIsOpen={setIsOpen}
                 email={email}
-                fileType={""}
+                fileType={fileType}
                 refetchUsers={refetchUsers}
               />
             </div>
@@ -478,7 +484,7 @@ const CustomMarker = ({
         </div>
       ) : (
         <div className="absolute top-0 left-0 flex items-center bg-white rounded-full">
-          <GiVirtualMarker className="text-4xl sm:text-5xl text-secondary shadow-md" />
+          <BiSolidMessageRoundedDots className="bg-white rounded-full text-5xl sm:text-6xl text-secondary shadow-md p-2" />
         </div>
       )}
     </div>

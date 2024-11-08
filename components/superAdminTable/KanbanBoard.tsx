@@ -87,7 +87,7 @@ const Board = ({ userId, role }: { userId: any, role: any }) => {
 
     return (
         <div className="px-6 py-8 md:py-12 overflow-scroll scrollbar flex flex-col justify-center items-center">
-            <div className="flex justify-between h-auto sidebar_scroll_2 w-full gap-3 overflow-x-scroll xl:overflow-hidden py-12">
+            <div className="flex justify-between h-auto sidebar_scroll_2 w-full gap-3 overflow-x-scroll py-12">
                 <div className="flex flex-col items-center">
                     <Column
                         title="2D Note"
@@ -116,6 +116,18 @@ const Board = ({ userId, role }: { userId: any, role: any }) => {
                     <Column
                         title="Mood Board Note"
                         column="Mood Board Note"
+                        headingColor="text-yellow-200"
+                        cards={cards}
+                        setCards={setCards}
+                        userId={userId}
+                        handleCardUpdate={handleCardUpdate}
+                        refetch={refetch}
+                    />
+                </div>
+                <div className="flex flex-col items-center">
+                    <Column
+                        title="Approval Board Note"
+                        column="Approval Board Note"
                         headingColor="text-yellow-200"
                         cards={cards}
                         setCards={setCards}
@@ -449,7 +461,7 @@ const BurnBarrel = ({ setCards, refetch }: any) => {
                     Drag & Drop to delete
                 </p>
             </div>
-            <DeleteModal isOpen={isOpen} setIsOpen={setIsOpen} setActive={setActive} confirmDeleteCard={confirmDeleteCard} />
+            <DeleteModal isOpen={isOpen} setIsOpen={setIsOpen} setActive={setActive} confirmDeleteCard={confirmDeleteCard} type={"kanban"} />
         </>
     );
 };

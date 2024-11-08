@@ -1,12 +1,14 @@
 "use client";
 
 import { useQuery } from "@apollo/client";
-import { GET_ALL_EMPLOYEE_LISTS } from "@/lib/Queries";
+import { GET_EMPLOYEE_LISTS, GET_USER } from "@/lib/Queries";
 import { Loader } from "../Loader";
 import { CiNoWaitingSign } from "react-icons/ci";
 
 export const EmployeeLists = () => {
-    const { data, loading, error } = useQuery(GET_ALL_EMPLOYEE_LISTS);
+    const { data: RoleBased } = useQuery(GET_USER);
+
+    const { data, loading, error } = useQuery(GET_EMPLOYEE_LISTS, { variables: { company_name: RoleBased?.user?.company_name }, });
 
     if (loading) {
         return <Loader />;
@@ -16,14 +18,13 @@ export const EmployeeLists = () => {
         console.error("Error fetching data:", error);
         return <p>An error occurred while fetching data.</p>;
     }
-    console.log(data?.getAllAccessControlUsers.length);
 
     return (
         <div className="space-y-7 p-5">
             <h2 className="font-semibold text-3xl">Team Lists :</h2>
-            {data?.getAllAccessControlUsers.length > 0 ? (
+            {data?.getAccessControlUsers.length > 0 ? (
                 <ul className="list-decimal ml-5">
-                    {data?.getAllAccessControlUsers.map(
+                    {data?.getAccessControlUsers.map(
                         (list: { email: string; id: number }) => (
                             <li className="text-lg tracking-wide" key={list.id}>
                                 {list.email}

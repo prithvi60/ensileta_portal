@@ -10,6 +10,7 @@ import {
   GET_MARKER_GROUP_BY_ID_2D,
   GET_USER,
   GET_USERS,
+  TOGGLE_APPROVE_DRAWING,
 } from "@/lib/Queries";
 import { useMutation, useQuery } from "@apollo/client";
 import { usePathname } from "next/navigation";
@@ -27,12 +28,10 @@ interface GetAll2DViewResponse {
 
 const Page = () => {
   const [uploadFile] = useMutation(ADD_2D_FILENAME);
-  const { data } = useQuery<GetAll2DViewResponse>(GET_ALL_2D_VIEW);
-  const { data: AllUsers, loading, refetch } = useQuery(GET_USERS);
+  const { data, loading } = useQuery<GetAll2DViewResponse>(GET_ALL_2D_VIEW);
+  const { data: AllUsers, refetch } = useQuery(GET_USERS);
   const pathname = usePathname();
   const fileType = pathname.split("/").pop();
-  const { data: RoleBased } = useQuery(GET_USER);
-  const userId = RoleBased?.user?.id;
 
   // ID
   const lastItem =
@@ -43,16 +42,17 @@ const Page = () => {
   // Mutation
   const [createMarkerGroup] = useMutation(CREATE_MARKER_GROUP_2D, {
     refetchQueries: [
-      { query: GET_MARKER_GROUP_BY_ID_2D, variables: { id: lastItem?.id } },
+      { query: GET_MARKER_GROUP_BY_ID_2D, variables: { drawing2DId: lastItem?.id } },
     ],
     awaitRefetchQueries: true,
   });
+
   // Query
   const { data: marker2d } = useQuery(GET_MARKER_GROUP_BY_ID_2D, {
     variables: { drawing2DId: lastItem?.id },
   });
 
-  const createData = async (markers: any, id: number) => {
+  const createData = async (markers: any) => {
     try {
       const { data } = await createMarkerGroup({
         variables: {
@@ -79,6 +79,7 @@ const Page = () => {
             uploadFile={uploadFile}
             fileType={fileType || ""}
             title={"Your 2D Drawings"}
+            approveType={"DRAWING_2D"}
             refetchUsers={refetch}
             lastItem={lastItem}
             createMarkerGroup={createData}

@@ -11,22 +11,23 @@ import { GET_USERS, SIGN_UP } from "@/lib/Queries";
 import Link from "next/link";
 import Image from "next/image";
 import { FaPhoneVolume, FaRegAddressBook } from "react-icons/fa6";
+import Loader2 from "./Loader2";
 
 // Define the validation schema using Zod
 const schema = z
     .object({
         username: z
             .string()
-            .min(3, { message: "Username must be at least 3 characters long" })
+            .min(3, { message: "Username must be at least 3 characters" })
             .max(70, { message: "Username must be less than 30 characters" }),
         email: z.string().email({ message: "Invalid email address" }),
         company_name: z
             .string()
-            .min(3, { message: "Company name must be at least 3 characters long" })
+            .min(3, { message: "Company name must be at least 3 characters" })
             .max(50, { message: "Company name must be less than 30 characters" }),
         department: z
             .string()
-            .min(2, { message: "Department name must be at least 2 characters long" })
+            .min(2, { message: "Department name must be at least 2 characters" })
             .max(50, { message: "Department name must be less than 30 characters" }),
         phone_number: z
             .string()
@@ -35,7 +36,7 @@ const schema = z
         address: z.string().min(10, "Address is required"),
         password: z
             .string()
-            .min(6, { message: "Password must be at least 6 characters long" })
+            .min(6, { message: "Password must be at least 6 characters" })
             .regex(/[A-Z]/, {
                 message: "Password must contain at least one uppercase letter",
             })
@@ -47,7 +48,7 @@ const schema = z
                 message: "Password must contain at least one special character",
             }),
         confirmPassword: z.string().min(6, {
-            message: "Confirm Password must be at least 6 characters long",
+            message: "Confirm Password must be at least 6 characters",
         }),
     })
     .refine((data) => data.password === data.confirmPassword, {
@@ -62,6 +63,8 @@ export const SignUp = () => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const router = useRouter();
     const [signUp] = useMutation(SIGN_UP);
+    const imageUrl =
+        "https://ik.imagekit.io/webibee/newlogo2.png?updatedAt=1730964119061";
     // const { data: AllUsers } = useQuery(GET_USERS);
     // const SAfilteredData = AllUsers.users.filter((val: any) => val.role === "super admin")
     // console.log(SAfilteredData);
@@ -73,7 +76,7 @@ export const SignUp = () => {
         formState: { errors, isSubmitting, isValid },
     } = useForm<FormFields>({
         resolver: zodResolver(schema),
-        mode: "onChange",
+        mode: "onBlur",
     });
 
     const onSubmit: SubmitHandler<FormFields> = async (data) => {
@@ -87,17 +90,26 @@ export const SignUp = () => {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                // Session info not changing based after update
                 body: JSON.stringify({
                     recipientEmail: `${data.email}`,
                     recipientType: "client",
-                    subject: "New Client Form Submission",
-                    message: `
-                    <div className="block space-y-10 font-merriWeather">
-                    <h4 className="!text-lg !capitalize">Hi,</h4>
+                    employeeId: `${data.email}`,
+                    subject2: `ENSILETA INTERIORS- Welcome ${data.username}`,
+                    message2: `<h4>Hello ${data.username},</h4>
+      <p>
+        Congratulations on successfully signing up for ${data.company_name}! Your account is now active, and you can begin exploring our services and resources. You can seamlessly review the drawings and obtain approval, all in one place.
+      </p>
+      <p>
+        If you need assistance or have any questions about your account, feel free to contact our support team.
+      </p>
+      <p>Thank you for joining us. We’re excited to have you on board!</p>`,
+                    subject1: `New Client Form Submitted - ${data.company_name}`,
+                    message1: `
+                    <div class="block space-y-10 font-merriWeather">
+                    <h4 class="!text-lg !capitalize">Hi,</h4>
                     <p>You have a new Client Form Submission</p>
-                    <p className="!flex !items-center !justify-center !gap-3">
-                    <span className="!capitalize !font-bold">Name:</span> 
+                    <p class="!flex !items-center !justify-center !gap-3">
+                    <span class="!capitalize !font-bold">Name:</span> 
                     ${data.username}
                     </p>
                     <p>Company: ${data.company_name}</p>
@@ -189,14 +201,14 @@ export const SignUp = () => {
                 </div>
 
                 <div className="w-full p-4 sm:px-6 sm:py-0 xl:w-1/2 xl:border-l-2">
-                    <div className="w-full p-4 sm:p-12.5 xl:p-17.5 text-[#0E132A]">
+                    <div className="w-full px-4 py-7 sm:p-12.5 xl:p-17.5 text-[#0E132A]">
                         {/* <span className="mb-1.5 block font-medium text-sm md:text-base">Start for free</span> */}
                         <h2 className="mb-6 text-lg font-bold text-[#0E132A] md:text-2xl">
                             Create a New Account
                         </h2>
 
-                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                            <div>
+                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 relative">
+                            <div className="relative">
                                 <div className="flex gap-3 items-center">
                                     <label className="w-[45%] md:w-[30%] block font-medium text-[#0E132A] text-sm md:text-base">
                                         Name
@@ -205,7 +217,7 @@ export const SignUp = () => {
                                         <input
                                             type="text"
                                             placeholder="Enter your full name"
-                                            className="w-full  border border-stroke bg-transparent py-2 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none"
+                                            className="w-full  border border-stroke bg-transparent py-2 pl-6 placeholder:text-sm sm:placeholder:text-base sm:pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none"
                                             {...register("username")}
                                         />
 
@@ -233,13 +245,13 @@ export const SignUp = () => {
                                     </div>
                                 </div>
                                 {errors.username && (
-                                    <div className="text-warning font-semibold text-center text-sm mt-1">
+                                    <div className="absolute -bottom-6 left-0 w-full text-xs md:text-sm text-warning font-semibold text-center mt-1">
                                         {errors.username.message}
                                     </div>
                                 )}
                             </div>
 
-                            <div>
+                            <div className="relative">
                                 <div className="flex gap-3 items-center">
                                     <label className="w-[45%] md:w-[30%] block font-medium text-[#0E132A] text-sm md:text-base">
                                         Company
@@ -248,7 +260,7 @@ export const SignUp = () => {
                                         <input
                                             type="text"
                                             placeholder="Enter your Company Name"
-                                            className="w-full  border border-stroke bg-transparent py-2 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none"
+                                            className="w-full  border border-stroke bg-transparent py-2 pl-6 placeholder:text-sm sm:placeholder:text-base sm:pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none"
                                             {...register("company_name")}
                                         />
 
@@ -269,13 +281,13 @@ export const SignUp = () => {
                                     </div>
                                 </div>
                                 {errors.company_name && (
-                                    <div className="text-warning font-semibold text-center text-sm mt-1">
+                                    <div className="absolute -bottom-8 sm:-bottom-6 left-0 w-full text-xs md:text-sm text-warning font-semibold text-center mt-1">
                                         {errors.company_name.message}
                                     </div>
                                 )}
                             </div>
 
-                            <div>
+                            <div className="relative">
                                 <div className="flex gap-3 items-center ">
                                     <label className="w-[45%] md:w-[30%] block font-medium text-[#0E132A] text-sm md:text-base">
                                         Email
@@ -284,7 +296,7 @@ export const SignUp = () => {
                                         <input
                                             type="email"
                                             placeholder="Enter your email"
-                                            className="w-full  border border-stroke bg-transparent py-2 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none"
+                                            className="w-full  border border-stroke bg-transparent py-2 pl-6 placeholder:text-sm sm:placeholder:text-base sm:pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none"
                                             {...register("email")}
                                         />
 
@@ -308,13 +320,13 @@ export const SignUp = () => {
                                     </div>
                                 </div>
                                 {errors.email && (
-                                    <div className="text-warning font-semibold text-center text-sm mt-1">
+                                    <div className="text-warning font-semibold text-center absolute -bottom-6 left-0 w-full text-xs md:text-sm mt-1">
                                         {errors.email.message}
                                     </div>
                                 )}
                             </div>
 
-                            <div>
+                            <div className="relative">
                                 <div className="flex gap-3 items-center">
                                     <label className="w-[45%] md:w-[30%] block font-medium text-[#0E132A] text-sm md:text-base">
                                         Department
@@ -323,7 +335,7 @@ export const SignUp = () => {
                                         <input
                                             type="text"
                                             placeholder="Enter Your Department"
-                                            className="w-full  border border-stroke bg-transparent py-2 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none"
+                                            className="w-full  border border-stroke bg-transparent py-2 pl-6 placeholder:text-sm sm:placeholder:text-base sm:pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none"
                                             {...register("department")}
                                         />
                                         <span className="hidden sm:block absolute right-4 top-2">
@@ -370,13 +382,13 @@ export const SignUp = () => {
                                     </div>
                                 </div>
                                 {errors.department && (
-                                    <span className="text-warning font-semibold text-center mt-2">
+                                    <span className="text-warning font-semibold text-center absolute -bottom-8 sm:-bottom-6 left-0 w-full text-xs md:text-sm mt-2">
                                         {errors.department.message}
                                     </span>
                                 )}
                             </div>
                             {/* Phone Number */}
-                            <div>
+                            <div className="relative">
                                 <div className="flex gap-3 items-center">
                                     <label className="w-[45%] md:w-[30%] block font-medium text-[#0E132A] text-sm md:text-base">
                                         Phone Number
@@ -385,7 +397,7 @@ export const SignUp = () => {
                                         <input
                                             type="text"
                                             placeholder="Enter Your Ph.No."
-                                            className="w-full  border border-stroke bg-transparent py-2 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none"
+                                            className="w-full  border border-stroke bg-transparent py-2 pl-6 placeholder:text-sm sm:placeholder:text-base sm:pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none"
                                             {...register("phone_number")}
                                         />
                                         <span className="hidden sm:block absolute right-4 top-2">
@@ -394,13 +406,13 @@ export const SignUp = () => {
                                     </div>
                                 </div>
                                 {errors.phone_number && (
-                                    <span className="text-warning font-semibold text-center mt-2">
+                                    <span className="text-warning font-semibold text-center absolute -bottom-6 left-0 w-full text-xs md:text-sm mt-2">
                                         {errors.phone_number.message}
                                     </span>
                                 )}
                             </div>
                             {/* Address */}
-                            <div>
+                            <div className="relative">
                                 <div className="flex gap-3 items-center">
                                     <label className="w-[45%] md:w-[30%] block font-medium text-[#0E132A] text-sm md:text-base">
                                         Address
@@ -409,7 +421,7 @@ export const SignUp = () => {
                                         <textarea
                                             placeholder="Enter Your address"
                                             rows={3}
-                                            className="w-full  border border-stroke bg-transparent py-2 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none"
+                                            className="w-full  border border-stroke bg-transparent py-2 pl-6 placeholder:text-sm sm:placeholder:text-base sm:pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none"
                                             {...register("address")}
                                         />
                                         <span className="hidden sm:block absolute right-4 top-8">
@@ -418,12 +430,12 @@ export const SignUp = () => {
                                     </div>
                                 </div>
                                 {errors.address && (
-                                    <span className="text-warning font-semibold text-center mt-2">
+                                    <span className="text-warning font-semibold text-center absolute -bottom-6 left-0 w-full text-xs md:text-sm mt-2">
                                         {errors.address.message}
                                     </span>
                                 )}
                             </div>
-                            <div>
+                            <div className="relative">
                                 <div className="flex gap-3 items-center">
                                     <label className="w-[45%] md:w-[30%] block font-medium text-[#0E132A] text-sm md:text-base">
                                         Password
@@ -432,7 +444,7 @@ export const SignUp = () => {
                                         <input
                                             type={showPassword ? "text" : "password"}
                                             placeholder="6+ Characters, 1 Capital letter"
-                                            className="w-full  border border-stroke bg-transparent py-2 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none"
+                                            className="w-full  border border-stroke bg-transparent py-2 pl-6 placeholder:text-sm sm:placeholder:text-base sm:pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none"
                                             {...register("password")}
                                         />
 
@@ -487,13 +499,13 @@ export const SignUp = () => {
                                     </div>
                                 </div>
                                 {errors.password && (
-                                    <div className="text-warning font-semibold text-center text-sm mt-1">
+                                    <div className="text-warning font-semibold text-center absolute -bottom-6 left-0 w-full text-xs md:text-sm mt-1">
                                         {errors.password.message}
                                     </div>
                                 )}
                             </div>
 
-                            <div>
+                            <div className="relative">
                                 <div className="flex gap-3 items-center">
                                     <label className="w-[45%] md:w-[30%] block font-medium text-[#0E132A] text-sm md:text-base">
                                         Re-type Password
@@ -502,7 +514,7 @@ export const SignUp = () => {
                                         <input
                                             type={showConfirmPassword ? "text" : "password"}
                                             placeholder="Re-enter your password"
-                                            className="w-full  border border-stroke bg-transparent py-2 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none"
+                                            className="w-full  border border-stroke bg-transparent py-2 pl-6 placeholder:text-sm sm:placeholder:text-base sm:pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none"
                                             {...register("confirmPassword")}
                                         />
 
@@ -559,7 +571,7 @@ export const SignUp = () => {
                                     </div>
                                 </div>
                                 {errors.confirmPassword && (
-                                    <div className="text-warning font-semibold text-center text-sm mt-1">
+                                    <div className="text-warning font-semibold text-center absolute -bottom-8 sm:-bottom-6 left-0 w-full text-xs md:text-sm mt-1">
                                         {errors.confirmPassword.message}
                                     </div>
                                 )}
@@ -574,11 +586,11 @@ export const SignUp = () => {
                                         : "hover:bg-opacity-90"
                                         }`}
                                 >
-                                    {isSubmitting ? "Submitting..." : "Sign up"}
+                                    {isSubmitting ? <Loader2 /> : "Sign up"}
                                 </button>
                             </div>
 
-                            <div className="mt-6 text-center">
+                            <div className="text-center !-mt-2 ">
                                 <p>
                                     Already have an account?{" "}
                                     <Link href="/api/auth/signin" className="text-secondary">
@@ -586,6 +598,11 @@ export const SignUp = () => {
                                     </Link>
                                 </p>
                             </div>
+                            {errors.root && (
+                                <div className="absolute -bottom-10 text-sm md:text-base w-full left-1/2 -translate-x-1/2 text-warning font-semibold text-center mt-5">
+                                    {errors.root.message}
+                                </div>
+                            )}
                         </form>
                     </div>
                 </div>

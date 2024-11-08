@@ -15,6 +15,7 @@ export const typeDefs = `#graphql
     drawing2Dfiles: [Drawing2D]
     drawing3Dfiles: [Drawing3D]
     drawingMBfiles: [DrawingMB]
+    drawingABfiles: [DrawingAB]
     drawingBOQfiles: [DrawingBOQ]
     kanbanCards:     [KanbanCard]
   }
@@ -25,6 +26,8 @@ export const typeDefs = `#graphql
     email: String!
     department: String
     role: String
+    company_name: String
+    phone_number: String
   }
 
   enum SortOrder {
@@ -45,6 +48,7 @@ export const typeDefs = `#graphql
     userId: String
     createdAt: String
     markerGroup2d: [MarkerGroup2D]
+    approve: Boolean!
   }
 
   type Drawing3D {
@@ -55,6 +59,7 @@ export const typeDefs = `#graphql
     userId: String
     createdAt: String
     markerGroup3d: [MarkerGroup3D]
+    approve: Boolean!
   }
 
   type DrawingMB {
@@ -65,6 +70,18 @@ export const typeDefs = `#graphql
     userId: String
     createdAt: String
     markerGroupMb: [MarkerGroupMB]
+    approve: Boolean!
+  }
+
+  type DrawingAB {
+    id: Int
+    filename: String
+    fileUrl: String
+    version: Int
+    userId: String
+    createdAt: String
+    markerGroupAb: [MarkerGroupAB]
+    approve: Boolean!
   }
 
   type DrawingBOQ {
@@ -75,6 +92,7 @@ export const typeDefs = `#graphql
     userId: String
     createdAt: String
     markerGroupBoq: [MarkerGroupBoq]
+    approve: Boolean!
   }
 
   type MarkerGroup2D {
@@ -99,6 +117,14 @@ type MarkerGroupMB {
   createdAt: String!
   drawingMbId: Int
   drawingMB: DrawingMB
+}
+
+type MarkerGroupAB {
+  id: ID!
+  data: JSON!
+  createdAt: String!
+  drawingAbId: Int
+  drawingAB: DrawingAB
 }
 
 type MarkerGroupBoq {
@@ -155,20 +181,32 @@ input UpdateKanbanCardInput {
   column: String!
 }
 
+enum DrawingType {
+  DRAWING_2D
+  DRAWING_3D
+  DRAWING_MB
+  DRAWING_AB
+  DRAWING_BOQ
+}
+
   type Query {
     user: User
     users: [User]
     getUser(email: String!): User
-    getAllAccessControlUsers: [AccessControl]!
+    getAccessControlUsers(company_name: String!): [AccessControl]!
     getEmployeeUser: AccessControl!
     getAll2DFiles: [Drawing2D!]!
     getAll3DFiles: [Drawing3D!]!
     getAllMBFiles: [DrawingMB!]!
+    getAllABFiles: [DrawingAB!]!
     getAllBOQFiles: [DrawingBOQ!]!
     kanbanCards(userId: Int!): [KanbanCard]
     getMarkerGroupBy2DId(drawing2DId: Int!): MarkerGroup2D
     getMarkerGroupBy3DId(drawing3DId: Int!): MarkerGroup3D
     getMarkerGroupByMBId(drawingMbId: Int!): MarkerGroupMB
+    getMarkerGroupByABId(drawingAbId: Int!): MarkerGroupAB
+
+    
     # excess one
     getMarkerGroupByBoqId(drawingBoqId: Int!): MarkerGroupBoq
   }
@@ -200,12 +238,15 @@ input UpdateKanbanCardInput {
     upload2DFile(fileUrl: String!, filename: String!, userId: Int!) : Drawing2D!
     upload3DFile(fileUrl: String!, filename: String!, userId: Int!) : Drawing3D!
     uploadMBFile(fileUrl: String!, filename: String!, userId: Int!) : DrawingMB!
+    uploadABFile(fileUrl: String!, filename: String!, userId: Int!) : DrawingAB!
     uploadBOQFile(fileUrl: String!, filename: String!, userId: Int!) : DrawingBOQ! 
     uploadAccessControlUsers(
       username: String!,
       email: String!,
       department: String!,
-      password: String!
+      password: String!,
+      company_name: String!,
+      phone_number: String!
     ): AccessControl
       saveKanbanCard(userId: Int!, card: KanbanCardInput!): Boolean!
     deleteKanbanCard(id: Int!): DeleteKanbanCardResponse!
@@ -213,6 +254,10 @@ input UpdateKanbanCardInput {
     createMarkerGroup2D(data: JSON!, drawing2DId: Int!): MarkerGroup2D!
     createMarkerGroup3D(data: JSON!, drawing3DId: Int!): MarkerGroup3D!
     createMarkerGroupMB(data: JSON!, drawingMbId: Int!): MarkerGroupMB!
+    createMarkerGroupAB(data: JSON!, drawingAbId: Int!): MarkerGroupAB!
+    toggleApproveDrawing(id: Int!, drawingType: DrawingType!): Boolean!
+
+
     # excess one
     createMarkerGroupBOQ(data: JSON!, drawingBoqId: Int!): MarkerGroupBoq!
   }

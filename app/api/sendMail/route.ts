@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import { NextResponse } from "next/server";
+import { generateEmailTemplate } from "@/helper/EmailTemplate";
 
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
@@ -12,7 +13,18 @@ const transporter = nodemailer.createTransport({
 });
 
 export async function POST(req: Request) {
-  const { recipientEmail, subject, message, recipientType } = await req.json();
+  const {
+    recipientEmail,
+    subject1,
+    subject2,
+    subject3,
+    message1,
+    message2,
+    message3,
+    recipientType,
+    employeeId,
+  } = await req.json();
+
   if (!recipientEmail || !recipientType) {
     return NextResponse.json(
       { success: false, message: "Recipient email(s) missing" },
@@ -21,33 +33,43 @@ export async function POST(req: Request) {
   }
 
   let mailOptions;
-
-  // const mailOptions = {
-  //   from: recipientEmail,
-  //   to: process.env.EMAIL_ID,
-  //   subject: subject,
-  //   html: message,
-  //   // bcc: ["john@ensileta.com","design@ensileta.com"],
-  // };
+  let notifyMailOptions;
 
   if (recipientType === "client") {
-    // Email to admin
     mailOptions = {
       from: recipientEmail,
       to: process.env.EMAIL_ID,
-      subject: subject,
-      html: message,
-      // bcc: ["bccclient@example.com"]
+      subject: subject1,
+      html: message1,
+      // bcc: ["prithvi@webibee.com"],
     };
+    if (message2 && employeeId) {
+      notifyMailOptions = {
+        from: process.env.EMAIL_ID,
+        to: employeeId,
+        subject: subject2,
+        html: generateEmailTemplate(message2),
+        // bcc: ["prithvi@webibee.com"],
+      };
+    }
   } else if (recipientType === "admin") {
-    // Email to client
-    mailOptions = {
-      from: process.env.EMAIL_ID,
-      to: recipientEmail,
-      subject: subject,
-      html: message,
-      // bcc: ["bccclient@example.com"],
-    };
+    if (message3) {
+      mailOptions = {
+        from: process.env.EMAIL_ID,
+        to: recipientEmail,
+        subject: subject3,
+        html: generateEmailTemplate(message3),
+        // bcc: ["prithvi@webibee.com"],
+      };
+    }
+    // if (message4) {
+    //   notifyMailOptions = {
+    //     from: process.env.EMAIL_ID,
+    //     to: employeeId,
+    //     subject: subject4,
+    //     html: generateEmailTemplate(message4),
+    //   };
+    // }
   } else {
     return NextResponse.json(
       { success: false, message: "Invalid recipient type" },
@@ -56,7 +78,16 @@ export async function POST(req: Request) {
   }
 
   try {
-    await transporter.sendMail(mailOptions);
+    // Send the main email if mailOptions is defined
+    if (mailOptions) {
+      await transporter.sendMail(mailOptions);
+    }
+
+    // Send notification email to the employee if notifyMailOptions is defined
+    if (notifyMailOptions) {
+      await transporter.sendMail(notifyMailOptions);
+    }
+
     return NextResponse.json({
       success: true,
       message: "Email sent successfully",

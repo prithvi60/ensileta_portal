@@ -1,19 +1,21 @@
 "use client"
 import { AnimatePresence, motion } from "framer-motion";
 import { FiAlertCircle } from "react-icons/fi";
-const DeleteModal = ({ isOpen, setIsOpen, setActive, confirmDeleteCard }: any) => {
+const DeleteModal = ({ isOpen, setIsOpen, setActive, type, confirmDeleteCard }: any) => {
 
     return (
         <div className={` px-4 py-64 place-content-center ${!isOpen ? "hidden" : "grid"}`}>
-            <SpringModal isOpen={isOpen} setIsOpen={setIsOpen} setActive={setActive} confirmDeleteCard={confirmDeleteCard} />
+            <SpringModal isOpen={isOpen} setIsOpen={setIsOpen} setActive={setActive} confirmDeleteCard={confirmDeleteCard} type={type} />
         </div>
     );
 };
 
-const SpringModal = ({ isOpen, setIsOpen, setActive, confirmDeleteCard }: any) => {
+const SpringModal = ({ isOpen, setIsOpen, setActive, type, confirmDeleteCard }: any) => {
 
     const handleBack = () => {
-        setActive(false)
+        if (type) {
+            setActive(false)
+        }
         setIsOpen(false);
     }
 
@@ -42,8 +44,10 @@ const SpringModal = ({ isOpen, setIsOpen, setActive, confirmDeleteCard }: any) =
                             {/* <h3 className="mb-2 text-3xl font-bold text-center text-info">
                                 Disclaimer
                             </h3> */}
-                            <p className="mb-6 text-center text-white capitalize">
-                                Are you sure you want to delete this note? This action is permanent and cannot be undone.
+                            <p className="mb-6 text-center text-white">
+                                {`Are you certain you want to ${type ? "delete" : "approve"} this`} ?
+                                <br />
+                                Please note, this action is final and cannot be reversed
                             </p>
                             <div className="flex gap-2">
                                 <button

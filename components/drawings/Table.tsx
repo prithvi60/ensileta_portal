@@ -3,7 +3,18 @@ import { motion } from "framer-motion";
 import React, { useEffect } from "react";
 import ModalWrapper, { ModalWrapper2D, ViewModalWrapper } from "./Modal";
 import { useMutation, useQuery } from "@apollo/client";
-import { ADD_2D_FILENAME, ADD_3D_FILENAME, ADD_BOQ_FILENAME, ADD_MB_FILENAME, GET_MARKER_GROUP_BY_ID_2D, GET_MARKER_GROUP_BY_ID_3D, GET_MARKER_GROUP_BY_ID_BOQ, GET_MARKER_GROUP_BY_ID_MB } from "@/lib/Queries";
+import {
+    ADD_2D_FILENAME,
+    ADD_3D_FILENAME,
+    ADD_AB_FILENAME,
+    ADD_BOQ_FILENAME,
+    ADD_MB_FILENAME,
+    GET_MARKER_GROUP_BY_ID_2D,
+    GET_MARKER_GROUP_BY_ID_3D,
+    GET_MARKER_GROUP_BY_ID_AB,
+    GET_MARKER_GROUP_BY_ID_BOQ,
+    GET_MARKER_GROUP_BY_ID_MB,
+} from "@/lib/Queries";
 
 interface Data {
     uploadFile: any;
@@ -51,8 +62,6 @@ const Table = ({ uploadFile, data, fileType, refetchUsers }: Data) => {
                     <TableRows
                         uploadFile={uploadFile}
                         refetchUsers={refetchUsers}
-                        // pdf={pdf}
-                        // id={id}
                         data={data}
                         fileType={fileType}
                     />
@@ -105,6 +114,10 @@ const TableRows = ({
                                 ) : fileType === "moodBoard" ? (
                                     <span className="block mb-1 font-medium">
                                         {user.drawingMBfiles.length}
+                                    </span>
+                                ) : fileType === "approvalBoard" ? (
+                                    <span className="block mb-1 font-medium">
+                                        {user.drawingABfiles.length}
                                     </span>
                                 ) : fileType === "viewboq" ? (
                                     <span className="block mb-1 font-medium">
@@ -162,8 +175,12 @@ export default ShuffleSortTable;
 export const SuperAdminTable = ({
     data,
     refetchUsers,
-    role
-}: { data: any, refetchUsers: any, role: any }) => {
+    role,
+}: {
+    data: any;
+    refetchUsers: any;
+    role: any;
+}) => {
     return (
         <div className="md:w-full w-[90vw] overflow-hidden">
             <div className="w-full bg-white shadow-lg rounded-lg overflow-x-scroll xl:overflow-hidden sidebar_scroll_2">
@@ -179,11 +196,7 @@ export const SuperAdminTable = ({
                     </thead>
 
                     <tbody>
-                        <TableRows2
-                            refetchUsers={refetchUsers}
-                            data={data}
-                            role={role}
-                        />
+                        <TableRows2 refetchUsers={refetchUsers} data={data} role={role} />
                     </tbody>
                 </table>
             </div>
@@ -191,49 +204,86 @@ export const SuperAdminTable = ({
     );
 };
 
-const TableRows2 = ({ data, refetchUsers, role }: { data: any, refetchUsers: any, role: any }) => {
+const TableRows2 = ({
+    data,
+    refetchUsers,
+    role,
+}: {
+    data: any;
+    refetchUsers: any;
+    role: any;
+}) => {
     const [uploadFile2D] = useMutation(ADD_2D_FILENAME);
     const [uploadFile3D] = useMutation(ADD_3D_FILENAME);
     const [uploadFileMB] = useMutation(ADD_MB_FILENAME);
+    const [uploadFileAB] = useMutation(ADD_AB_FILENAME);
     const [uploadFileBOQ] = useMutation(ADD_BOQ_FILENAME);
+
     const drawing2d =
-        data?.drawing2Dfiles[data.drawing2Dfiles.length - 1];
+        data?.drawing2Dfiles && data.drawing2Dfiles.length > 0
+            ? data.drawing2Dfiles[data.drawing2Dfiles.length - 1]
+            : null;
+
     const drawing3d =
-        data?.drawing3Dfiles[data.drawing3Dfiles.length - 1];
+        data?.drawing3Dfiles && data.drawing3Dfiles.length > 0
+            ? data.drawing3Dfiles[data.drawing3Dfiles.length - 1]
+            : null;
+
     const drawingMb =
-        data?.drawingMBfiles[data.drawingMBfiles.length - 1];
+        data?.drawingMBfiles && data.drawingMBfiles.length > 0
+            ? data.drawingMBfiles[data.drawingMBfiles.length - 1]
+            : null;
+
+    const drawingAb =
+        data?.drawingABfiles && data.drawingABfiles.length > 0
+            ? data.drawingABfiles[data.drawingABfiles.length - 1]
+            : null;
+
     const drawingBoq =
-        data?.drawingBOQfiles[data.drawingBOQfiles.length - 1];
+        data?.drawingBOQfiles && data.drawingBOQfiles.length > 0
+            ? data.drawingBOQfiles[data.drawingBOQfiles.length - 1]
+            : null;
 
     const { data: marker2d, refetch } = useQuery(GET_MARKER_GROUP_BY_ID_2D, {
         variables: { drawing2DId: drawing2d?.id },
     });
-    const { data: marker3d, refetch: fetch3D } = useQuery(GET_MARKER_GROUP_BY_ID_3D, {
-        variables: { drawing3DId: drawing3d?.id },
-    });
-    const { data: markerMb, refetch: fetchMB } = useQuery(GET_MARKER_GROUP_BY_ID_MB, {
-        variables: { drawingMbId: drawingMb?.id },
-    });
-    const { data: markerBoq, refetch: fetchBoq } = useQuery(GET_MARKER_GROUP_BY_ID_BOQ, {
-        variables: { drawingBoqId: drawingBoq?.id },
-    });
+    const { data: marker3d, refetch: fetch3D } = useQuery(
+        GET_MARKER_GROUP_BY_ID_3D,
+        {
+            variables: { drawing3DId: drawing3d?.id },
+        }
+    );
+    const { data: markerMb, refetch: fetchMB } = useQuery(
+        GET_MARKER_GROUP_BY_ID_MB,
+        {
+            variables: { drawingMbId: drawingMb?.id },
+        }
+    );
+    const { data: markerAb, refetch: fetchAB } = useQuery(
+        GET_MARKER_GROUP_BY_ID_AB,
+        {
+            variables: { drawingAbId: drawingAb?.id },
+        }
+    );
+    const { data: markerBoq, refetch: fetchBoq } = useQuery(
+        GET_MARKER_GROUP_BY_ID_BOQ,
+        {
+            variables: { drawingBoqId: drawingBoq?.id },
+        }
+    );
 
     return (
         <>
             <motion.tr className="text-xs sm:text-sm">
                 <td className="p-2 sm:p-4">
-                    <span className="block mb-1 font-medium text-center w-3/5">
-                        2D
-                    </span>
+                    <span className="block mb-1 font-medium text-center w-3/5">2D</span>
                 </td>
                 <td className="p-2 sm:p-4">
-                    <span className="block text-xs text-slate-500">
-                        {data?.email}
-                    </span>
+                    <span className="block text-xs text-slate-500">{data?.email}</span>
                 </td>
                 <td className="p-2 sm:p-4">
                     <span className="block mb-1 font-medium text-center w-3/5">
-                        {data?.drawing2Dfiles.length}
+                        {data?.drawing2Dfiles.length || 0}
                     </span>
                 </td>
                 <td className="p-2 sm:p-4">
@@ -242,13 +292,12 @@ const TableRows2 = ({ data, refetchUsers, role }: { data: any, refetchUsers: any
                         uploadFile={uploadFile2D}
                         userId={data?.id}
                         refetchUsers={refetchUsers}
+                        fileType={"view2d"}
                     />
                 </td>
                 <td className="p-2 sm:p-4">
                     <ViewModalWrapper
-                        pdf={
-                            drawing2d?.fileUrl
-                        }
+                        pdf={drawing2d?.fileUrl}
                         markerData={marker2d?.getMarkerGroupBy2DId?.data}
                         refetchUsers={refetch}
                         id={drawing2d?.id}
@@ -258,18 +307,14 @@ const TableRows2 = ({ data, refetchUsers, role }: { data: any, refetchUsers: any
             </motion.tr>
             <motion.tr className="text-xs sm:text-sm">
                 <td className="p-2 sm:p-4">
-                    <span className="block mb-1 font-medium text-center w-3/5">
-                        3D
-                    </span>
+                    <span className="block mb-1 font-medium text-center w-3/5">3D</span>
                 </td>
                 <td className="p-2 sm:p-4">
-                    <span className="block text-xs text-slate-500">
-                        {data?.email}
-                    </span>
+                    <span className="block text-xs text-slate-500">{data?.email}</span>
                 </td>
                 <td className="p-2 sm:p-4">
                     <span className="block mb-1 font-medium text-center w-3/5">
-                        {data?.drawing3Dfiles.length}
+                        {data?.drawing3Dfiles.length || 0}
                     </span>
                 </td>
                 <td className="p-2 sm:p-4">
@@ -278,13 +323,12 @@ const TableRows2 = ({ data, refetchUsers, role }: { data: any, refetchUsers: any
                         uploadFile={uploadFile3D}
                         userId={data?.id}
                         refetchUsers={refetchUsers}
+                        fileType={"view3d"}
                     />
                 </td>
                 <td className="p-2 sm:p-4">
                     <ViewModalWrapper
-                        pdf={
-                            drawing3d?.fileUrl
-                        }
+                        pdf={drawing3d?.fileUrl}
                         markerData={marker3d?.getMarkerGroupBy3DId?.data}
                         refetchUsers={fetch3D}
                         id={drawing3d?.id}
@@ -299,13 +343,11 @@ const TableRows2 = ({ data, refetchUsers, role }: { data: any, refetchUsers: any
                     </span>
                 </td>
                 <td className="p-2 sm:p-4">
-                    <span className="block text-xs text-slate-500">
-                        {data?.email}
-                    </span>
+                    <span className="block text-xs text-slate-500">{data?.email}</span>
                 </td>
                 <td className="p-2 sm:p-4">
                     <span className="block mb-1 font-medium text-center w-3/5">
-                        {data?.drawingMBfiles.length}
+                        {data?.drawingMBfiles.length || 0}
                     </span>
                 </td>
                 <td className="p-2 sm:p-4">
@@ -314,14 +356,12 @@ const TableRows2 = ({ data, refetchUsers, role }: { data: any, refetchUsers: any
                         uploadFile={uploadFileMB}
                         userId={data?.id}
                         refetchUsers={refetchUsers}
-
+                        fileType={"moodBoard"}
                     />
                 </td>
                 <td className="p-2 sm:p-4">
                     <ViewModalWrapper
-                        pdf={
-                            drawingMb?.fileUrl
-                        }
+                        pdf={drawingMb?.fileUrl}
                         markerData={markerMb?.getMarkerGroupByMBId?.data}
                         refetchUsers={fetchMB}
                         id={drawingMb?.id}
@@ -329,43 +369,74 @@ const TableRows2 = ({ data, refetchUsers, role }: { data: any, refetchUsers: any
                     />
                 </td>
             </motion.tr>
-            {role !== "design admin" && (<motion.tr className="text-xs sm:text-sm">
-                <td className="p-2 sm:p-4">
+            <motion.tr className="text-xs sm:text-sm">
+                <td className="p-2 sm:p-4 mx-auto">
                     <span className="block mb-1 font-medium text-center w-3/5">
-                        BOQ
+                        Approval Board
                     </span>
                 </td>
                 <td className="p-2 sm:p-4">
-                    <span className="block text-xs text-slate-500">
-                        {data?.email}
-                    </span>
+                    <span className="block text-xs text-slate-500">{data?.email}</span>
                 </td>
                 <td className="p-2 sm:p-4">
                     <span className="block mb-1 font-medium text-center w-3/5">
-                        {data?.drawingBOQfiles.length}
+                        {data?.drawingABfiles?.length || 0}
                     </span>
                 </td>
                 <td className="p-2 sm:p-4">
                     <ModalWrapper2D
                         email={data?.email}
-                        uploadFile={uploadFileBOQ}
+                        uploadFile={uploadFileAB}
                         userId={data?.id}
                         refetchUsers={refetchUsers}
+                        fileType={"approvalBoard"}
                     />
                 </td>
                 <td className="p-2 sm:p-4">
                     <ViewModalWrapper
-                        pdf={
-                            drawingBoq?.fileUrl
-                        }
-                        markerData={markerBoq?.getMarkerGroupByBoqId?.data}
-                        refetchUsers={fetchBoq}
-                        id={drawingBoq?.id}
-                        markerId={markerBoq?.getMarkerGroupByBoqId?.drawingBoqId}
+                        pdf={drawingAb?.fileUrl}
+                        markerData={markerAb?.getMarkerGroupByABId?.data}
+                        refetchUsers={fetchAB}
+                        id={drawingAb?.id}
+                        markerId={markerAb?.getMarkerGroupByABId?.drawingAbId}
                     />
                 </td>
-            </motion.tr>)}
-
+            </motion.tr>
+            {role !== "design admin" && (
+                <motion.tr className="text-xs sm:text-sm">
+                    <td className="p-2 sm:p-4">
+                        <span className="block mb-1 font-medium text-center w-3/5">
+                            BOQ
+                        </span>
+                    </td>
+                    <td className="p-2 sm:p-4">
+                        <span className="block text-xs text-slate-500">{data?.email}</span>
+                    </td>
+                    <td className="p-2 sm:p-4">
+                        <span className="block mb-1 font-medium text-center w-3/5">
+                            {data?.drawingBOQfiles.length || 0}
+                        </span>
+                    </td>
+                    <td className="p-2 sm:p-4">
+                        <ModalWrapper2D
+                            email={data?.email}
+                            uploadFile={uploadFileBOQ}
+                            userId={data?.id}
+                            refetchUsers={refetchUsers}
+                            fileType={"viewboq"}
+                        />
+                    </td>
+                    <td className="p-2 sm:p-4">
+                        <ViewModalWrapper
+                            pdf={drawingBoq?.fileUrl}
+                            markerData={markerBoq?.getMarkerGroupByBoqId?.data}
+                            refetchUsers={fetchBoq}
+                            id={drawingBoq?.id}
+                            markerId={markerBoq?.getMarkerGroupByBoqId?.drawingBoqId}
+                        />
+                    </td>
+                </motion.tr>
+            )}
         </>
     );
 };

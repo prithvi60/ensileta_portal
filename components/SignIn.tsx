@@ -1,7 +1,6 @@
 "use client";
 
-import { signIn, useSession } from "next-auth/react";
-import Link from "next/link";
+import { signIn, useSession } from "next-auth/react";;
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,11 +8,11 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import toast from "react-hot-toast";
 import Image from "next/image";
+import Loader2 from "./Loader2";
 
 const schema = z.object({
   email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters long"),
-  // role: z.string()
+  password: z.string().min(6, "Password must be at least 6 characters")
 });
 type FormFields = z.infer<typeof schema>;
 
@@ -30,7 +29,7 @@ export const SignIn = () => {
     watch,
   } = useForm<FormFields>({
     resolver: zodResolver(schema),
-    mode: "onChange",
+    mode: "onBlur",
   });
 
   const onSubmit: SubmitHandler<FormFields> = async (data) => {
@@ -90,7 +89,7 @@ export const SignIn = () => {
 
   return (
     <div className="rounded-md border-4 border-secondary bg-white shadow-xl m-4">
-      <div className="flex flex-wrap items-center">
+      <div className="flex flex-wrap items-center p-4 md:p-7 xl:divide-x-2 divide-secondary">
         <div className="hidden w-full xl:block xl:w-1/2">
           <div className="p-4 sm:px-16 sm:py-0 space-y-5 text-center flex justify-center flex-col">
             <div className="w-64 h-14 relative items-center flex justify-center">
@@ -107,17 +106,17 @@ export const SignIn = () => {
           </div>
         </div>
 
-        <div className="w-full p-4 sm:px-16 sm:py-0 xl:w-1/2 xl:border-l-2">
-          <div className="w-full p-4 sm:p-12.5 xl:p-17.5 text-[#0E132A]">
+        <div className="w-full p-4 sm:px-16 sm:py-0 xl:w-1/2 ">
+          <div className="w-full py-4 text-[#0E132A] space-y-6">
             {/* <span className="mb-1.5 block font-medium ">Start for free</span> */}
-            <h2 className="text-2xl font-bold text-[#0E132A] sm:text-title-xl2 mb-2">
+            <h2 className="text-2xl font-bold text-[#0E132A] sm:text-2xl w-full text-center">
               Welcome to Ensileta Interiors
             </h2>
             {/* <h4 className='mb-7 text-xl font-semibold'>Sign in</h4> */}
             {/* Form with validation */}
 
-            <form onSubmit={handleSubmit(onSubmit)}>
-              <div className="mb-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="px-4 sm:px-12.5 xl:px-17.5 space-y-7 relative">
+              <div className="mb-4 relative">
                 <label className="mb-2.5 block font-medium text-[#0E132A]">
                   Email
                 </label>
@@ -148,13 +147,13 @@ export const SignIn = () => {
                   </span>
                 </div>
                 {errors.email && (
-                  <div className="text-warning font-semibold text-center mt-1">
+                  <div className="absolute -bottom-5 left-0 w-full text-xs md:text-sm text-warning font-semibold text-center mt-1">
                     {errors.email.message}
                   </div>
                 )}
               </div>
 
-              <div className="mb-6">
+              <div className="mb-6 relative">
                 <label className="mb-2.5 block font-medium text-[#0E132A]">
                   Password
                 </label>
@@ -216,33 +215,33 @@ export const SignIn = () => {
                   </span>
                 </div>
                 {errors.password && (
-                  <div className="text-warning font-semibold text-center mt-1">
+                  <div className="absolute -bottom-5 left-0 w-full text-xs md:text-sm text-warning font-semibold text-center mt-1">
                     {errors.password.message}
                   </div>
                 )}
               </div>
 
               <button
-                disabled={!isValid || isSubmitting}
+                disabled={isSubmitting}
                 type="submit"
-                className={`w-full cursor-pointer p-4 text-white transition  bg-secondary mb-5 ${!isValid || isSubmitting
+                className={`w-full cursor-pointer p-4 text-white transition  bg-secondary ${isSubmitting
                   ? "bg-opacity-40 cursor-not-allowed"
                   : "hover:bg-opacity-90"
                   }`}
               >
-                {isSubmitting ? "Logging in..." : "Log In"}
+                {isSubmitting ? <Loader2 /> : "Log In"}
               </button>
 
-              <div className="mt-3 text-center">
+              {/* <div className="mt-3 text-center">
                 <p>
                   Don’t have any account?{" "}
-                  <Link href="/portal/signup" className="text-secondary ">
+                  <Link href="/portal/onboarding" className="text-secondary ">
                     Sign Up
                   </Link>
                 </p>
-              </div>
+              </div> */}
               {errors.root && (
-                <div className="text-warning font-semibold text-center mt-5">
+                <div className="absolute -bottom-10 text-base md:text-lg w-full left-1/2 -translate-x-1/2 text-warning font-semibold text-center mt-5">
                   {errors.root.message}
                 </div>
               )}
