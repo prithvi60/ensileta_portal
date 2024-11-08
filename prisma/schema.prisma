@@ -21,6 +21,7 @@ model users {
   drawing2Dfiles  Drawing_2D[]
   drawing3Dfiles  Drawing_3D[]
   drawingMBfiles  Drawing_MB[]
+  drawingABfiles  Drawing_AB[]
   drawingBOQfiles Drawing_BOQ[]
   kanbanCards     Kanban_Cards[]
 }
@@ -34,6 +35,7 @@ model Drawing_2D {
   userId        Int
   user          users           @relation(fields: [userId], references: [id])
   markerGroup2d MarkerGroup2D[]
+  approve       Boolean         @default(false)
 }
 
 model Drawing_3D {
@@ -45,6 +47,7 @@ model Drawing_3D {
   userId        Int
   user          users           @relation(fields: [userId], references: [id])
   markerGroup3d MarkerGroup3D[]
+  approve       Boolean         @default(false)
 }
 
 model Drawing_MB {
@@ -56,6 +59,19 @@ model Drawing_MB {
   userId        Int
   user          users           @relation(fields: [userId], references: [id])
   markerGroupMb MarkerGroupMB[]
+  approve       Boolean         @default(false)
+}
+
+model Drawing_AB {
+  id            Int             @id @default(autoincrement())
+  filename      String
+  fileUrl       String
+  version       Int
+  createdAt     DateTime        @default(now())
+  userId        Int
+  user          users           @relation(fields: [userId], references: [id])
+  markerGroupAb MarkerGroupAB[]
+  approve       Boolean         @default(false)
 }
 
 model Drawing_BOQ {
@@ -67,6 +83,7 @@ model Drawing_BOQ {
   userId         Int
   user           users            @relation(fields: [userId], references: [id])
   markerGroupBoq MarkerGroupBoq[]
+  approve        Boolean          @default(false)
 }
 
 model MarkerGroup2D {
@@ -77,6 +94,14 @@ model MarkerGroup2D {
   drawing2D   Drawing_2D? @relation(fields: [drawing2DId], references: [id])
 }
 
+model MarkerGroup3D {
+  id          Int         @id @default(autoincrement())
+  data        Json
+  createdAt   DateTime    @default(now())
+  drawing3DId Int
+  drawing3D   Drawing_3D? @relation(fields: [drawing3DId], references: [id])
+}
+
 model MarkerGroupMB {
   id          Int         @id @default(autoincrement())
   data        Json
@@ -85,12 +110,12 @@ model MarkerGroupMB {
   drawingMb   Drawing_MB? @relation(fields: [drawingMbId], references: [id])
 }
 
-model MarkerGroup3D {
+model MarkerGroupAB {
   id          Int         @id @default(autoincrement())
   data        Json
   createdAt   DateTime    @default(now())
-  drawing3DId Int
-  drawing3D   Drawing_3D? @relation(fields: [drawing3DId], references: [id])
+  drawingAbId Int
+  drawingAb   Drawing_AB? @relation(fields: [drawingAbId], references: [id])
 }
 
 model MarkerGroupBoq {
@@ -109,6 +134,7 @@ model accessControl {
   password     String
   role         String  @default("employee")
   company_name String?
+  phone_number String?
 }
 
 model Kanban_Cards {

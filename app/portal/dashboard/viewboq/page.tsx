@@ -64,6 +64,7 @@ const Page = () => {
                         allUsers={AllUsers}
                         uploadFile={uploadFile}
                         fileType={fileType || ""}
+                        approveType={"DRAWING_BOQ"}
                         title={"Your BOQ Drawings"}
                         refetchUsers={refetch}
                         lastItem={lastItem}

@@ -16,7 +16,7 @@ const Header = (props: {
   return (
     <header className="sticky top-0 z-[1000] flex w-full bg-white drop-shadow-1">
       <div className="flex flex-grow items-center justify-between px-4 py-4 shadow-2 md:px-6 2xl:px-11">
-        <div className="flex items-center w-4/5 xl:w-[85%] overflow-hidden gap-3 md:gap-5">
+        <div className="flex items-center w-max xl:w-[85%] overflow-hidden gap-3 md:gap-5 ">
           {/* <!-- Hamburger Toggle BTN --> */}
           <button
             aria-controls="sidebar"
@@ -70,23 +70,9 @@ const Header = (props: {
         </div>
 
         <div className="flex items-center gap-3 2xsm:gap-7">
-          <ul className="flex items-center gap-2 2xsm:gap-4">
-            {/* <!-- Dark Mode Toggler --> */}
-            {/* <DarkModeSwitcher /> */}
-            {/* <!-- Dark Mode Toggler --> */}
-
-            {/* <!-- Notification Menu Area --> */}
-            <DropdownNotification />
-            {/* <!-- Notification Menu Area --> */}
-
-            {/* <!-- Chat Notification Area --> */}
-            {/* <DropdownMessage /> */}
-            {/* <!-- Chat Notification Area --> */}
-          </ul>
-
-          {/* <!-- User Area --> */}
-          {/* <DropdownUser /> */}
-          {/* <!-- User Area --> */}
+          {/* <!-- Notification Menu Area --> */}
+          <DropdownNotification />
+          {/* <!-- Notification Menu Area --> */}
         </div>
       </div>
     </header>

@@ -68,54 +68,61 @@ export default function UploadFile({
                 body: formData,
             });
 
-            const res = await fetch("/api/sendMail", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    recipientEmail: `${email}`,
-                    recipientType: "admin",
-                    subject3:
-                        fileType === "view2d"
-                            ? `ENSILETA INTERIORS -                            New version - 2D Drawing`
-                            : fileType === "view3d"
-                                ? `ENSILETA INTERIORS -                            New version - 3D Drawing`
-                                : fileType === "viewboq"
-                                    ? `ENSILETA INTERIORS -                            New version - BOQ Drawing`
-                                    : fileType === "moodBoard"
-                                        ? `ENSILETA INTERIORS -                            New version - Mood Board Drawing`
-                                        : `ENSILETA INTERIORS -                            New version - Unknown Filetype Drawing`,
-                    message3: `<p>
-        We have updated the new version of ${fileType === "view2d"
-                            ? "2D Drawing"
-                            : fileType === "view3d"
-                                ? "3D Drawing"
-                                : fileType === "viewboq"
-                                    ? "BOQ Drawing"
-                                    : fileType === "moodBoard"
-                                        ? "Mood Board Drawing"
-                                        : "Unknown File Type"
-                        }, based on your inputs. Please review it and add your valuable remarks
-      </p>`,
-                }),
-            });
-
-            if (!response.ok && !res.ok) {
-                const errorData = await response.text();
-                throw new Error(`Error: Error: please reload and try again`);
-            }
-
             const data = await response.json();
-            const result2 = await res.json();
             const fileUrl = data.fileUrl;
-            // console.log("uploading....");
 
             const result = await uploadFile({
                 variables: { fileUrl, filename: file.name, userId },
             });
+            console.log(result);
 
-            if (response && result && result2) {
+            //         const res = await fetch("/api/sendMail", {
+            //             method: "POST",
+            //             headers: {
+            //                 "Content-Type": "application/json",
+            //             },
+            //             body: JSON.stringify({
+            //                 recipientEmail: `${email}`,
+            //                 recipientType: "admin",
+            //                 subject3:
+            //                     fileType === "view2d"
+            //                         ? `ENSILETA INTERIORS -                            New version - 2D Drawing`
+            //                         : fileType === "view3d"
+            //                             ? `ENSILETA INTERIORS -                            New version - 3D Drawing`
+            //                             : fileType === "viewboq"
+            //                                 ? `ENSILETA INTERIORS -                            New version - BOQ Drawing`
+            //                                 : fileType === "moodBoard"
+            //                                     ? `ENSILETA INTERIORS -                            New version - Mood Board Drawing`
+            //                                     : fileType === "approvalBoard"
+            //                                         ? `ENSILETA INTERIORS -                            New version - Approval Board Drawing`
+            //                                         : `ENSILETA INTERIORS -                            New version - Unknown Filetype Drawing`,
+            //                 message3: `<p>
+            //     We have updated the new version of ${fileType === "view2d"
+            //                         ? "2D Drawing"
+            //                         : fileType === "view3d"
+            //                             ? "3D Drawing"
+            //                             : fileType === "viewboq"
+            //                                 ? "BOQ Drawing"
+            //                                 : fileType === "moodBoard"
+            //                                     ? "Mood Board Drawing"
+            //                                     : fileType === "approvalBoard"
+            //                                         ? "Approval Board Drawing"
+            //                                         : "Unknown File Type"
+            //                     }, based on your inputs. Please review it and add your valuable remarks
+            //   </p>`,
+            //             }),
+            //         });
+
+            if (!response.ok) {
+                const errorData = await response.text();
+                throw new Error(`Error: Error: please reload and try again`);
+            }
+
+
+            // const result2 = await res.json();
+            // console.log("uploading....");
+
+            if (response && result) {
                 toast.success("successfully Uploaded", {
                     position: "top-right",
                     duration: 3000,

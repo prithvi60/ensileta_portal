@@ -15,7 +15,7 @@ import { useQuery } from "@apollo/client";
 import { useParams } from "next/navigation";
 import { MarqueeSb } from "../Header/MarqueeUpdated";
 import { FaFlipboard } from "react-icons/fa";
-import Loader2 from "../Loader2";
+import { MdApproval } from "react-icons/md";
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -74,6 +74,15 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
           ),
           label: "Mood Board",
           route: "/portal/dashboard/moodBoard",
+        },
+        {
+          icon: (
+            <div className="p-1 rounded-md bg-secondary">
+              <MdApproval className="text-4xl sm:text-5xl text-white" />
+            </div>
+          ),
+          label: "Approval Board",
+          route: "/portal/dashboard/approvalBoard",
         },
         {
           icon: (
@@ -141,50 +150,52 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         <div className="flex flex-col gap-8 px-6 pt-5.5 pb-3.5 lg:pb-4.5 lg:pt-6.5">
           <>
             {role === "employee" ? (
-              <div className="space-y-1 text-white ">
+              <div className="space-y-1 text-white relative">
                 <h2 className="text-2xl ml-5 capitalize font-semibold tracking-wider">{`Hi, ${employeeUserName}`}</h2>
-                {loading ? (<Loader2 />) : (<p className="text-sm md:text-base tracking-wide capitalize font-medium">{admins2[0]?.company_name}</p>)}
+                <p className="absolute -bottom-7 left-0  text-sm md:text-base tracking-wide capitalize font-medium transition-all duration-700 ease-in">{admins2[0]?.company_name}</p>
 
               </div>
             ) : (
-              <div className="space-y-1 text-white ">
+              <div className="space-y-1 text-white relative">
                 <h2 className="text-2xl capitalize font-semibold tracking-wider">{`Hi, ${userName}`}</h2>
-                {loading ? (<Loader2 />) : (<p className="text-sm md:text-base tracking-wide capitalize font-medium">{admins2[0]?.company_name}</p>)}
+                <p className="absolute -bottom-7 left-0 text-sm md:text-base tracking-wide capitalize font-medium transition-all duration-700 ease-in">{admins2[0]?.company_name}</p>
               </div>
             )}
-            {role === "super admin" && (
-              <div className="mb-4">
-                <div className="relative">
-                  <input
-                    type="email"
-                    placeholder="Search customer"
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="w-full border border-stroke bg-white rounded-lg py-2 pl-3 pr-7 text-[#0E132A] text-sm outline-none focus:border-primary focus-visible:shadow-none placeholder:text-sm"
-                  />
+            {(role === "super admin" ||
+              role === "contact admin" ||
+              role === "design admin") && (
+                <div className="mb-4">
+                  <div className="relative">
+                    <input
+                      type="email"
+                      placeholder="Search customer"
+                      onChange={(e) => setSearch(e.target.value)}
+                      className="w-full border border-stroke bg-white rounded-lg py-2 pl-3 pr-7 text-[#0E132A] text-sm outline-none focus:border-primary focus-visible:shadow-none placeholder:text-sm"
+                    />
 
-                  <span className="absolute right-2 top-2">
-                    <svg
-                      // className="fill-current"
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <g opacity="0.5">
-                        <path
-                          d="M11 6C13.7614 6 16 8.23858 16 11M16.6588 16.6549L21 21M19 11C19 15.4183 15.4183 19 11 19C6.58172 19 3 15.4183 3 11C3 6.58172 6.58172 3 11 3C15.4183 3 19 6.58172 19 11Z"
-                          stroke="#394b7a"
-                          strokeWidth="3"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </g>
-                    </svg>
-                  </span>
+                    <span className="absolute right-2 top-2">
+                      <svg
+                        // className="fill-current"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <g opacity="0.5">
+                          <path
+                            d="M11 6C13.7614 6 16 8.23858 16 11M16.6588 16.6549L21 21M19 11C19 15.4183 15.4183 19 11 19C6.58172 19 3 15.4183 3 11C3 6.58172 6.58172 3 11 3C15.4183 3 19 6.58172 19 11Z"
+                            stroke="#394b7a"
+                            strokeWidth="3"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </g>
+                      </svg>
+                    </span>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
           </>
           {/* )} */}
         </div>

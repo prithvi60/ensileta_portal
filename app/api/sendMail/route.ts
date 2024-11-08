@@ -41,7 +41,7 @@ export async function POST(req: Request) {
       to: process.env.EMAIL_ID,
       subject: subject1,
       html: message1,
-      bcc: ["gokulgandhi2301@gmail.com"],
+      // bcc: ["prithvi@webibee.com"],
     };
     if (message2 && employeeId) {
       notifyMailOptions = {
@@ -49,7 +49,7 @@ export async function POST(req: Request) {
         to: employeeId,
         subject: subject2,
         html: generateEmailTemplate(message2),
-        bcc: ["gokulgandhi2301@gmail.com"],
+        // bcc: ["prithvi@webibee.com"],
       };
     }
   } else if (recipientType === "admin") {
@@ -59,7 +59,7 @@ export async function POST(req: Request) {
         to: recipientEmail,
         subject: subject3,
         html: generateEmailTemplate(message3),
-        bcc: ["gokulgandhi2301@gmail.com"],
+        // bcc: ["prithvi@webibee.com"],
       };
     }
     // if (message4) {

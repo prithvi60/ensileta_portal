@@ -2,15 +2,15 @@
 
 import ModernCarousel from "./SwipeCarousal";
 import ShuffleSortTable from "./Table";
-import { GET_USER } from "@/lib/Queries";
-import { useQuery } from "@apollo/client";
+import { GET_USER, TOGGLE_APPROVE_DRAWING } from "@/lib/Queries";
+import { useMutation, useQuery } from "@apollo/client";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import React from "react";
-import { MarqueeSb } from "../Header/MarqueeUpdated";
 import { BiSolidMessageRoundedDots } from "react-icons/bi";
 import Loader2 from "../Loader2";
+import { FaDownload } from "react-icons/fa6";
+import DeleteModal from "../superAdminTable/Modal";
 
 interface FileData {
   id: number;
@@ -32,6 +32,7 @@ interface GetAll2DViewProps {
   lastItem: any;
   createMarkerGroup: any;
   markerData: any;
+  approveType: string
 }
 
 export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
@@ -44,12 +45,15 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
   createMarkerGroup,
   lastItem,
   markerData,
+  approveType
 }) => {
   const { data: RoleBased } = useQuery(GET_USER);
-  // const { data: session } = useSession()
-  const [isApproved, setIsApproved] = useState(false);
+  const [isApproved, setIsApproved] = useState(lastItem?.approve);
   const [isApproving, setIsApproving] = useState(false);
   const [filteredData, setFilteredData] = useState<Array<any>>([]);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const [toggleApproveDrawing] = useMutation(TOGGLE_APPROVE_DRAWING);
 
   useEffect(() => {
     // Update filteredData whenever allUsers changes
@@ -66,41 +70,11 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
 
   const userId = RoleBased?.user?.id;
 
-  // Unique localStorage key for each user and file type
-  const localStorageKey = `isApproved_${userId}_${fileType}`;
-
-  // Check localStorage to see if the button has been approved before
-  useEffect(() => {
-    const approved = localStorage.getItem(localStorageKey);
-    if (approved === "true") {
-      setIsApproved(true);
-    }
-  }, [localStorageKey]);
-
-  useEffect(() => {
-    if (lastItem?.id) {
-      const currentApprovalStatus = localStorage.getItem(localStorageKey);
-      if (currentApprovalStatus === "true") {
-        const currentVersion = lastItem?.version;
-        const previouslyApprovedVersion = localStorage.getItem(
-          `${localStorageKey}_version`
-        );
-
-        if (previouslyApprovedVersion !== currentVersion.toString()) {
-          setIsApproved(false);
-          localStorage.removeItem(localStorageKey);
-          localStorage.setItem(
-            `${localStorageKey}_version`,
-            currentVersion.toString()
-          );
-        }
-      }
-    }
-  }, [lastItem?.id, lastItem?.version, localStorageKey]);
-
   const handleSendEmail = async () => {
     try {
       setIsApproving(true);
+      setIsOpen(false);
+      toggleApproveDrawing({ variables: { id: lastItem?.id, drawingType: approveType } });
       const response = await fetch("/api/sendMail", {
         method: "POST",
         headers: {
@@ -122,7 +96,6 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
       const data = await response.json();
       if (data) {
         setIsApproved(true);
-        localStorage.setItem(localStorageKey, "true");
         toast.success("Version Updated successfully", {
           position: "top-right",
           duration: 3000,
@@ -154,6 +127,7 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
       });
     } finally {
       setIsApproving(false);
+      setIsOpen(false);
     }
   };
 
@@ -190,7 +164,7 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
               disabled={isApproved || isApproving}
               type="submit"
               className="cursor-pointer w-full sm:w-1/2 p-4 shadow-md select-none bg-secondary text-white hover:bg-primary disabled:bg-opacity-70 disabled:cursor-not-allowed"
-              onClick={handleSendEmail}
+              onClick={() => setIsOpen(true)}
             >
               {isApproving
                 ? <Loader2 />
@@ -198,6 +172,7 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
                   ? "Approved"
                   : `Approve`}
             </button>
+            <DeleteModal isOpen={isOpen} setIsOpen={setIsOpen} confirmDeleteCard={handleSendEmail} />
             <div className="mt-8 flex gap-2">
               <span>
                 <BiSolidMessageRoundedDots className="text-xl md:text-2xl text-secondary" />
@@ -207,15 +182,8 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
                 comments in the &apos;Remarks&apos; section by viewing the drawing
                 in fullscreen and annotating directly on the image.</p>
             </div>
-            {/* <button
-              type="button"
-              className="cursor-pointer w-max p-4 shadow-md select-none bg-secondary text-white hover:bg-primary"
-            // onClick={handleSendEmail}
-            >
-              Remarks
-            </button> */}
-            {/* <RemarkModal handleSave={handleSave} pdf={lastItem?.fileUrl || ""} handleSendEmail={handleSendEmail} isApproved={isApproved} isApproving={isApproving}/> */}
           </div>
+
         </>
       )}
     </div>

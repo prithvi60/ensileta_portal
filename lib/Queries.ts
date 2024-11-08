@@ -67,6 +67,11 @@ export const GET_USER = gql`
         filename
         fileUrl
       }
+      drawingABfiles {
+        id
+        filename
+        fileUrl
+      }
       drawingBOQfiles {
         id
         filename
@@ -109,6 +114,13 @@ export const GET_USERS = gql`
         createdAt
       }
       drawingMBfiles {
+        id
+        filename
+        fileUrl
+        version
+        createdAt
+      }
+      drawingABfiles {
         id
         filename
         fileUrl
@@ -177,6 +189,7 @@ export const GET_ALL_2D_VIEW = gql`
       userId
       version
       createdAt
+      approve
     }
   }
 `;
@@ -205,6 +218,7 @@ export const GET_ALL_3D_VIEW = gql`
       userId
       version
       createdAt
+      approve
     }
   }
 `;
@@ -233,6 +247,36 @@ export const GET_ALL_MB_VIEW = gql`
       userId
       version
       createdAt
+      approve
+    }
+  }
+`;
+
+// View Approval Board queries
+
+export const ADD_AB_FILENAME = gql`
+  mutation UploadABFile($fileUrl: String!, $filename: String!, $userId: Int!) {
+    uploadABFile(fileUrl: $fileUrl, filename: $filename, userId: $userId) {
+      id
+      filename
+      fileUrl
+      userId
+      version
+      createdAt
+    }
+  }
+`;
+
+export const GET_ALL_AB_VIEW = gql`
+  query GetAllABFiles {
+    getAllABFiles {
+      id
+      filename
+      fileUrl
+      userId
+      version
+      createdAt
+      approve
     }
   }
 `;
@@ -261,6 +305,7 @@ export const GET_ALL_BOQ_VIEW = gql`
       userId
       version
       createdAt
+      approve
     }
   }
 `;
@@ -274,6 +319,7 @@ export const ADD_EMPLOYEE = gql`
     $department: String!
     $password: String!
     $company_name: String!
+    $phone_number: String!
   ) {
     uploadAccessControlUsers(
       username: $username
@@ -281,12 +327,14 @@ export const ADD_EMPLOYEE = gql`
       department: $department
       password: $password
       company_name: $company_name
+      phone_number: $phone_number
     ) {
       id
       username
       email
       role
       company_name
+      phone_number
     }
   }
 `;
@@ -298,6 +346,7 @@ export const GET_EMPLOYEE_LISTS = gql`
       email
       role
       company_name
+      phone_number
     }
   }
 `;
@@ -309,6 +358,8 @@ export const GET_EMPLOYEE = gql`
       username
       email
       role
+      phone_number
+      company_name
     }
   }
 `;
@@ -417,6 +468,17 @@ export const GET_MARKER_GROUP_BY_ID_MB = gql`
   }
 `;
 
+export const GET_MARKER_GROUP_BY_ID_AB = gql`
+  query GetMarkerGroupByABId($drawingAbId: Int!) {
+    getMarkerGroupByABId(drawingAbId: $drawingAbId) {
+      id
+      data
+      createdAt
+      drawingAbId
+    }
+  }
+`;
+
 export const GET_MARKER_GROUP_BY_ID_BOQ = gql`
   query GetMarkerGroupByBOQId($drawingBoqId: Int!) {
     getMarkerGroupByBoqId(drawingBoqId: $drawingBoqId) {
@@ -455,11 +517,27 @@ export const CREATE_MARKER_GROUP_MB = gql`
   }
 `;
 
+export const CREATE_MARKER_GROUP_AB = gql`
+  mutation CreateMarkerGroupAB($data: JSON!, $drawingAbId: Int!) {
+    createMarkerGroupAB(data: $data, drawingAbId: $drawingAbId) {
+      id
+      data
+    }
+  }
+`;
+
 export const CREATE_MARKER_GROUP_BOQ = gql`
   mutation CreateMarkerGroupBOQ($data: JSON!, $drawingBoqId: Int!) {
     createMarkerGroupBOQ(data: $data, drawingBoqId: $drawingBoqId) {
       id
       data
     }
+  }
+`;
+
+// Toggle Approve Button
+export const TOGGLE_APPROVE_DRAWING = gql`
+  mutation ToggleApproveDrawing($id: Int!, $drawingType: DrawingType!) {
+    toggleApproveDrawing(id: $id, drawingType: $drawingType)
   }
 `;

@@ -41,6 +41,7 @@ export const resolvers = {
             drawing2Dfiles: true,
             drawing3Dfiles: true,
             drawingMBfiles: true,
+            drawingABfiles: true,
             drawingBOQfiles: true,
           },
         });
@@ -58,6 +59,7 @@ export const resolvers = {
             drawing2Dfiles: true,
             drawing3Dfiles: true,
             drawingMBfiles: true,
+            drawingABfiles: true,
             drawingBOQfiles: true,
           },
         });
@@ -113,6 +115,23 @@ export const resolvers = {
       }
       try {
         const user = await prisma.drawing_MB.findMany({
+          where: {
+            userId: userId,
+          },
+        });
+
+        return user;
+      } catch (error) {
+        console.error("Error while fetching user:", error);
+        throw new Error("Failed to fetch user");
+      }
+    },
+    getAllABFiles: async (_: any, __: any, { userId }: any) => {
+      if (!userId) {
+        throw new Error("Unauthorized");
+      }
+      try {
+        const user = await prisma.drawing_AB.findMany({
           where: {
             userId: userId,
           },
@@ -230,6 +249,22 @@ export const resolvers = {
         throw new Error("Unable to fetch marker group.");
       }
     },
+    getMarkerGroupByABId: async (
+      _: any,
+      { drawingAbId }: { drawingAbId: number }
+    ) => {
+      try {
+        // @ts-ignore
+        const markerGroup = await prisma.markerGroupAB.findFirst({
+          where: { drawingAbId },
+        });
+
+        return markerGroup;
+      } catch (error) {
+        console.error("Error fetching marker group:", error);
+        throw new Error("Unable to fetch marker group.");
+      }
+    },
     getMarkerGroupByBoqId: async (
       _: any,
       { drawingBoqId }: { drawingBoqId: number }
@@ -264,7 +299,7 @@ export const resolvers = {
       try {
         // Validate password match
         if (password !== confirmPassword) {
-          throw new Error("Passwords do not match, please check the password.");
+          throw new Error("Passwords do not match, please check the password");
         }
 
         // Check if the email already exists
@@ -273,7 +308,7 @@ export const resolvers = {
         });
 
         if (existingUser) {
-          throw new Error("Email already exists, please use a different one.");
+          throw new Error("Email already in use. Please try another");
         }
 
         // Hash the password
@@ -304,9 +339,7 @@ export const resolvers = {
         } else if (error.message.includes("Email already exists")) {
           throw new Error(error.message);
         } else {
-          throw new Error(
-            "An error occurred while creating the user. Please try again later."
-          );
+          throw new Error("Couldn’t create user. Please try again later");
         }
       }
     },
@@ -405,9 +438,9 @@ export const resolvers = {
     },
     uploadAccessControlUsers: async (
       _: any,
-      { username, email, department, password, company_name }: any
+      { username, email, department, password, company_name, phone_number }: any
     ) => {
-      if (!username && !email && !password && !company_name) {
+      if (!username && !email && !password && !company_name && !phone_number) {
         throw new Error("All fields are mandatory");
       }
 
@@ -434,6 +467,7 @@ export const resolvers = {
             department,
             password: hashedPwd,
             company_name,
+            phone_number,
           },
         });
 
@@ -512,6 +546,30 @@ export const resolvers = {
           filename,
           fileUrl,
           version: newVersion,
+          createdAt: new Date(),
+          userId,
+        },
+      });
+
+      return createdFile;
+    },
+    uploadABFile: async (
+      _: any,
+      {
+        fileUrl,
+        filename,
+        userId,
+      }: { fileUrl: string; filename: string; userId: number }
+    ) => {
+      const existingFile = await prisma.drawing_AB.findMany();
+
+      const newVersion = existingFile.length;
+
+      const createdFile = await prisma.drawing_AB.create({
+        data: {
+          filename,
+          fileUrl,
+          version: newVersion || 1,
           createdAt: new Date(),
           userId,
         },
@@ -686,6 +744,27 @@ export const resolvers = {
         throw new Error("Failed to create marker group");
       }
     },
+    createMarkerGroupAB: async (_: any, { data, drawingAbId }: any) => {
+      const jsonData = JSON.stringify(data);
+      try {
+        // @ts-ignore
+        await prisma.markerGroupAB.deleteMany({
+          where: { drawingAbId },
+        });
+        // @ts-ignore
+        const newMarkerGroup = await prisma.markerGroupAB.create({
+          data: {
+            data: jsonData,
+            drawingAbId,
+          },
+        });
+
+        return newMarkerGroup;
+      } catch (error) {
+        console.error("Error creating marker group:", error);
+        throw new Error("Failed to create marker group");
+      }
+    },
     createMarkerGroupBOQ: async (_: any, { data, drawingBoqId }: any) => {
       const jsonData = JSON.stringify(data);
       try {
@@ -705,6 +784,46 @@ export const resolvers = {
       } catch (error) {
         console.error("Error creating marker group:", error);
         throw new Error("Failed to create marker group");
+      }
+    },
+    toggleApproveDrawing: async (
+      _: any,
+      { id, drawingType }: { id: number; drawingType: string }
+    ) => {
+      try {
+        const drawingModels = {
+          DRAWING_2D: prisma.drawing_2D,
+          DRAWING_3D: prisma.drawing_3D,
+          DRAWING_MB: prisma.drawing_MB,
+          DRAWING_AB: prisma.drawing_AB,
+          DRAWING_BOQ: prisma.drawing_BOQ,
+        };
+
+        // @ts-ignore
+        const model = drawingModels[drawingType];
+
+        if (!model) {
+          throw new Error("Invalid drawing type");
+        }
+
+        // Find the drawing and toggle the approve field
+        const drawing = await model.findUnique({ where: { id } });
+
+        if (!drawing) {
+          throw new Error("Drawing not found");
+        }
+
+        // Toggle the approve status
+        if (!drawing.approve) {
+          await model.update({
+            where: { id },
+            data: { approve: true },
+          });
+        }
+
+        return true;
+      } catch (error: any) {
+        throw new Error(`Failed to toggle approve status: ${error.message}`);
       }
     },
   },

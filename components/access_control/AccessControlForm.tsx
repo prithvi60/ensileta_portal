@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import { useMutation, useQuery } from "@apollo/client";
 import { ADD_EMPLOYEE, GET_EMPLOYEE_LISTS, GET_USER } from "@/lib/Queries";
 import Loader2 from "../Loader2";
+import { FaPhoneVolume } from "react-icons/fa6";
 
 const schema = z.object({
     username: z
@@ -20,12 +21,16 @@ const schema = z.object({
         .min(2, { message: "Department name must be at least 2 characters long" })
         .max(50, { message: "Department name must be less than 30 characters" }),
     password: z.string().min(6),
+    phone_number: z
+        .string()
+        .min(10, "Phone number must be at least 10 digits")
+        .max(10, "Phone number must not exceed 10 digits"),
 });
 
 type FormFields = z.infer<typeof schema>;
 
 const AccessControlForm = () => {
-    const { data: RoleBased, loading } = useQuery(GET_USER);
+    const { data: RoleBased } = useQuery(GET_USER);
     const [showPassword, setShowPassword] = useState(false);
     const [employeeData] = useMutation(ADD_EMPLOYEE, {
         refetchQueries: [{ query: GET_EMPLOYEE_LISTS, variables: { company_name: RoleBased?.user?.company_name } }],
@@ -39,10 +44,11 @@ const AccessControlForm = () => {
         formState: { errors, isSubmitting },
     } = useForm<FormFields>({
         resolver: zodResolver(schema),
+        mode: "onBlur",
     });
 
-
     const onSubmit: SubmitHandler<FormFields> = async (data) => {
+        // console.log(data);
         try {
             const result = await employeeData({
                 variables: {
@@ -50,9 +56,11 @@ const AccessControlForm = () => {
                     email: data.email,
                     department: data.department,
                     password: data.password,
-                    company_name: RoleBased?.user?.company_name
+                    company_name: RoleBased?.user?.company_name,
+                    phone_number: data.phone_number
                 },
             });
+
 
             const response = await fetch("/api/sendMail", {
                 method: "POST",
@@ -65,28 +73,30 @@ const AccessControlForm = () => {
                     employeeId: `${data.email}`,
                     subject2: `ENSILETA INTERIORS- Welcome ${data.username}`,
                     message2: `
-                    <h2>Hello ${data.username},</h2>
-      <p>
-        We are pleased to inform you that a new email and password have been successfully created for your account. You can now use this login information to access your employee portal.
-      </p>
-      <div>
-      <p><strong>Email Id:</strong> ${data.email}</p>
-          <p><strong>Password:</strong> ${data.password}</p>
-      </div>
-      <p>
-        For security reasons, please ensure that you change your password upon first login. If you encounter any issues or have questions, don’t hesitate to reach out to us.
-      </p>
-      <p>Thank you, and welcome aboard!</p>
-                `,
+                            <h2>Hello ${data.username},</h2>
+              <p>
+                We are pleased to inform you that a new email and password have been successfully created for your account. You can now use this login information to access your employee portal.
+              </p>
+              <div>
+              <p><strong>Email Id:</strong> ${data.email}</p>
+                  <p><strong>Password:</strong> ${data.password}</p>
+                  <p><strong>Phone Number:</strong> ${data.phone_number}</p>
+              </div>
+              <p>
+                For security reasons, please ensure that you change your password upon first login. If you encounter any issues or have questions, don’t hesitate to reach out to us.
+              </p>
+              <p>Thank you, and welcome aboard!</p>
+                        `,
                     subject1: `New Team Member Added by ${RoleBased?.user?.company_name}`,
                     message1: `
-      <p>
-        We are pleased to inform you that a new email and password have been successfully created by <strong> ${RoleBased?.user?.company_name}</strong> for new Team member.
-      </p>
-      <div>
-      <p><strong>Email Id:</strong> ${data.email}</p>
-      </div>
-                `
+              <p>
+                We are pleased to inform you that a new email and password have been successfully created by <strong> ${RoleBased?.user?.company_name}</strong> for new Team member.
+              </p>
+              <div>
+              <p><strong>Email Id:</strong> ${data.email}</p>
+               <p><strong>Phone Number:</strong> ${data.phone_number}</p>
+              </div>
+                        `
                 }),
             });
 
@@ -239,7 +249,7 @@ const AccessControlForm = () => {
                                 </div>
 
                                 <div className="mb-4">
-                                    <label className="w-[45%] md:w-[30%] block font-medium text-[#0E132A] text-sm md:text-base">
+                                    <label className="mb-2.5 w-[45%] md:w-[30%] block font-medium text-[#0E132A] text-sm md:text-base">
                                         Department
                                     </label>
                                     <div className="relative flex-grow">
@@ -298,9 +308,31 @@ const AccessControlForm = () => {
                                     )}
                                 </div>
 
+                                <div className="mb-4">
+                                    <label className="mb-2.5 w-[45%] md:w-[30%] block font-medium text-[#0E132A] text-sm md:text-base">
+                                        Phone Number
+                                    </label>
+                                    <div className="relative flex-grow">
+                                        <input
+                                            type="text"
+                                            placeholder="Enter Your Phone Number"
+                                            className="w-full  border border-stroke bg-transparent py-2 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none"
+                                            {...register("phone_number")}
+                                        />
+                                        <span className="hidden sm:block absolute right-4 top-2">
+                                            <FaPhoneVolume className="fill-current text-[18px] opacity-50" />
+                                        </span>
+                                    </div>
+                                    {errors.phone_number && (
+                                        <span className="text-warning font-semibold text-center mt-2">
+                                            {errors.phone_number.message}
+                                        </span>
+                                    )}
+                                </div>
+
                                 <div className="mb-6">
                                     <label className="mb-2.5 block font-medium text-[#0E132A]">
-                                        Password
+                                        Create Password
                                     </label>
                                     <div className="relative">
                                         <input
@@ -366,7 +398,6 @@ const AccessControlForm = () => {
                                     )}
                                 </div>
 
-                                {/* <div className=""> */}
                                 <button
                                     disabled={isSubmitting}
                                     type="submit"
@@ -374,7 +405,6 @@ const AccessControlForm = () => {
                                 >
                                     {isSubmitting ? <Loader2 /> : "Submit"}
                                 </button>
-                                {/* </div> */}
 
                                 {errors.root && (
                                     <div className="text-warning font-semibold text-center mt-5">

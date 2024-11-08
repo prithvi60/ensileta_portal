@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePDFJS } from "@/hooks/usePdfJS";
-import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
+import { FaArrowLeft, FaArrowRight, FaDownload } from "react-icons/fa6";
 import { GiVirtualMarker } from "react-icons/gi";
 import Slider from "react-slick";
 import ImageMarker, { Marker, MarkerComponentProps } from "react-image-marker";
@@ -9,6 +9,7 @@ import { FaCircleArrowUp } from "react-icons/fa6";
 import { useSession } from "next-auth/react";
 import { BiSolidMessageRoundedDots } from "react-icons/bi";
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
+import Link from "next/link";
 export default function ModernCarousel({
   pdf,
   version,
@@ -70,7 +71,15 @@ export default function ModernCarousel({
   const userName = session?.user?.name || "Unknown";
 
   return (
-    <div className="h-[30vw] min-h-[200px] max-h-[400px] bg-black relative overflow-hidden">
+    <div className="h-[30vw] min-h-[200px] max-h-[400px] bg-black relative">
+      {fileType === "viewboq" && (
+        <Link target='_blank' href={pdf} download className="absolute -top-9 sm:-top-11 lg:-top-14 right-2">
+          <button className="rounded-sm w-max p-2 bg-secondary hover:animate-pulse capitalize flex items-center gap-2">
+            <h4 className="tracking-wide text-sm md:text-base lg:text-lg text-white hidden sm:block">Download Now</h4>
+            <FaDownload className="text-lg lg:text-xl text-white" />
+          </button>
+        </Link>)}
+
       <button
         onClick={() => {
           setPrevIdx(idx);
@@ -242,14 +251,13 @@ const SpringModal = ({
 }) => {
   const [isMarkerEnabled, setIsMarkerEnabled] = useState<boolean>(false);
   const [index, setIndex] = useState<number>(0);
-  const [IsChanged, setIsChanged] = useState<boolean>(false);
   const transformWrapperRef = useRef<any>(null);
   const [markers, setMarkers] = useState<
     Array<Array<Marker & { comment?: string }>>
   >(
     Array.from(
       { length: images.length },
-      (_, index) => (index === 0 ? [] : []) // Other arrays remain empty
+      (_, index) => (index === 0 ? [] : [])
     )
   );
 
@@ -267,8 +275,9 @@ const SpringModal = ({
   }, [index]);
 
   const handleSliderChange = (newIndex: number) => {
-    setIndex(newIndex); // Update the index when the slider changes
+    setIndex(newIndex);
   };
+
   // Update the handleAddMarker function to accept an image index
   const handleAddMarker = (
     imageIndex: number,
@@ -303,12 +312,10 @@ const SpringModal = ({
     infinite: false,
     slidesToShow: 1,
     slidesToScroll: 1,
-    // autoplay: true,
-    // autoplaySpeed: 3000,
-    // speed: 1000,
     nextArrow: <NextArrow />,
     prevArrow: <PrevArrow />,
   };
+
   const toggleFullScreen = () => {
     const element = document.documentElement;
     if (!document.fullscreenElement) {
@@ -352,7 +359,7 @@ const SpringModal = ({
                 {images.map((src, idx) => {
                   return (
                     <div key={idx} className="w-full h-full">
-                      <TransformWrapper
+                      {/* <TransformWrapper
                         maxScale={4}
                         minScale={1}
                         initialScale={1}
@@ -360,36 +367,35 @@ const SpringModal = ({
                       >
                         <TransformComponent
                           wrapperStyle={{ width: '100%', height: '100%' }}
-                          contentStyle={{ width: '100%', height: '100%' }}>
-                          <ImageMarker
-                            key={idx}
-                            src={src}
+                          contentStyle={{ width: '100%', height: '100%' }}> */}
+                      <ImageMarker
+                        key={idx}
+                        src={src}
+                        markers={markers[idx] || []} // Pass markers for the current image
+                        onAddMarker={
+                          (marker: Marker) =>
+                            handleAddMarker(idx, marker, "", userName, userId) // Pass the current image index
+                        }
+                        markerComponent={(props) => (
+                          <CustomMarker
+                            {...props}
+                            onAddComment={(marker, comment) =>
+                              handleAddMarker(
+                                idx,
+                                marker,
+                                comment,
+                                userName,
+                                userId
+                              )
+                            } // Pass the current image index
                             markers={markers[idx] || []} // Pass markers for the current image
-                            onAddMarker={
-                              (marker: Marker) =>
-                                handleAddMarker(idx, marker, "", userName, userId) // Pass the current image index
-                            }
-                            markerComponent={(props) => (
-                              <CustomMarker
-                                setIsChanged={setIsChanged}
-                                {...props}
-                                onAddComment={(marker, comment) =>
-                                  handleAddMarker(
-                                    idx,
-                                    marker,
-                                    comment,
-                                    userName,
-                                    userId
-                                  )
-                                } // Pass the current image index
-                                markers={markers[idx] || []} // Pass markers for the current image
-                              />
-                            )}
-                            extraClass={`cursor-crosshair ${!isMarkerEnabled ? "pointer-events-none" : ""
-                              }`}
                           />
-                        </TransformComponent>
-                      </TransformWrapper>
+                        )}
+                        extraClass={`cursor-crosshair ${!isMarkerEnabled ? "pointer-events-none" : ""}`}
+
+                      />
+                      {/* </TransformComponent>
+                      </TransformWrapper> */}
                     </div>
                   );
                 })}
@@ -444,11 +450,9 @@ const CustomMarker = ({
   markers,
   top,
   left,
-  setIsChanged,
 }: MarkerComponentProps & {
   onAddComment: (marker: Marker, comment: string) => void;
   markers: any;
-  setIsChanged: Function;
 }) => {
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>("");
@@ -477,25 +481,19 @@ const CustomMarker = ({
   // @ts-ignore
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && inputRef.current) {
-      setIsChanged(0);
       const marker = { top, left };
       onAddComment(marker, inputValue); // Pass the comment back to the Page component
       setIsHovered(false);
       //   console.log("val", inputValue);
-    } else {
-      setIsChanged(false);
     }
   };
 
   const handleBtn = () => {
     if (inputRef.current) {
-      setIsChanged(true);
       const marker = { top, left };
       onAddComment(marker, inputValue); // Pass the comment back to the Page component
       setIsHovered(false);
       //   console.log("val", inputValue);
-    } else {
-      setIsChanged(false);
     }
   };
   return (
