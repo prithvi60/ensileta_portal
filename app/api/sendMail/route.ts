@@ -12,6 +12,23 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// Middleware to add CORS headers
+function setCorsHeaders(res: NextResponse) {
+  res.headers.set("Access-Control-Allow-Origin", "*"); // Or specify allowed origins
+  res.headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.headers.set(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization"
+  );
+  return res;
+}
+
+// Handle OPTIONS (Preflight) Request
+export async function OPTIONS() {
+  const res = new NextResponse(null);
+  return setCorsHeaders(res);
+}
+
 export async function POST(req: Request) {
   const {
     recipientEmail,
@@ -26,10 +43,11 @@ export async function POST(req: Request) {
   } = await req.json();
 
   if (!recipientEmail || !recipientType) {
-    return NextResponse.json(
+    const res = NextResponse.json(
       { success: false, message: "Recipient email(s) missing" },
       { status: 400 }
     );
+    return setCorsHeaders(res);
   }
 
   let mailOptions;
@@ -41,7 +59,7 @@ export async function POST(req: Request) {
       to: process.env.EMAIL_ID,
       subject: subject1,
       html: message1,
-      // bcc: ["prithvi@webibee.com"],
+      // bcc: [""],
     };
     if (message2 && employeeId) {
       notifyMailOptions = {
@@ -49,7 +67,7 @@ export async function POST(req: Request) {
         to: employeeId,
         subject: subject2,
         html: generateEmailTemplate(message2),
-        // bcc: ["prithvi@webibee.com"],
+        // bcc: [""],
       };
     }
   } else if (recipientType === "admin") {
@@ -59,22 +77,15 @@ export async function POST(req: Request) {
         to: recipientEmail,
         subject: subject3,
         html: generateEmailTemplate(message3),
-        // bcc: ["prithvi@webibee.com"],
+        // bcc: [""],
       };
     }
-    // if (message4) {
-    //   notifyMailOptions = {
-    //     from: process.env.EMAIL_ID,
-    //     to: employeeId,
-    //     subject: subject4,
-    //     html: generateEmailTemplate(message4),
-    //   };
-    // }
   } else {
-    return NextResponse.json(
+    const res = NextResponse.json(
       { success: false, message: "Invalid recipient type" },
       { status: 400 }
     );
+    return setCorsHeaders(res);
   }
 
   try {
@@ -88,17 +99,17 @@ export async function POST(req: Request) {
       await transporter.sendMail(notifyMailOptions);
     }
 
-    return NextResponse.json({
+    const res = NextResponse.json({
       success: true,
       message: "Email sent successfully",
     });
+    return setCorsHeaders(res);
   } catch (error) {
     console.error("Error sending email:", error);
-    return NextResponse.json(
+    const res = NextResponse.json(
       { success: false, message: "Error sending email" },
       { status: 500 }
     );
+    return setCorsHeaders(res);
   }
 }
-
-// please try again later
