@@ -74,7 +74,7 @@ export default function UploadFile({
             const result = await uploadFile({
                 variables: { fileUrl, filename: file.name, userId },
             });
-            console.log(result);
+            // console.log(result);
 
             //         const res = await fetch("/api/sendMail", {
             //             method: "POST",

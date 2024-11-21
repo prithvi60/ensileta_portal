@@ -1,7 +1,7 @@
 export function generateEmailTemplate(mainContent: any) {
-    const imageUrl =
-        "https://ik.imagekit.io/webibee/newlogo2.png?updatedAt=1730964119061";
-    return `
+  const imageUrl =
+    "https://ik.imagekit.io/webibee/newlogo2.png?updatedAt=1730964119061";
+  return `
     <!DOCTYPE html>
     <html lang="en">
     <head>
