@@ -20,8 +20,8 @@ interface GetAllBOQViewResponse {
 
 const Page = () => {
     const [uploadFile] = useMutation(ADD_BOQ_FILENAME);
-    const { data } = useQuery<GetAllBOQViewResponse>(GET_ALL_BOQ_VIEW);
-    const { data: AllUsers, loading, refetch } = useQuery(GET_USERS);
+    const { data, loading } = useQuery<GetAllBOQViewResponse>(GET_ALL_BOQ_VIEW);
+    const { data: AllUsers, refetch } = useQuery(GET_USERS);
     const pathname = usePathname();
     const fileType = pathname.split("/").pop();
     const lastItem =

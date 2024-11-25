@@ -20,8 +20,8 @@ interface GetAllMBViewResponse {
 
 const Page = () => {
     const [uploadFile] = useMutation(ADD_MB_FILENAME);
-    const { data } = useQuery<GetAllMBViewResponse>(GET_ALL_MB_VIEW);
-    const { data: AllUsers, loading, refetch } = useQuery(GET_USERS);
+    const { data, loading } = useQuery<GetAllMBViewResponse>(GET_ALL_MB_VIEW);
+    const { data: AllUsers, refetch } = useQuery(GET_USERS);
     const pathname = usePathname();
     const fileType = pathname.split("/").pop();
     const lastItem =

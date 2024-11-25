@@ -8,8 +8,19 @@ import ImageMarker, { Marker, MarkerComponentProps } from "react-image-marker";
 import { FaCircleArrowUp } from "react-icons/fa6";
 import { useSession } from "next-auth/react";
 import { BiSolidMessageRoundedDots } from "react-icons/bi";
-import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
 import Link from "next/link";
+
+declare global {
+  interface HTMLElement {
+    webkitRequestFullscreen?: () => Promise<void>;
+  }
+
+  interface Document {
+    webkitExitFullscreen?: () => Promise<void>;
+    webkitFullscreenElement?: Element;
+  }
+}
+
 export default function ModernCarousel({
   pdf,
   version,
@@ -30,13 +41,17 @@ export default function ModernCarousel({
   const [idx, setIdx] = useState(0);
   const [prevIdx, setPrevIdx] = useState(idx);
   const [imgs, setImgs] = useState<string[]>([]);
-
   const [isOpen, setIsOpen] = useState(false);
+  const { data: session } = useSession();
+  const userName = session?.user?.name || "Unknown";
+  // console.log(pdf);
 
   usePDFJS(async (pdfjs) => {
     try {
-      const url = pdf;
-      const response = await fetch(url);
+      // const url = pdf;
+      const response = await fetch(pdf);
+      if (!response.ok) throw new Error("PDF file not found");
+
       const data = await response.arrayBuffer();
       const loadingTask = pdfjs.getDocument(new Uint8Array(data));
       const pdfDocument = await loadingTask.promise;
@@ -67,8 +82,6 @@ export default function ModernCarousel({
 
   const trend = idx > prevIdx ? 1 : -1;
   const imageIndex = Math.abs(idx % imgs.length);
-  const { data: session } = useSession();
-  const userName = session?.user?.name || "Unknown";
 
   return (
     <div className="h-[30vw] min-h-[200px] max-h-[400px] bg-black relative">
@@ -317,15 +330,28 @@ const SpringModal = ({
   };
 
   const toggleFullScreen = () => {
-    const element = document.documentElement;
-    if (!document.fullscreenElement) {
-      element.requestFullscreen().catch((err) => {
-        console.error(
-          `Error attempting to enable full-screen mode: ${err.message} (${err.name})`
-        );
-      });
+    const element = document.documentElement; // Use the root element for full screen
+    if (
+      !document.fullscreenElement &&
+      !document.webkitFullscreenElement // Safari fallback
+    ) {
+      // Request full-screen mode
+      if (element.requestFullscreen) {
+        element.requestFullscreen().catch((err) => {
+          console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+        });
+      } else if (element.webkitRequestFullscreen) {
+        // Fallback for iOS Safari
+        element.webkitRequestFullscreen();
+      }
     } else {
-      document.exitFullscreen();
+      // Exit full-screen mode
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        // Fallback for iOS Safari
+        document.webkitExitFullscreen();
+      }
     }
   };
 

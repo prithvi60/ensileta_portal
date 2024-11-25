@@ -9,7 +9,7 @@ const Header = (props: {
 }) => {
   // const [signUp, { data, loading, error }] = useMutation(SIGN_UP);
   // console.log(data);
-  const { data: session } = useSession();
+  const { data: session, status: sessionStatus } = useSession();
   // const { name } = useParams();
 
   const role = session?.user?.role;
@@ -60,12 +60,15 @@ const Header = (props: {
             <Image alt="logo" src={"/logo/newlogo.png"} fill />
           </div>
           {/* <div className=""> */}
-          {role !== "super admin" && role !== "contact admin" &&
-            role !== "design admin" && (
-              <div className="hidden sm:block sm:max-w-48 md:max-w-72 xl:max-w-xl w-full">
-                <MarqueeSb />
-              </div>
-            )}
+          {sessionStatus === "loading" ? (<div></div>) : (<>
+            {role !== "super admin" && role !== "contact admin" &&
+              role !== "design admin" && (
+                <div className="hidden sm:block sm:max-w-48 md:max-w-72 xl:max-w-xl w-full">
+                  <MarqueeSb />
+                </div>
+              )}
+          </>)}
+
           {/* </div> */}
         </div>
 

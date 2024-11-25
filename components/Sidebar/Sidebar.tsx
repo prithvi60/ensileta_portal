@@ -12,8 +12,6 @@ import { FaFileInvoice, FaQ } from "react-icons/fa6";
 import { SiLibreofficedraw } from "react-icons/si";
 import { GET_EMPLOYEE, GET_USERS } from "@/lib/Queries";
 import { useQuery } from "@apollo/client";
-import { useParams } from "next/navigation";
-import { MarqueeSb } from "../Header/MarqueeUpdated";
 import { FaFlipboard } from "react-icons/fa";
 import { MdApproval } from "react-icons/md";
 
@@ -26,14 +24,41 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const [pageName, setPageName] = useLocalStorage("selectedMenu", "");
   const [search, setSearch] = useState<string>("");
   const [filteredData, setFilteredData] = useState<any[]>([]);
-  const { data: session } = useSession();
+  const { data: session, status: sessionStatus } = useSession();
   // const { name } = useParams();
-  const { data: employee } = useQuery(GET_EMPLOYEE);
-  const { data: allUsers, loading } = useQuery(GET_USERS);
+  const { data: employee, loading: employeeLoading } = useQuery(GET_EMPLOYEE);
+  const { data: allUsers, loading: usersLoading } = useQuery(GET_USERS);
 
   const role = session?.user?.role;
   const userName = session?.user?.name;
   const employeeUserName = employee?.getEmployeeUser?.username;
+
+  const admins = useMemo(() => {
+    return allUsers?.users?.filter((val: any) => val.role === "admin") || [];
+  }, [allUsers]);
+
+  const admins2 = useMemo(() => {
+    return (
+      allUsers?.users?.filter((val: any) => val.username === userName) || []
+    );
+  }, [allUsers, userName]);
+
+  const sortedCompanies = admins.sort((a: any, b: any) =>
+    a?.company_name.localeCompare(b?.company_name, undefined, {
+      sensitivity: "base",
+    })
+  );
+
+  useEffect(() => {
+    if (search.trim()) {
+      const results = sortedCompanies.filter((val: any) =>
+        val?.company_name?.toLowerCase().includes(search.toLowerCase())
+      );
+      setFilteredData(results);
+    } else {
+      setFilteredData(sortedCompanies);
+    }
+  }, [search, sortedCompanies]);
 
   const menuGroups = [
     {
@@ -115,30 +140,14 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     },
   ];
 
-  const admins = useMemo(() => {
-    return allUsers?.users?.filter((val: any) => val.role === "admin") || [];
-  }, [allUsers]);
-
-  const admins2 = useMemo(() => {
-    return allUsers?.users?.filter((val: any) => val.username === userName) || [];
-  }, [allUsers, userName]);
-
-  const sortedCompanies = admins.sort((a: any, b: any) =>
-    a?.company_name.localeCompare(b?.company_name, undefined, {
-      sensitivity: "base",
-    })
-  );
-
-  useEffect(() => {
-    if (search.trim()) {
-      const results = sortedCompanies.filter((val: any) =>
-        val?.company_name?.toLowerCase().includes(search.toLowerCase())
-      );
-      setFilteredData(results);
-    } else {
-      setFilteredData(sortedCompanies);
-    }
-  }, [search, sortedCompanies]);
+  // Display loading if session or user data is not ready
+  // if (sessionStatus === "loading" || usersLoading || employeeLoading) {
+  //   return (
+  //     <aside className="flex justify-center items-center h-full w-full">
+  //       <Loader />
+  //     </aside>
+  //   );
+  // }
 
   return (
     <ClickOutside onClick={() => setSidebarOpen(false)}>
@@ -146,19 +155,28 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         className={`fixed left-0 top-0 z-[1001] flex h-screen w-72.5 flex-col overflow-y-hidden bg-primary duration-300 ease-linear lg:translate-x-0 gap-4 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
           }`}
       >
+        {/* {sessionStatus === null || usersLoading || employeeLoading ? (
+          <div className="flex justify-center items-center gap-2.5 h-full w-full px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out text-xl capitalize line-clamp-2">
+            Loading...
+          </div>
+        ) : (
+          <> */}
         {/* <!-- SIDEBAR HEADER --> */}
         <div className="flex flex-col gap-8 px-6 pt-5.5 pb-3.5 lg:pb-4.5 lg:pt-6.5">
           <>
             {role === "employee" ? (
               <div className="space-y-1 text-white relative">
                 <h2 className="text-2xl ml-5 capitalize font-semibold tracking-wider">{`Hi, ${employeeUserName}`}</h2>
-                <p className="absolute -bottom-7 left-0  text-sm md:text-base tracking-wide capitalize font-medium transition-all duration-700 ease-in">{admins2[0]?.company_name}</p>
-
+                <p className="absolute -bottom-7 left-0  text-sm md:text-base tracking-wide capitalize font-medium transition-all duration-700 ease-in">
+                  {admins2[0]?.company_name}
+                </p>
               </div>
             ) : (
               <div className="space-y-1 text-white relative">
                 <h2 className="text-2xl capitalize font-semibold tracking-wider">{`Hi, ${userName}`}</h2>
-                <p className="absolute -bottom-7 left-0 text-sm md:text-base tracking-wide capitalize font-medium transition-all duration-700 ease-in">{admins2[0]?.company_name}</p>
+                <p className="absolute -bottom-7 left-0 text-sm md:text-base tracking-wide capitalize font-medium transition-all duration-700 ease-in">
+                  {admins2[0]?.company_name}
+                </p>
               </div>
             )}
             {(role === "super admin" ||
@@ -200,73 +218,69 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
           {/* )} */}
         </div>
         {/* <!-- SIDEBAR HEADER --> */}
-
+        {/* {sessionStatus === null || usersLoading || employeeLoading ? (
+          <div className="flex justify-center items-center gap-2.5 h-full w-full px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out text-xl capitalize line-clamp-2">
+            Loading...
+          </div>
+        ) : ( */}
         <div className="no-scrollbar flex flex-col overflow-y-auto sidebar_scroll duration-300 ease-linear h-full max-h-[75vh]">
-          {/* <!-- Sidebar Menu --> */}
-          {role === "super admin" ||
-            role === "contact admin" ||
-            role === "design admin" ? (
-            <>
-              {loading ? (
-                <div className="flex justify-center items-center gap-2.5 h-full w-full px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out text-xl capitalize line-clamp-2">
-                  Loading...
-                </div>
-              ) : (
-                <nav className="px-4 py-4 lg:px-6">
-                  {filteredData?.map((group: any, groupIndex: number) => (
-                    <div key={groupIndex}>
-                      <ul className="mb-6 flex flex-col gap-1.5">
-                        <SidebarItem
-                          key={groupIndex}
-                          item={""}
-                          pageName={pageName}
-                          setPageName={setPageName}
-                          companyName={group?.company_name}
-                        />
-                      </ul>
-                    </div>
-                  ))}
-                </nav>
-              )}
-            </>
-          ) : (
-            <nav className="px-4 py-4 lg:px-6">
-              {menuGroups.map((group, groupIndex) => (
-                <div key={groupIndex}>
-                  {/* <h3 className="mb-4 ml-4 capitalize text-xl font-semibold text-bodydark2">
-                    {group.name}
-                  </h3> */}
-
-                  <ul className="mb-6 flex flex-col gap-1.5">
-                    {group.menuItems.map((menuItem, menuIndex) => (
+          {sessionStatus === "loading" ? (<div className="flex justify-center items-center gap-2.5 h-full w-full px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out text-xl capitalize line-clamp-2">
+            Loading...
+          </div>) : (<>
+            {role === "super admin" ||
+              role === "contact admin" ||
+              role === "design admin" ? (
+              // <>
+              //   {sessionStatus === "loading" ? (
+              //     <div className="flex justify-center items-center gap-2.5 h-full w-full px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out text-xl capitalize line-clamp-2">
+              //       Loading...
+              //     </div>
+              // ) : (
+              <nav className="px-4 py-4 lg:px-6">
+                {filteredData?.map((group: any, groupIndex: number) => (
+                  <div key={groupIndex}>
+                    <ul className="mb-6 flex flex-col gap-1.5">
                       <SidebarItem
-                        key={menuIndex}
-                        item={menuItem}
+                        key={groupIndex}
+                        item={""}
                         pageName={pageName}
                         setPageName={setPageName}
-                        companyName={""}
+                        companyName={group?.company_name}
                       />
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </nav>
-          )}
+                    </ul>
+                  </div>
+                ))}
+              </nav>
+              //   )}
+              // </>
+            ) : (
+              <nav className="px-4 py-4 lg:px-6">
+                {menuGroups.map((group, groupIndex) => (
+                  <div key={groupIndex}>
+                    <ul className="mb-6 flex flex-col gap-1.5">
+                      {group.menuItems.map((menuItem, menuIndex) => (
+                        <SidebarItem
+                          key={menuIndex}
+                          item={menuItem}
+                          pageName={pageName}
+                          setPageName={setPageName}
+                          companyName={""}
+                        />
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </nav>
+            )}
+          </>)}
+          {/* <!-- Sidebar Menu --> */}
+
           {/* <!-- Sidebar Menu --> */}
         </div>
-        {/* {role !== "super admin" && (
-          <section className="fixed bottom-0 my-2 sm:max-w-48 md:max-w-72 xl:max-w-xl w-full space-y-2">
-            <h4 className="text-2xl ml-5 capitalize font-semibold tracking-wider text-white mb-8" >Our Partners</h4>
-            <MarqueeSb />
-          </section>
-        )} */}
+        {/* )} */}
       </aside>
     </ClickOutside>
   );
 };
 
 export default Sidebar;
-
-// john@ensileta.com
-// contact@ensileta.com
-// design@ensileta.com
