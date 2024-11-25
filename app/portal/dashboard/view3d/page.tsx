@@ -20,8 +20,8 @@ interface GetAll3DViewResponse {
 
 const Page = () => {
     const [uploadFile] = useMutation(ADD_3D_FILENAME);
-    const { data } = useQuery<GetAll3DViewResponse>(GET_ALL_3D_VIEW);
-    const { data: AllUsers, loading, refetch } = useQuery(GET_USERS);
+    const { data, loading } = useQuery<GetAll3DViewResponse>(GET_ALL_3D_VIEW);
+    const { data: AllUsers, refetch } = useQuery(GET_USERS);
     const pathname = usePathname();
     const fileType = pathname.split("/").pop();
     const lastItem =

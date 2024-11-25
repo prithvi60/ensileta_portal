@@ -20,8 +20,8 @@ interface GetAllABViewResponse {
 
 const Page = () => {
     const [uploadFile] = useMutation(ADD_AB_FILENAME);
-    const { data } = useQuery<GetAllABViewResponse>(GET_ALL_AB_VIEW);
-    const { data: AllUsers, loading, refetch } = useQuery(GET_USERS);
+    const { data, loading } = useQuery<GetAllABViewResponse>(GET_ALL_AB_VIEW);
+    const { data: AllUsers, refetch } = useQuery(GET_USERS);
     const pathname = usePathname();
     const fileType = pathname.split("/").pop();
     const lastItem =
