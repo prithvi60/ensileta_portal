@@ -113,7 +113,7 @@ export const ModalWrapper2D = ({
   userId: number;
   email: string;
   refetchUsers: any;
-  fileType:string
+  fileType: string
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
@@ -281,12 +281,6 @@ export const ViewModalWrapper = ({
       >
         View
       </button>
-      {/* <FsLightbox
-                exitFullscreenOnClose={true}
-                toggler={toggle}
-                sources={imgs.length > 0 ? imgs : []}
-                type="image"
-            /> */}
       <SpringModal2
         isOpen={toggle}
         setIsOpen={setToggle}
@@ -358,7 +352,7 @@ const SpringModal2 = ({
 
   const handleClose = () => {
     setIsOpen(false);
-    toggleFullScreen()
+    toggleFullScreen(isOpen)
   };
 
   const settings = {
@@ -372,24 +366,32 @@ const SpringModal2 = ({
     nextArrow: <NextArrow />,
     prevArrow: <PrevArrow />,
   };
-  const toggleFullScreen = () => {
+
+  const toggleFullScreen = (shouldEnterFullScreen: any) => {
     const element = document.documentElement; // Get the document element
-    if (!document.fullscreenElement) {
-      element.requestFullscreen().catch((err) => {
-        console.error(
-          `Error attempting to enable full-screen mode: ${err.message} (${err.name})`
-        );
-      });
+    if (shouldEnterFullScreen) {
+      // Enter full-screen mode if not already in it
+      if (!document.fullscreenElement) {
+        element.requestFullscreen().catch((err) => {
+          console.error(
+            `Error attempting to enable full-screen mode: ${err.message} (${err.name})`
+          );
+        });
+      }
     } else {
-      document.exitFullscreen();
+      // Exit full-screen mode if currently in it
+      if (document.fullscreenElement) {
+        document.exitFullscreen().catch((err) => {
+          console.error(
+            `Error attempting to exit full-screen mode: ${err.message} (${err.name})`
+          );
+        });
+      }
     }
   };
   useEffect(() => {
-    if (isOpen) {
-
-      toggleFullScreen()
-    }
-  }, [isOpen])
+    toggleFullScreen(isOpen);
+  }, [isOpen]);
   return (
     <AnimatePresence>
       {isOpen && (

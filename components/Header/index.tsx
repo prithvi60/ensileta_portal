@@ -62,7 +62,7 @@ const Header = (props: {
           {/* <div className=""> */}
           {sessionStatus === "loading" ? (<div></div>) : (<>
             {role !== "super admin" && role !== "contact admin" &&
-              role !== "design admin" && (
+              role !== "design admin" && role !== "project admin" && (
                 <div className="hidden sm:block sm:max-w-48 md:max-w-72 xl:max-w-xl w-full">
                   <MarqueeSb />
                 </div>

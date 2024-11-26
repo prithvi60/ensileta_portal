@@ -46,13 +46,13 @@ const SidebarItem = ({ item, pageName, setPageName, companyName }: any) => {
   return (
     <>
       {item === "" ? (
-        <li className={` ${pageName === companyName ? "bg-blue-900 " : ""} flex items-center gap-2.5  hover:bg-blue-900/50 cursor-pointer`}>
+        <li
+          onClick={handleClickForEmployee} className={` ${pageName === companyName ? "bg-blue-900 " : ""} flex items-center gap-2.5  hover:bg-blue-900/50 cursor-pointer`}>
           <div className="p-1 rounded-md bg-secondary">
-            <SiVorondesign className="text-4xl sm:text-5xl text-white" />
+            <SiVorondesign className="text-3xl md:text-4xl 2xl:text-5xl text-white" />
           </div>
           <div
             // href={hrefValue}
-            onClick={handleClickForEmployee}
             className={` relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out text-base capitalize line-clamp-2`}
           >
             {companyName}

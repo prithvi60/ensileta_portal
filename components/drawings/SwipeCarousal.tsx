@@ -28,7 +28,7 @@ export default function ModernCarousel({
   createMarkerGroup,
   userId,
   markerData,
-  fileType
+  fileType,
 }: {
   pdf: string;
   version: number;
@@ -36,7 +36,7 @@ export default function ModernCarousel({
   createMarkerGroup: any;
   userId: number;
   markerData: any;
-  fileType: string
+  fileType: string;
 }) {
   const [idx, setIdx] = useState(0);
   const [prevIdx, setPrevIdx] = useState(idx);
@@ -83,16 +83,41 @@ export default function ModernCarousel({
   const trend = idx > prevIdx ? 1 : -1;
   const imageIndex = Math.abs(idx % imgs.length);
 
+  // Add a keydown event listener to handle navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") {
+        // Navigate to the previous image
+        setPrevIdx(idx);
+        setIdx((prev) => prev - 1);
+      } else if (e.key === "ArrowRight") {
+        // Navigate to the next image
+        setPrevIdx(idx);
+        setIdx((prev) => prev + 1);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [idx, setIdx, setPrevIdx]);
+
+  const handlePointerDown = (e: React.PointerEvent<HTMLImageElement>) => {
+    if (e.pointerType === "touch" || e.pointerType === "mouse") {
+      e.preventDefault(); // Prevent default actions for both mouse and touch inputs
+    }
+  };
+
   return (
-    <div className="h-[30vw] min-h-[200px] max-h-[400px] bg-black relative">
-      {fileType === "viewboq" && (
+    <div className="h-[30vw] min-h-[200px] max-h-[350px] bg-black relative w-full max-w-6xl mx-auto overflow-hidden">
+      {/* {fileType === "viewboq" && (
         <Link target='_blank' href={pdf} download className="absolute -top-9 sm:-top-11 lg:-top-14 right-2">
           <button className="rounded-sm w-max p-2 bg-secondary hover:animate-pulse capitalize flex items-center gap-2">
             <h4 className="tracking-wide text-sm md:text-base lg:text-lg text-white hidden sm:block">Download Now</h4>
             <FaDownload className="text-lg lg:text-xl text-white" />
           </button>
-        </Link>)}
-
+        </Link>)} */}
       <button
         onClick={() => {
           setPrevIdx(idx);
@@ -130,6 +155,8 @@ export default function ModernCarousel({
               style={{ y: "-50%", x: "-50%" }}
               className="aspect-square max-h-[90%] max-w-[calc(100%_-_80px)] mx-auto bg-black object-cover shadow-2xl absolute left-1/2 top-1/2"
               onContextMenu={(e) => e.preventDefault()} // Disable right-click
+              onPointerDown={(e) => handlePointerDown(e)} // Handle tap-and-hold on mobile
+              draggable="false" // Disable drag-and-drop
             />
           ) : (
             <motion.img
@@ -145,6 +172,8 @@ export default function ModernCarousel({
               style={{ y: "-50%", x: "-50%" }}
               className="aspect-video max-h-[90%] max-w-[calc(100%_-_80px)] mx-auto bg-black object-contain shadow-2xl absolute left-1/2 top-1/2"
               onContextMenu={(e) => e.preventDefault()} // Disable right-click
+              onPointerDown={(e) => handlePointerDown(e)} // Handle tap-and-hold on mobile
+              draggable="false" // Disable drag-and-drop
             />
           )}
         </AnimatePresence>
@@ -250,7 +279,7 @@ const SpringModal = ({
   userName,
   userId,
   id,
-  fileType
+  fileType,
 }: {
   isOpen: boolean;
   setIsOpen: Function;
@@ -260,18 +289,16 @@ const SpringModal = ({
   userId: number;
   id: number;
   markerData: any;
-  fileType: string
+  fileType: string;
 }) => {
   const [isMarkerEnabled, setIsMarkerEnabled] = useState<boolean>(false);
   const [index, setIndex] = useState<number>(0);
   const transformWrapperRef = useRef<any>(null);
+  const sliderRef = useRef<Slider | null>(null);
   const [markers, setMarkers] = useState<
     Array<Array<Marker & { comment?: string }>>
   >(
-    Array.from(
-      { length: images.length },
-      (_, index) => (index === 0 ? [] : [])
-    )
+    Array.from({ length: images.length }, (_, index) => (index === 0 ? [] : []))
   );
 
   useEffect(() => {
@@ -286,6 +313,30 @@ const SpringModal = ({
       transformWrapperRef.current.resetTransform();
     }
   }, [index]);
+
+  // Key-down event for slider navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") {
+        // Navigate to the previous slide
+        if (sliderRef.current && index > 0) {
+          sliderRef.current.slickPrev();
+        }
+      } else if (e.key === "ArrowRight") {
+        // Navigate to the next slide
+        if (sliderRef.current && index < images.length - 1) {
+          sliderRef.current.slickNext();
+        }
+      }
+    };
+
+    if (isOpen) {
+      window.addEventListener("keydown", handleKeyDown);
+    }
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, index, images.length]);
 
   const handleSliderChange = (newIndex: number) => {
     setIndex(newIndex);
@@ -315,8 +366,7 @@ const SpringModal = ({
       await createMarkerGroup(markers);
     } finally {
       setIsOpen(false);
-      toggleFullScreen()
-
+      toggleFullScreen(isOpen);
     }
   };
 
@@ -325,42 +375,57 @@ const SpringModal = ({
     infinite: false,
     slidesToShow: 1,
     slidesToScroll: 1,
-    nextArrow: <NextArrow />,
-    prevArrow: <PrevArrow />,
+    nextArrow: (
+      <NextArrow
+        currentSlide={index}
+        slideCount={images.length}
+      />
+    ),
+    prevArrow: (
+      <PrevArrow
+        currentSlide={index}
+      />
+    ),
+    afterChange: (current: number) => setIndex(current),
   };
 
-  const toggleFullScreen = () => {
+  const toggleFullScreen = (shouldEnterFullScreen: boolean) => {
     const element = document.documentElement; // Use the root element for full screen
-    if (
-      !document.fullscreenElement &&
-      !document.webkitFullscreenElement // Safari fallback
-    ) {
-      // Request full-screen mode
-      if (element.requestFullscreen) {
-        element.requestFullscreen().catch((err) => {
-          console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
-        });
-      } else if (element.webkitRequestFullscreen) {
-        // Fallback for iOS Safari
-        element.webkitRequestFullscreen();
+
+    if (shouldEnterFullScreen) {
+      // Enter full-screen mode
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        if (element.requestFullscreen) {
+          element.requestFullscreen().catch((err) => {
+            console.error(
+              `Error attempting to enable full-screen mode: ${err.message} (${err.name})`
+            );
+          });
+        } else if (element.webkitRequestFullscreen) {
+          // Safari fallback
+          element.webkitRequestFullscreen();
+        }
       }
     } else {
       // Exit full-screen mode
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      } else if (document.webkitExitFullscreen) {
-        // Fallback for iOS Safari
-        document.webkitExitFullscreen();
+      if (document.fullscreenElement || document.webkitFullscreenElement) {
+        if (document.exitFullscreen) {
+          document.exitFullscreen().catch((err) => {
+            console.error(
+              `Error attempting to exit full-screen mode: ${err.message} (${err.name})`
+            );
+          });
+        } else if (document.webkitExitFullscreen) {
+          // Safari fallback
+          document.webkitExitFullscreen();
+        }
       }
     }
   };
 
   useEffect(() => {
-    if (isOpen) {
-
-      toggleFullScreen()
-    }
-  }, [isOpen])
+    toggleFullScreen(isOpen);
+  }, [isOpen]);
 
   return (
     <AnimatePresence>
@@ -381,7 +446,7 @@ const SpringModal = ({
             onContextMenu={(e) => e.preventDefault()} // Disable right-click
           >
             <div className="slider-container">
-              <Slider {...settings} afterChange={handleSliderChange}>
+              <Slider {...settings} ref={sliderRef} afterChange={handleSliderChange}>
                 {images.map((src, idx) => {
                   return (
                     <div key={idx} className="w-full h-full">
@@ -417,8 +482,8 @@ const SpringModal = ({
                             markers={markers[idx] || []} // Pass markers for the current image
                           />
                         )}
-                        extraClass={`cursor-crosshair ${!isMarkerEnabled ? "pointer-events-none" : ""}`}
-
+                        extraClass={`cursor-crosshair ${!isMarkerEnabled ? "pointer-events-none" : ""
+                          }`}
                       />
                       {/* </TransformComponent>
                       </TransformWrapper> */}
@@ -428,43 +493,45 @@ const SpringModal = ({
               </Slider>
             </div>
           </motion.div>
-          <div className="fixed top-0 left-0 flex" >
+          <div className="fixed top-0 left-0 flex">
             <div className="p-2 text-white bg-secondary">
               {index + 1} / {images.length}
             </div>
             <button
               onClick={(e) => {
                 e.stopPropagation(); // Prevent event from bubbling up
-                handleClose()
+                handleClose();
               }}
               className="bg-secondary hover:bg-primary transition-colors text-white p-2 ml-4"
             >
               Close Screen
             </button>
           </div>
-          {fileType !== "viewboq" && (<div
-            className="fixed top-0 right-0 flex bg-white"
-            onClick={(e) => {
-              e.stopPropagation(); // Prevent event from bubbling up
-            }}
-          >
-            {isMarkerEnabled && (
-              <div className="text-black text-sm p-2 text-justify items-center flex">
-                Click anywhere to add comment. Please Enter/ click Arrow button to save.
-              </div>
-            )}
-            <button
-              type="submit"
-              className="cursor-pointer w-max-xontent  p-4 shadow-md select-none bg-secondary text-white hover:bg-primary"
+          {fileType !== "viewboq" && (
+            <div
+              className="fixed top-0 right-0 flex bg-white"
               onClick={(e) => {
-                e.stopPropagation();
-                setIsMarkerEnabled((o) => !o);
+                e.stopPropagation(); // Prevent event from bubbling up
               }}
             >
-              {isMarkerEnabled ? "Close Remarks" : "Add Remarks"}
-            </button>
-          </div>)}
-
+              {isMarkerEnabled && (
+                <div className="text-black text-sm p-2 text-justify items-center flex">
+                  Click anywhere to add comment. Please Enter/ click Arrow
+                  button to save.
+                </div>
+              )}
+              <button
+                type="submit"
+                className="cursor-pointer w-max-xontent  p-4 shadow-md select-none bg-secondary text-white hover:bg-primary"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsMarkerEnabled((o) => !o);
+                }}
+              >
+                {isMarkerEnabled ? "Close Remarks" : "Add Remarks"}
+              </button>
+            </div>
+          )}
         </motion.div>
       )}
     </AnimatePresence>
@@ -530,7 +597,9 @@ const CustomMarker = ({
     >
       {isHovered ? (
         <div className="relative bg-primary bg-opacity-30 rounded-lg p-2">
-          <label className="mb-.5 block font-extrabold text-white drop-shadow-lg">{user}</label>
+          <label className="mb-.5 block font-extrabold text-white drop-shadow-lg">
+            {user}
+          </label>
           <div className="relative">
             <textarea
               ref={inputRef}
@@ -562,31 +631,42 @@ const CustomMarker = ({
   );
 };
 
-function NextArrow(props: any) {
-  const { onClick } = props;
+function NextArrow({
+  currentSlide,
+  slideCount,
+  onClick,
+}: {
+  currentSlide: number;
+  slideCount: number;
+  onClick?: () => void;
+}) {
+  const isDisabled = currentSlide === slideCount - 1;
   return (
     <div
-      className={
-        "p-1.5 md:p-2 xl:p-3 rounded-full bg-primary absolute top-[25%] cursor-pointer -right-5 md:-right-10 xl:-right-14 group"
-      }
-      onClick={onClick}
+      className={`p-1.5 md:p-2 xl:p-3 rounded-full ${isDisabled ? "bg-gray-400 cursor-not-allowed" : "bg-primary cursor-pointer"
+        } absolute top-[25%] -right-5 md:-right-10 xl:-right-14 group`}
+      onClick={!isDisabled ? onClick : undefined}
     >
       <FaArrowRight className="text-sm text-white md:text-lg xl:text-xl group-hover:text-secondary" />
     </div>
   );
 }
 
-function PrevArrow(props: any) {
-  const { onClick } = props;
+function PrevArrow({
+  currentSlide,
+  onClick,
+}: {
+  currentSlide: number;
+  onClick?: () => void;
+}) {
+  const isDisabled = currentSlide === 0;
   return (
     <div
-      className={
-        "p-1.5 md:p-2 xl:p-3 rounded-full bg-primary absolute top-[25%] cursor-pointer -left-5 md:-left-10 xl:-left-14 group"
-      }
-      onClick={onClick}
+      className={`p-1.5 md:p-2 xl:p-3 rounded-full ${isDisabled ? "bg-gray-400 cursor-not-allowed" : "bg-primary cursor-pointer"
+        } absolute top-[25%] -left-5 md:-left-10 xl:-left-14 group`}
+      onClick={!isDisabled ? onClick : undefined}
     >
       <FaArrowLeft className="text-sm text-white md:text-lg xl:text-xl group-hover:text-secondary" />
     </div>
   );
 }
-
