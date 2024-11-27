@@ -9,6 +9,8 @@ import { FaCircleArrowUp } from "react-icons/fa6";
 import { useSession } from "next-auth/react";
 import { BiSolidMessageRoundedDots } from "react-icons/bi";
 import Link from "next/link";
+import { Loader } from "../Loader";
+import Loader2 from "../Loader2";
 
 declare global {
   interface HTMLElement {
@@ -42,13 +44,14 @@ export default function ModernCarousel({
   const [prevIdx, setPrevIdx] = useState(idx);
   const [imgs, setImgs] = useState<string[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { data: session } = useSession();
   const userName = session?.user?.name || "Unknown";
   // console.log(pdf);
 
   usePDFJS(async (pdfjs) => {
     try {
-      // const url = pdf;
+      setLoading(true);
       const response = await fetch(pdf);
       if (!response.ok) throw new Error("PDF file not found");
 
@@ -75,8 +78,10 @@ export default function ModernCarousel({
         }
       }
       setImgs(imgArray);
+      setLoading(false);
     } catch (error) {
       console.error("Error loading PDF:", error);
+      setLoading(false);
     }
   });
 
@@ -110,7 +115,7 @@ export default function ModernCarousel({
   };
 
   return (
-    <div className="h-[30vw] min-h-[200px] max-h-[350px] bg-black relative w-full max-w-6xl mx-auto overflow-hidden">
+    <div className="h-[250px] 2xl:h-[390px] bg-black relative w-full max-w-6xl mx-auto overflow-hidden">
       {/* {fileType === "viewboq" && (
         <Link target='_blank' href={pdf} download className="absolute -top-9 sm:-top-11 lg:-top-14 right-2">
           <button className="rounded-sm w-max p-2 bg-secondary hover:animate-pulse capitalize flex items-center gap-2">
@@ -159,22 +164,27 @@ export default function ModernCarousel({
               draggable="false" // Disable drag-and-drop
             />
           ) : (
-            <motion.img
-              onClick={() => setIsOpen(true)}
-              variants={imgVariants}
-              custom={trend}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              key={imgs[imageIndex]}
-              src={"/logo/newlogo.png"}
-              alt={"image"}
-              style={{ y: "-50%", x: "-50%" }}
-              className="aspect-video max-h-[90%] max-w-[calc(100%_-_80px)] mx-auto bg-black object-contain shadow-2xl absolute left-1/2 top-1/2"
-              onContextMenu={(e) => e.preventDefault()} // Disable right-click
-              onPointerDown={(e) => handlePointerDown(e)} // Handle tap-and-hold on mobile
-              draggable="false" // Disable drag-and-drop
-            />
+            <div className="relative w-full h-full">
+              <motion.img
+                onClick={() => setIsOpen(true)}
+                variants={imgVariants}
+                custom={trend}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                key={imgs[imageIndex]}
+                src={"/logo/newlogo.png"}
+                alt={"image"}
+                style={{ y: "-50%", x: "-50%" }}
+                className="aspect-video max-h-[90%] max-w-[calc(100%_-_80px)] mx-auto bg-black object-contain shadow-2xl absolute left-1/2 top-1/2"
+                onContextMenu={(e) => e.preventDefault()} // Disable right-click
+                onPointerDown={(e) => handlePointerDown(e)} // Handle tap-and-hold on mobile
+                draggable="false" // Disable drag-and-drop
+              />
+              {/* <div className={`${loading ? "block " : "hidden"} absolute bottom-40 right-96`}>
+                <Loader2 />
+              </div> */}
+            </div>
           )}
         </AnimatePresence>
       </div>
@@ -202,7 +212,9 @@ export default function ModernCarousel({
         </svg>
       </button>
       <AnimatePresence initial={false} custom={trend}>
-        <motion.span
+        {loading ? (<div className={`p-2 rounded-lg absolute z-20 left-10 bottom-4 bg-white/10 backdrop-blur-lg font-semibold shadow-lg`}>
+          <Loader2 />
+        </div>) : (<motion.span
           custom={trend}
           variants={titleVariants}
           initial="initial"
@@ -214,7 +226,9 @@ export default function ModernCarousel({
           {version === 0
             ? "Your document will show here after upload"
             : `Version: ${version}`}
-        </motion.span>
+        </motion.span>)}
+
+
       </AnimatePresence>
       <AnimatePresence initial={false}>
         <motion.div

@@ -182,7 +182,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             {role === "super admin" ||
               role === "contact admin" ||
               role === "design admin" ||
-              (role !== "project admin" && (
+              role === "project admin" && (
                 <div className="mb-4">
                   <div className="relative">
                     <input
@@ -214,7 +214,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                     </span>
                   </div>
                 </div>
-              ))}
+              )}
           </>
           {/* )} */}
         </div>
@@ -234,7 +234,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               {role === "super admin" ||
                 role === "contact admin" ||
                 role === "design admin" ||
-                role !== "project admin" ? (
+                role === "project admin" ? (
                 <nav className="px-4 py-4 lg:px-6">
                   {filteredData?.map((group: any, groupIndex: number) => (
                     <div key={groupIndex}>
