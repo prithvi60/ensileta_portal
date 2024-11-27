@@ -67,7 +67,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         role !== "employee" && {
           icon: (
             <div className="p-1 rounded-md bg-secondary">
-              <IoPeopleSharp className="text-4xl sm:text-5xl text-white" />
+              <IoPeopleSharp className="text-3xl md:text-4xl 2xl:text-5xl text-white" />
             </div>
           ),
           label: "Add Team",
@@ -76,7 +76,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         {
           icon: (
             <div className="p-1 rounded-md bg-secondary">
-              <SiLibreofficedraw className="text-4xl sm:text-5xl text-white" />
+              <SiLibreofficedraw className="text-3xl md:text-4xl 2xl:text-5xl text-white" />
             </div>
           ),
           label: "2D drawings",
@@ -85,7 +85,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         {
           icon: (
             <div className="p-1 rounded-md bg-secondary">
-              <GiCardDraw className="text-4xl sm:text-5xl text-white" />
+              <GiCardDraw className="text-3xl md:text-4xl 2xl:text-5xl text-white" />
             </div>
           ),
           label: "3D drawings",
@@ -94,7 +94,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         {
           icon: (
             <div className="p-1 rounded-md bg-secondary">
-              <FaFlipboard className="text-4xl sm:text-5xl text-white" />
+              <FaFlipboard className="text-3xl md:text-4xl 2xl:text-5xl text-white" />
             </div>
           ),
           label: "Mood Board",
@@ -103,7 +103,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         {
           icon: (
             <div className="p-1 rounded-md bg-secondary">
-              <MdApproval className="text-4xl sm:text-5xl text-white" />
+              <MdApproval className="text-3xl md:text-4xl 2xl:text-5xl text-white" />
             </div>
           ),
           label: "Approval Board",
@@ -112,7 +112,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         {
           icon: (
             <div className="p-1 rounded-md bg-secondary">
-              <FaFileInvoice className="text-4xl sm:text-5xl text-white" />
+              <FaFileInvoice className="text-3xl md:text-4xl 2xl:text-5xl text-white" />
             </div>
           ),
           label: "BOQ",
@@ -179,9 +179,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                 </p>
               </div>
             )}
-            {(role === "super admin" ||
+            {role === "super admin" ||
               role === "contact admin" ||
-              role === "design admin") && (
+              role === "design admin" ||
+              (role !== "project admin" && (
                 <div className="mb-4">
                   <div className="relative">
                     <input
@@ -213,7 +214,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                     </span>
                   </div>
                 </div>
-              )}
+              ))}
           </>
           {/* )} */}
         </div>
@@ -224,55 +225,52 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
           </div>
         ) : ( */}
         <div className="no-scrollbar flex flex-col overflow-y-auto sidebar_scroll duration-300 ease-linear h-full max-h-[75vh]">
-          {sessionStatus === "loading" ? (<div className="flex justify-center items-center gap-2.5 h-full w-full px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out text-xl capitalize line-clamp-2">
-            Loading...
-          </div>) : (<>
-            {role === "super admin" ||
-              role === "contact admin" ||
-              role === "design admin" ? (
-              // <>
-              //   {sessionStatus === "loading" ? (
-              //     <div className="flex justify-center items-center gap-2.5 h-full w-full px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out text-xl capitalize line-clamp-2">
-              //       Loading...
-              //     </div>
-              // ) : (
-              <nav className="px-4 py-4 lg:px-6">
-                {filteredData?.map((group: any, groupIndex: number) => (
-                  <div key={groupIndex}>
-                    <ul className="mb-6 flex flex-col gap-1.5">
-                      <SidebarItem
-                        key={groupIndex}
-                        item={""}
-                        pageName={pageName}
-                        setPageName={setPageName}
-                        companyName={group?.company_name}
-                      />
-                    </ul>
-                  </div>
-                ))}
-              </nav>
-              //   )}
-              // </>
-            ) : (
-              <nav className="px-4 py-4 lg:px-6">
-                {menuGroups.map((group, groupIndex) => (
-                  <div key={groupIndex}>
-                    <ul className="mb-6 flex flex-col gap-1.5">
-                      {group.menuItems.map((menuItem, menuIndex) => (
+          {sessionStatus === "loading" ? (
+            <div className="flex justify-center items-center gap-2.5 h-full w-full px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out text-xl capitalize line-clamp-2">
+              Loading...
+            </div>
+          ) : (
+            <>
+              {role === "super admin" ||
+                role === "contact admin" ||
+                role === "design admin" ||
+                role !== "project admin" ? (
+                <nav className="px-4 py-4 lg:px-6">
+                  {filteredData?.map((group: any, groupIndex: number) => (
+                    <div key={groupIndex}>
+                      <ul className="mb-6 flex flex-col gap-1.5">
                         <SidebarItem
-                          key={menuIndex}
-                          item={menuItem}
+                          key={groupIndex}
+                          item={""}
                           pageName={pageName}
                           setPageName={setPageName}
-                          companyName={""}
+                          companyName={group?.company_name}
                         />
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </nav>
-            )}
-          </>)}
+                      </ul>
+                    </div>
+                  ))}
+                </nav>
+              ) : (
+                <nav className="px-4 py-4 lg:px-6">
+                  {menuGroups.map((group, groupIndex) => (
+                    <div key={groupIndex}>
+                      <ul className="mb-6 flex flex-col gap-1.5">
+                        {group.menuItems.map((menuItem, menuIndex) => (
+                          <SidebarItem
+                            key={menuIndex}
+                            item={menuItem}
+                            pageName={pageName}
+                            setPageName={setPageName}
+                            companyName={""}
+                          />
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </nav>
+              )}
+            </>
+          )}
           {/* <!-- Sidebar Menu --> */}
 
           {/* <!-- Sidebar Menu --> */}

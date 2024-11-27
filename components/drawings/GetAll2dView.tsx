@@ -52,8 +52,8 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
   const [isApproving, setIsApproving] = useState(false);
   const [filteredData, setFilteredData] = useState<Array<any>>([]);
   const [isOpen, setIsOpen] = useState(false);
-
   const [toggleApproveDrawing] = useMutation(TOGGLE_APPROVE_DRAWING);
+
 
   useEffect(() => {
     // Update filteredData whenever allUsers changes
@@ -64,9 +64,6 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
     }
 
   }, [allUsers]);
-
-  const SAfilteredData =
-    allUsers?.users?.filter((val: any) => val.role === "super admin") || [];
 
   const userId = RoleBased?.user?.id;
 
@@ -133,13 +130,13 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
 
   return (
 
-    <div className="h-full w-full pt-6 md:p-10 space-y-5">
-      <h2 className="text-3xl w-full text-center font-semibold caption-bottom tracking-wide mb-10">
+    <div className="h-full w-full py-3 md:pb-6 md:px-10 space-y-5">
+      <h2 className="text-2xl 2xl:text-3xl w-full text-center font-semibold caption-bottom tracking-wide">
         {title}
       </h2>
       {RoleBased?.user?.role === "super admin" ||
         RoleBased?.user?.role === "contact admin" ||
-        RoleBased?.user?.role === "design admin" ? (
+        RoleBased?.user?.role === "design admin" || RoleBased?.user?.role === "project admin" ? (
         // Table format User Details for super admin
         <ShuffleSortTable
           uploadFile={uploadFile}
@@ -161,9 +158,9 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
           />
           <div className="w-full flex flex-col justify-between items-center text-justify">
             <button
-              disabled={isApproved || isApproving}
+              disabled={isApproved || isApproving || lastItem === null}
               type="submit"
-              className="cursor-pointer w-full sm:w-1/2 p-4 shadow-md select-none bg-secondary text-white hover:bg-primary disabled:bg-opacity-70 disabled:cursor-not-allowed"
+              className="cursor-pointer w-full sm:w-1/2 p-3 2xl:p-4 shadow-md select-none bg-secondary text-white hover:bg-primary disabled:bg-opacity-70 disabled:cursor-not-allowed"
               onClick={() => setIsOpen(true)}
             >
               {isApproving
@@ -177,7 +174,7 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
               <span>
                 <BiSolidMessageRoundedDots className="text-xl md:text-2xl text-secondary" />
               </span>
-              <p>Please review the drawings and click the &apos;Approve&apos;
+              <p className="text-sm md:text-base">Please review the drawings and click the &apos;Approve&apos;
                 button to confirm if this version is acceptable. You can add
                 comments in the &apos;Remarks&apos; section by viewing the drawing
                 in fullscreen and annotating directly on the image.</p>
