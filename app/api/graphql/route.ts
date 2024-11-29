@@ -8,7 +8,7 @@ import { getUserFromToken } from "@/helper/GetUserInfo";
 
 const allowedOrigins = [
   "https://ensileta-hub.webibee.com",
-  "http://designhub.ensileta.com",
+  "https://designhub.ensileta.com",
 ];
 
 const context = async (req: NextRequest) => {
