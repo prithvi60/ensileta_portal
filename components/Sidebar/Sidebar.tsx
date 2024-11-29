@@ -140,27 +140,12 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     },
   ];
 
-  // Display loading if session or user data is not ready
-  // if (sessionStatus === "loading" || usersLoading || employeeLoading) {
-  //   return (
-  //     <aside className="flex justify-center items-center h-full w-full">
-  //       <Loader />
-  //     </aside>
-  //   );
-  // }
-
   return (
     <ClickOutside onClick={() => setSidebarOpen(false)}>
       <aside
         className={`fixed left-0 top-0 z-[1001] flex h-screen w-72.5 flex-col overflow-y-hidden bg-primary duration-300 ease-linear lg:translate-x-0 gap-4 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
           }`}
       >
-        {/* {sessionStatus === null || usersLoading || employeeLoading ? (
-          <div className="flex justify-center items-center gap-2.5 h-full w-full px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out text-xl capitalize line-clamp-2">
-            Loading...
-          </div>
-        ) : (
-          <> */}
         {/* <!-- SIDEBAR HEADER --> */}
         <div className="flex flex-col gap-8 px-6 pt-5.5 pb-3.5 lg:pb-4.5 lg:pt-6.5">
           <>
@@ -179,10 +164,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                 </p>
               </div>
             )}
-            {role === "super admin" ||
+            {(role === "super admin" ||
               role === "contact admin" ||
               role === "design admin" ||
-              role === "project admin" && (
+              role === "project admin") && (
                 <div className="mb-4">
                   <div className="relative">
                     <input
@@ -219,11 +204,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
           {/* )} */}
         </div>
         {/* <!-- SIDEBAR HEADER --> */}
-        {/* {sessionStatus === null || usersLoading || employeeLoading ? (
-          <div className="flex justify-center items-center gap-2.5 h-full w-full px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out text-xl capitalize line-clamp-2">
-            Loading...
-          </div>
-        ) : ( */}
         <div className="no-scrollbar flex flex-col overflow-y-auto sidebar_scroll duration-300 ease-linear h-full max-h-[75vh]">
           {sessionStatus === "loading" ? (
             <div className="flex justify-center items-center gap-2.5 h-full w-full px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out text-xl capitalize line-clamp-2">
