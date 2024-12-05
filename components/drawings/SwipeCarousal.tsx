@@ -11,6 +11,11 @@ import { BiSolidMessageRoundedDots } from "react-icons/bi";
 import Link from "next/link";
 import { Loader } from "../Loader";
 import Loader2 from "../Loader2";
+import {
+  TransformComponent,
+  TransformWrapper,
+  useControls,
+} from "react-zoom-pan-pinch";
 
 declare global {
   interface HTMLElement {
@@ -212,23 +217,27 @@ export default function ModernCarousel({
         </svg>
       </button>
       <AnimatePresence initial={false} custom={trend}>
-        {loading ? (<div className={`p-2 rounded-lg absolute z-20 left-10 bottom-4 bg-white/10 backdrop-blur-lg font-semibold shadow-lg`}>
-          <Loader2 />
-        </div>) : (<motion.span
-          custom={trend}
-          variants={titleVariants}
-          initial="initial"
-          animate="animate"
-          exit="exit"
-          key={imgs[imageIndex]}
-          className="text-white text-base md:text-xl p-2 rounded-lg bg-white/10 backdrop-blur-lg font-semibold shadow-lg absolute z-20 left-10 bottom-4"
-        >
-          {version === 0
-            ? "Your document will show here after upload"
-            : `Version: ${version}`}
-        </motion.span>)}
-
-
+        {loading ? (
+          <div
+            className={`p-2 rounded-lg absolute z-20 left-10 bottom-4 bg-white/10 backdrop-blur-lg font-semibold shadow-lg`}
+          >
+            <Loader2 />
+          </div>
+        ) : (
+          <motion.span
+            custom={trend}
+            variants={titleVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            key={imgs[imageIndex]}
+            className="text-white text-base md:text-xl p-2 rounded-lg bg-white/10 backdrop-blur-lg font-semibold shadow-lg absolute z-20 left-10 bottom-4"
+          >
+            {version === 0
+              ? "Your document will show here after upload"
+              : `Version: ${version}`}
+          </motion.span>
+        )}
       </AnimatePresence>
       <AnimatePresence initial={false}>
         <motion.div
@@ -389,17 +398,8 @@ const SpringModal = ({
     infinite: false,
     slidesToShow: 1,
     slidesToScroll: 1,
-    nextArrow: (
-      <NextArrow
-        currentSlide={index}
-        slideCount={images.length}
-      />
-    ),
-    prevArrow: (
-      <PrevArrow
-        currentSlide={index}
-      />
-    ),
+    nextArrow: <NextArrow currentSlide={index} slideCount={images.length} />,
+    prevArrow: <PrevArrow currentSlide={index} />,
     afterChange: (current: number) => setIndex(current),
   };
 
@@ -437,6 +437,16 @@ const SpringModal = ({
     }
   };
 
+  // const handleRemoveMarker = (imageIndex: number, top: number, left: number) => {
+  //   setMarkers((prevMarkers) => {
+  //     const updatedMarkers = [...prevMarkers];
+  //     updatedMarkers[imageIndex] = updatedMarkers[imageIndex].filter(
+  //       (marker) => marker.top !== top || marker.left !== left
+  //     );
+  //     return updatedMarkers;
+  //   });
+  // };
+
   useEffect(() => {
     toggleFullScreen(isOpen);
   }, [isOpen]);
@@ -455,24 +465,19 @@ const SpringModal = ({
             initial={{ scale: 0, rotate: "12.5deg" }}
             animate={{ scale: 1, rotate: "0deg" }}
             exit={{ scale: 0, rotate: "0deg" }}
-            className="text-white p-6 w-full max-w-7xl relative h-full"
+            className="text-white p-6 w-full max-w-80 md:max-w-125 lg:max-w-203 xl:max-w-7xl relative h-full"
             onClick={(e) => e.stopPropagation()}
             onContextMenu={(e) => e.preventDefault()} // Disable right-click
           >
             <div className="slider-container">
-              <Slider {...settings} ref={sliderRef} afterChange={handleSliderChange}>
+              <Slider
+                {...settings}
+                ref={sliderRef}
+                afterChange={handleSliderChange}
+              >
                 {images.map((src, idx) => {
                   return (
-                    <div key={idx} className="w-full h-full">
-                      {/* <TransformWrapper
-                        maxScale={4}
-                        minScale={1}
-                        initialScale={1}
-                        ref={transformWrapperRef}
-                      >
-                        <TransformComponent
-                          wrapperStyle={{ width: '100%', height: '100%' }}
-                          contentStyle={{ width: '100%', height: '100%' }}> */}
+                    <>
                       <ImageMarker
                         key={idx}
                         src={src}
@@ -493,15 +498,14 @@ const SpringModal = ({
                                 userId
                               )
                             } // Pass the current image index
+                            // onRemoveMarker={(top, left) => handleRemoveMarker(idx, top, left)}
                             markers={markers[idx] || []} // Pass markers for the current image
                           />
                         )}
                         extraClass={`cursor-crosshair ${!isMarkerEnabled ? "pointer-events-none" : ""
                           }`}
                       />
-                      {/* </TransformComponent>
-                      </TransformWrapper> */}
-                    </div>
+                    </>
                   );
                 })}
               </Slider>
@@ -536,7 +540,7 @@ const SpringModal = ({
               )}
               <button
                 type="submit"
-                className="cursor-pointer w-max-xontent  p-4 shadow-md select-none bg-secondary text-white hover:bg-primary"
+                className="cursor-pointer w-max  p-4 shadow-md select-none bg-secondary text-white hover:bg-primary"
                 onClick={(e) => {
                   e.stopPropagation();
                   setIsMarkerEnabled((o) => !o);
@@ -554,11 +558,13 @@ const SpringModal = ({
 
 const CustomMarker = ({
   onAddComment,
+  // onRemoveMarker,
   markers,
   top,
   left,
 }: MarkerComponentProps & {
   onAddComment: (marker: Marker, comment: string) => void;
+  // onRemoveMarker: (top: number, left: number) => void;
   markers: any;
 }) => {
   const [isHovered, setIsHovered] = useState<boolean>(false);
@@ -569,7 +575,6 @@ const CustomMarker = ({
   const { data: session } = useSession();
   const userName = session?.user?.name || "Unknown";
   const [user, setUser] = useState<string>(userName);
-  // console.log("custom marker",markers)
   useEffect(() => {
     if (isHovered && inputRef.current) {
       inputRef.current.focus();
@@ -585,41 +590,60 @@ const CustomMarker = ({
       setUser(existingMarker.user);
     }
   }, [markers, top]);
+
+  const addComment = () => {
+    if (inputValue.trim()) {
+      const marker = { top, left };
+      onAddComment(marker, inputValue.trim());
+      setStoredValue(inputValue.trim());
+      setIsHovered(false);
+    }
+  };
+
   // @ts-ignore
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && inputRef.current) {
-      const marker = { top, left };
-      onAddComment(marker, inputValue); // Pass the comment back to the Page component
-      setIsHovered(false);
-      //   console.log("val", inputValue);
+    if (e.key === "Enter") {
+      e.preventDefault(); // Prevents default action of "Enter" key
+      addComment();
     }
   };
 
   const handleBtn = () => {
-    if (inputRef.current) {
-      const marker = { top, left };
-      onAddComment(marker, inputValue); // Pass the comment back to the Page component
-      setIsHovered(false);
-      //   console.log("val", inputValue);
+    addComment();
+  };
+
+  const handleBlur = () => {
+    // console.log("blur");
+    // console.log(inputValue);
+    addComment();
+    // console.log("blur after");
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    if (inputRef.current && inputValue) {
+      inputRef.current.blur(); // Force textarea to lose focus
     }
   };
+
   return (
     <div
       onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseLeave={handleMouseLeave}
       className="relative"
     >
       {isHovered ? (
-        <div className="relative bg-primary bg-opacity-30 rounded-lg p-2">
+        <div className="relative bg-primary bg-opacity-30 rounded-lg p-2 ">
           <label className="mb-.5 block font-extrabold text-white drop-shadow-lg">
             {user}
           </label>
           <div className="relative">
             <textarea
               ref={inputRef}
-              disabled={storedValue.length > 0}
+              // disabled={storedValue.length > 0}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
+              onBlur={handleBlur}
               placeholder="Add comments"
               className=" scrollbar-hidden z-1000 w-full rounded-lg border bg-white border-stroke bg-transparent py-2 pl-2 pr-10 text-[#0E132A] outline-none focus:border-primary focus-visible:shadow-none mr-8"
               onKeyDown={handleKeyDown}
@@ -657,7 +681,9 @@ function NextArrow({
   const isDisabled = currentSlide === slideCount - 1;
   return (
     <div
-      className={`p-1.5 md:p-2 xl:p-3 rounded-full ${isDisabled ? "bg-gray-400 cursor-not-allowed" : "bg-primary cursor-pointer"
+      className={`p-1.5 md:p-2 xl:p-3 rounded-full ${isDisabled
+        ? "bg-gray-400 cursor-not-allowed"
+        : "bg-primary cursor-pointer"
         } absolute top-[25%] -right-5 md:-right-10 xl:-right-14 group`}
       onClick={!isDisabled ? onClick : undefined}
     >
@@ -676,7 +702,9 @@ function PrevArrow({
   const isDisabled = currentSlide === 0;
   return (
     <div
-      className={`p-1.5 md:p-2 xl:p-3 rounded-full ${isDisabled ? "bg-gray-400 cursor-not-allowed" : "bg-primary cursor-pointer"
+      className={`p-1.5 md:p-2 xl:p-3 rounded-full ${isDisabled
+        ? "bg-gray-400 cursor-not-allowed"
+        : "bg-primary cursor-pointer"
         } absolute top-[25%] -left-5 md:-left-10 xl:-left-14 group`}
       onClick={!isDisabled ? onClick : undefined}
     >
