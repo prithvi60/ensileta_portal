@@ -245,10 +245,10 @@ export const ViewModalWrapper = ({
         const loadingTask = pdfjs.getDocument(new Uint8Array(data));
         const pdfDocument = await loadingTask.promise;
         const imgArray: string[] = [];
-
+        const scale = 3; // Increased scale for better quality
         for (let i = 1; i <= pdfDocument.numPages; i++) {
           const page = await pdfDocument.getPage(i);
-          const viewport = page.getViewport({ scale: 1 });
+          const viewport = page.getViewport({ scale });
           const canvas = document.createElement("canvas");
           const context = canvas.getContext("2d");
           canvas.height = viewport.height;
