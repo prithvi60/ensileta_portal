@@ -185,10 +185,13 @@ export const SignUp = () => {
         <div className="rounded-md border-4 border-secondary bg-white shadow-xl m-4">
             <div className="flex flex-wrap items-start relative">
                 <div className="hidden w-full xl:block xl:w-1/2 lg:sticky lg:top-0 py-4 sm:py-12.5 xl:py-17.5">
-                    <div className="p-4 sm:px-16 sm:py-0 space-y-5 text-center flex justify-center flex-col">
-                        <div className="w-64 h-14 relative items-center flex justify-center">
+                    <div className="p-4 sm:px-16 sm:py-0 space-y-5 text-center flex justify-center items-center flex-col">
+                        <div className="w-64 h-14 relative items-center flex justify-center mb-8">
                             <Image alt="logo" src={"/logo/newlogo.png"} fill />
                         </div>
+                        <h2 className="text-2xl font-bold text-secondary sm:text-2xl w-full text-center">
+              Our Prestigious Clients
+            </h2>
                         <span className="mt-15 inline-block">
                             <Image
                                 src="/cover/ensiletaclients.png"
@@ -207,7 +210,7 @@ export const SignUp = () => {
                             Create a New Account
                         </h2>
 
-                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 relative">
+                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 relative">
                             <div className="relative">
                                 <div className="flex gap-3 items-center">
                                     <label className="w-[45%] md:w-[30%] block font-medium text-[#0E132A] text-sm md:text-base">

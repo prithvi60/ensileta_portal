@@ -22,7 +22,7 @@ const DropdownUser = () => {
       >
         <span className="hidden text-right lg:block">
           <span className="block text-sm font-medium text-black capitalize">
-            {session ? userName : "Unknown Person"}
+            {session ? userName : "Guest"}
           </span>
           {/* <span className="block text-xs">UX Designer</span> */}
         </span>

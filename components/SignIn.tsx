@@ -89,12 +89,15 @@ export const SignIn = () => {
 
   return (
     <div className="rounded-md border-4 border-secondary bg-white shadow-xl m-4">
+ 
       <div className="flex flex-wrap items-center p-4 md:p-7 xl:divide-x-2 divide-secondary">
         <div className="hidden w-full xl:block xl:w-1/2">
-          <div className="p-4 sm:px-16 sm:py-0 space-y-5 text-center flex justify-center flex-col">
-            <div className="w-64 h-14 relative items-center flex justify-center">
-              <Image alt="logo" src={"/logo/newlogo.png"} fill />
-            </div>
+    
+          <div className="p-4 sm:px-16 sm:py-0 space-y-1 text-center flex justify-center flex-col">
+        
+            <h2 className="text-2xl font-bold text-secondary sm:text-2xl w-full text-center">
+              Our Prestigious Clients
+            </h2>
             <span className="mt-15 inline-block">
               <Image
                 src="/cover/ensiletaclients.png"
@@ -106,9 +109,15 @@ export const SignIn = () => {
           </div>
         </div>
 
-        <div className="w-full p-4 sm:px-16 sm:py-0 xl:w-1/2 ">
-          <div className="w-full py-4 text-[#0E132A] space-y-6">
+        <div className="w-full p-4 sm:px-16 sm:py-0 xl:w-1/2">
+        <div className="w-full justify-center flex mb-4">
+          <div className="w-64 h-14 relative items-center flex justify-center ">
+              <Image alt="logo" src={"/logo/newlogo.png"} fill />
+            </div>
+            </div>
+          <div className="w-full  text-[#0E132A] space-y-6">
             {/* <span className="mb-1.5 block font-medium ">Start for free</span> */}
+            
             <h2 className="text-2xl font-bold text-[#0E132A] sm:text-2xl w-full text-center">
               Welcome to Ensileta Interiors
             </h2>

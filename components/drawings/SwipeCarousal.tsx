@@ -51,7 +51,7 @@ export default function ModernCarousel({
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const { data: session } = useSession();
-  const userName = session?.user?.name || "Unknown";
+  const userName = session?.user?.name || "Guest";
   // console.log(pdf);
 
   usePDFJS(async (pdfjs) => {
@@ -64,10 +64,10 @@ export default function ModernCarousel({
       const loadingTask = pdfjs.getDocument(new Uint8Array(data));
       const pdfDocument = await loadingTask.promise;
       const imgArray: string[] = [];
-
+      const scale = 3; // Increased scale for better quality
       for (let i = 1; i <= pdfDocument.numPages; i++) {
         const page = await pdfDocument.getPage(i);
-        const viewport = page.getViewport({ scale: 1 });
+        const viewport = page.getViewport({ scale });
         const canvas = document.createElement("canvas");
         const context = canvas.getContext("2d");
         canvas.height = viewport.height;
@@ -573,7 +573,7 @@ const CustomMarker = ({
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const { data: session } = useSession();
-  const userName = session?.user?.name || "Unknown";
+  const userName = session?.user?.name || "Guest";
   const [user, setUser] = useState<string>(userName);
   useEffect(() => {
     if (isHovered && inputRef.current) {
