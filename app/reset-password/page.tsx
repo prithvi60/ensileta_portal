@@ -1,10 +1,13 @@
-import React from 'react'
+import { Suspense } from 'react'
 import ResetPasswordPage from '@/components/ResetPassword'
+import { Loader } from '@/components/Loader'
 
 const page = () => {
     return (
         <main className='flex justify-center items-center h-screen w-full bg-primary p-5'>
-            <ResetPasswordPage />
+            <Suspense fallback={<div><Loader /></div>}>
+                <ResetPasswordPage />
+            </Suspense>
         </main>
     )
 }
