@@ -9,6 +9,7 @@ import { z } from "zod";
 import toast from "react-hot-toast";
 import Image from "next/image";
 import Loader2 from "./Loader2";
+import Link from "next/link";
 
 const schema = z.object({
   email: z.string().email("Invalid email address"),
@@ -89,12 +90,12 @@ export const SignIn = () => {
 
   return (
     <div className="rounded-md border-4 border-secondary bg-white shadow-xl m-4">
- 
+
       <div className="flex flex-wrap items-center p-4 md:p-7 xl:divide-x-2 divide-secondary">
         <div className="hidden w-full xl:block xl:w-1/2">
-    
+
           <div className="p-4 sm:px-16 sm:py-0 space-y-1 text-center flex justify-center flex-col">
-        
+
             <h2 className="text-2xl font-bold text-secondary sm:text-2xl w-full text-center">
               Our Prestigious Clients
             </h2>
@@ -110,14 +111,14 @@ export const SignIn = () => {
         </div>
 
         <div className="w-full p-4 sm:px-16 sm:py-0 xl:w-1/2">
-        <div className="w-full justify-center flex mb-4">
-          <div className="w-64 h-14 relative items-center flex justify-center ">
+          <div className="w-full justify-center flex mb-4">
+            <div className="w-64 h-14 relative items-center flex justify-center ">
               <Image alt="logo" src={"/logo/newlogo.png"} fill />
             </div>
-            </div>
+          </div>
           <div className="w-full  text-[#0E132A] space-y-6">
             {/* <span className="mb-1.5 block font-medium ">Start for free</span> */}
-            
+
             <h2 className="text-2xl font-bold text-[#0E132A] sm:text-2xl w-full text-center">
               Welcome to Ensileta Interiors
             </h2>
@@ -241,20 +242,20 @@ export const SignIn = () => {
                 {isSubmitting ? <Loader2 /> : "Log In"}
               </button>
 
-              {/* <div className="mt-3 text-center">
-                <p>
-                  Don’t have any account?{" "}
-                  <Link href="/portal/onboarding" className="text-secondary ">
-                    Sign Up
-                  </Link>
-                </p>
-              </div> */}
+
               {errors.root && (
-                <div className="absolute -bottom-10 text-base md:text-lg w-full left-1/2 -translate-x-1/2 text-warning font-semibold text-center mt-5">
+                <div className="absolute -bottom-6 text-sm md:text-base w-full left-1/2 -translate-x-1/2 text-warning font-semibold text-center mt-5">
                   {errors.root.message}
                 </div>
               )}
             </form>
+            <div className="text-end">
+              <p>
+                <Link href="/forgot-password" className="text-primary text-sm md:text-base hover:text-primary/70">
+                  Forgot Password ?
+                </Link>
+              </p>
+            </div>
           </div>
         </div>
       </div>
