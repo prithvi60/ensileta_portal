@@ -6,24 +6,35 @@ import { Loader } from "@/components/Loader";
 import { ADD_3D_FILENAME, CREATE_MARKER_GROUP_3D, GET_ALL_3D_VIEW, GET_MARKER_GROUP_BY_ID_3D, GET_USERS } from "@/lib/Queries";
 import { useMutation, useQuery } from "@apollo/client";
 import { usePathname } from "next/navigation";
+import React from "react";
+
+type FileData = {
+    id: number;
+    filename: string;
+    fileUrl: string;
+    version: number;
+    userId: number;
+    createdAt: string;
+};
 
 interface GetAll3DViewResponse {
-    getAll3DFiles: Array<{
-        id: number;
-        filename: string;
-        fileUrl: string;
-        version: number;
-        userId: number;
-        createdAt: string;
-    }>;
+    getAll3DFiles: FileData[];
 }
 
-const Page = () => {
-    const [uploadFile] = useMutation(ADD_3D_FILENAME);
-    const { data, loading } = useQuery<GetAll3DViewResponse>(GET_ALL_3D_VIEW);
-    const { data: AllUsers, refetch } = useQuery(GET_USERS);
+type MarkerGroupResponse = {
+    getMarkerGroupBy3DId: {
+        data: any;
+    };
+};
+
+const Page: React.FC = () => {
     const pathname = usePathname();
-    const fileType = pathname.split("/").pop();
+    const fileType = pathname.split("/").pop() || "";
+    const { data, loading: filesLoading } = useQuery<GetAll3DViewResponse>(GET_ALL_3D_VIEW);
+    const { data: AllUsers, refetch } = useQuery(GET_USERS);
+
+    const [uploadFile] = useMutation(ADD_3D_FILENAME);
+
     const lastItem =
         data?.getAll3DFiles[data?.getAll3DFiles.length - 1] ||
         data?.getAll3DFiles[0] ||
@@ -35,21 +46,22 @@ const Page = () => {
         ],
         awaitRefetchQueries: true,
     });
-    const { data: marker3d } = useQuery(GET_MARKER_GROUP_BY_ID_3D, {
+    const { data: marker3d } = useQuery<MarkerGroupResponse>(GET_MARKER_GROUP_BY_ID_3D, {
         variables: { drawing3DId: lastItem?.id },
+        skip: !lastItem?.id,
     });
 
 
-    const createData = async (markers: any) => {
+    const handleCreateMarkerGroup = async (markers: any): Promise<void> => {
+        if (!lastItem?.id) return;
+
         try {
-            const { data } = await createMarkerGroup({
+            await createMarkerGroup({
                 variables: {
                     data: markers,
                     drawing3DId: lastItem?.id,
                 },
             });
-            // console.log("Created Marker Group:", data);
-            // alert("Successfully saved!");
         } catch (error) {
             console.error("Error creating marker group:", error);
         }
@@ -58,7 +70,7 @@ const Page = () => {
     return (
         <DefaultLayout>
             <section className="h-full w-full">
-                {loading ? (
+                {filesLoading ? (
                     <Loader />
                 ) : (
                     <GetAll2dView
@@ -70,7 +82,7 @@ const Page = () => {
                         title={"Your 3D Drawings"}
                         refetchUsers={refetch}
                         lastItem={lastItem}
-                        createMarkerGroup={createData}
+                        createMarkerGroup={handleCreateMarkerGroup}
                         markerData={marker3d?.getMarkerGroupBy3DId?.data}
                     />
                 )}

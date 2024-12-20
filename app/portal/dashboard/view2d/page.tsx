@@ -8,30 +8,37 @@ import {
   CREATE_MARKER_GROUP_2D,
   GET_ALL_2D_VIEW,
   GET_MARKER_GROUP_BY_ID_2D,
-  GET_USER,
   GET_USERS,
-  TOGGLE_APPROVE_DRAWING,
 } from "@/lib/Queries";
 import { useMutation, useQuery } from "@apollo/client";
 import { usePathname } from "next/navigation";
+import React from "react";
 
-interface GetAll2DViewResponse {
-  getAll2DFiles: Array<{
-    id: number;
-    filename: string;
-    fileUrl: string;
-    version: number;
-    userId: number;
-    createdAt: string;
-  }>;
-}
+type FileData = {
+  id: number;
+  filename: string;
+  fileUrl: string;
+  version: number;
+  userId: number;
+  createdAt: string;
+};
 
-const Page = () => {
-  const [uploadFile] = useMutation(ADD_2D_FILENAME);
-  const { data, loading } = useQuery<GetAll2DViewResponse>(GET_ALL_2D_VIEW);
-  const { data: AllUsers, refetch } = useQuery(GET_USERS);
+type GetAll2DViewResponse = {
+  getAll2DFiles: FileData[];
+};
+
+type MarkerGroupResponse = {
+  getMarkerGroupBy2DId: {
+    data: any;
+  };
+};
+
+const Page: React.FC = () => {
   const pathname = usePathname();
-  const fileType = pathname.split("/").pop();
+  const fileType = pathname.split("/").pop() || "";
+  const { data, loading: filesLoading } = useQuery<GetAll2DViewResponse>(GET_ALL_2D_VIEW);
+  const { data: AllUsers, refetch } = useQuery(GET_USERS);
+  const [uploadFile] = useMutation(ADD_2D_FILENAME);
 
   // ID
   const lastItem =
@@ -48,20 +55,21 @@ const Page = () => {
   });
 
   // Query
-  const { data: marker2d } = useQuery(GET_MARKER_GROUP_BY_ID_2D, {
+  const { data: marker2d } = useQuery<MarkerGroupResponse>(GET_MARKER_GROUP_BY_ID_2D, {
     variables: { drawing2DId: lastItem?.id },
+    skip: !lastItem?.id,
   });
 
-  const createData = async (markers: any) => {
+  const handleCreateMarkerGroup = async (markers: any): Promise<void> => {
+    if (!lastItem?.id) return;
+
     try {
-      const { data } = await createMarkerGroup({
+      await createMarkerGroup({
         variables: {
           data: markers,
-          drawing2DId: lastItem?.id,
+          drawing2DId: lastItem.id,
         },
       });
-      // console.log("Created Marker Group:", data);
-      // alert("Successfully saved!");
     } catch (error) {
       console.error("Error creating marker group:", error);
     }
@@ -69,7 +77,7 @@ const Page = () => {
 
   return (
     <DefaultLayout>
-      {loading ? (
+      {filesLoading ? (
         <Loader />
       ) : (
         <section className="h-full w-full">
@@ -82,7 +90,7 @@ const Page = () => {
             approveType={"DRAWING_2D"}
             refetchUsers={refetch}
             lastItem={lastItem}
-            createMarkerGroup={createData}
+            createMarkerGroup={handleCreateMarkerGroup}
             markerData={marker2d?.getMarkerGroupBy2DId?.data}
           />
         </section>

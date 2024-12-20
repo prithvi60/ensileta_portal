@@ -9,24 +9,18 @@ export default function UploadFile({
     uploadFile,
     setIsOpen,
     userId,
-    email,
-    fileType,
     refetchUsers,
 }: {
     uploadFile: any;
     setIsOpen: any;
     userId: number;
-    email: string;
-    fileType: string;
     refetchUsers: any;
 }) {
     const [file, setFile] = useState<File | null>(null);
     const [size, setSize] = useState<boolean>(false);
     const [loadingButton, setLoadingButton] = useState<boolean>(false);
     const { data: session } = useSession();
-    // console.log({ email, fileType });
     const userName = session?.user?.name || "anonymous";
-    // const email = session?.user?.email
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const uploadedFile = e.target.files?.[0] || null;
@@ -39,7 +33,7 @@ export default function UploadFile({
 
         if (file && file.size > 10 * 1024 * 1024) {
             // 10 MB in bytes
-            toast.error("File size exceeds 10 MB", {
+            toast.error("The file size must not exceed 10 MB", {
                 position: "top-right",
                 duration: 3000,
                 style: {

@@ -93,8 +93,6 @@ const SpringModal = ({
                 uploadFile={uploadFile}
                 userId={userId}
                 setIsOpen={setIsOpen}
-                email={email}
-                fileType={fileType}
                 refetchUsers={refetchUsers}
               />
             </div>
@@ -184,8 +182,6 @@ const SpringModal2D = ({
                 uploadFile={uploadFile}
                 userId={userId}
                 setIsOpen={setIsOpen}
-                email={email}
-                fileType={fileType}
                 refetchUsers={refetchUsers}
               />
             </div>

@@ -9,7 +9,6 @@ import { useEffect, useState } from "react";
 import React from "react";
 import { BiSolidMessageRoundedDots } from "react-icons/bi";
 import Loader2 from "../Loader2";
-import { FaDownload } from "react-icons/fa6";
 import DeleteModal from "../superAdminTable/Modal";
 
 interface FileData {
@@ -18,25 +17,35 @@ interface FileData {
   fileUrl: string;
   version: number;
   createdAt: string;
+  approve?: boolean;
+}
+
+interface User {
+  id: string;
+  role: string;
+  email: string;
+  username: string;
+}
+
+interface AllUsers {
+  users: User[];
 }
 
 interface GetAll2DViewProps {
-  data?: Array<FileData>;
-  // loading: boolean
-  // error?: Error;
+  data?: FileData[];
   uploadFile: any;
   title: string;
-  allUsers: any;
+  allUsers: AllUsers;
   fileType: string;
-  refetchUsers: any;
-  lastItem: any;
-  createMarkerGroup: any;
+  refetchUsers: () => void;
+  lastItem: FileData | null;
+  createMarkerGroup: (marker: any) => void;
   markerData: any;
-  approveType: string
+  approveType: string;
 }
 
 export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
-  data,
+  data = [],
   uploadFile,
   title,
   allUsers,
@@ -45,24 +54,20 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
   createMarkerGroup,
   lastItem,
   markerData,
-  approveType
+  approveType,
 }) => {
-  const { data: RoleBased } = useQuery(GET_USER);
-  const [isApproved, setIsApproved] = useState(lastItem?.approve);
+  const { data: RoleBased } = useQuery<{ user: User }>(GET_USER);
+  const [isApproved, setIsApproved] = useState(lastItem?.approve || false);
   const [isApproving, setIsApproving] = useState(false);
-  const [filteredData, setFilteredData] = useState<Array<any>>([]);
+  const [filteredData, setFilteredData] = useState<User[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [toggleApproveDrawing] = useMutation(TOGGLE_APPROVE_DRAWING);
 
-
   useEffect(() => {
-    // Update filteredData whenever allUsers changes
-    if (allUsers && allUsers.users) {
-      const admins =
-        allUsers.users.filter((val: any) => val.role === "admin") || [];
+    if (allUsers?.users) {
+      const admins = allUsers.users.filter((val) => val.role === "admin") || [];
       setFilteredData(admins);
     }
-
   }, [allUsers]);
 
   const userId = RoleBased?.user?.id;
@@ -71,7 +76,9 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
     try {
       setIsApproving(true);
       setIsOpen(false);
-      toggleApproveDrawing({ variables: { id: lastItem?.id, drawingType: approveType } });
+      toggleApproveDrawing({
+        variables: { id: lastItem?.id, drawingType: approveType },
+      });
       const response = await fetch("/api/sendMail", {
         method: "POST",
         headers: {
@@ -128,61 +135,66 @@ export const GetAll2dView: React.FC<GetAll2DViewProps> = ({
     }
   };
 
-  return (
+  const renderAdminView = () => (
+    <ShuffleSortTable
+      uploadFile={uploadFile}
+      data={filteredData}
+      fileType={fileType}
+      refetchUsers={refetchUsers}
+    />
+  );
 
+  const renderUserView = () => (
+    <>
+      <ModernCarousel
+        pdf={lastItem?.fileUrl || ""}
+        version={data.length || 0}
+        id={lastItem?.id || 1}
+        createMarkerGroup={createMarkerGroup}
+        userId={Number(userId) || 0}
+        markerData={markerData}
+        fileType={fileType}
+      />
+      <div className="w-full flex flex-col justify-between items-center text-justify">
+        <button
+          disabled={isApproved || isApproving || lastItem === null}
+          type="submit"
+          className="cursor-pointer w-full sm:w-1/2 p-3 2xl:p-4 shadow-md select-none bg-secondary text-white hover:bg-primary disabled:bg-opacity-70 disabled:cursor-not-allowed"
+          onClick={() => setIsOpen(true)}
+        >
+          {isApproving ? <Loader2 /> : isApproved ? "Approved" : `Approve`}
+        </button>
+        <DeleteModal
+          isOpen={isOpen}
+          setIsOpen={setIsOpen}
+          confirmDeleteCard={handleSendEmail}
+        />
+        <div className="mt-8 flex gap-2">
+          <span>
+            <BiSolidMessageRoundedDots className="text-xl md:text-2xl text-secondary" />
+          </span>
+          <p className="text-sm md:text-base">
+            Please review the drawings and click the &apos;Approve&apos; button
+            to confirm if this version is acceptable. You can add comments in
+            the &apos;Remarks&apos; section by viewing the drawing in fullscreen
+            and annotating directly on the image.
+          </p>
+        </div>
+      </div>
+    </>
+  );
+
+  return (
     <div className="h-full w-full py-3 md:pb-6 md:px-10 space-y-5">
       <h2 className="text-2xl 2xl:text-3xl w-full text-center font-semibold caption-bottom tracking-wide">
         {title}
       </h2>
       {RoleBased?.user?.role === "super admin" ||
         RoleBased?.user?.role === "contact admin" ||
-        RoleBased?.user?.role === "design admin" || RoleBased?.user?.role === "project admin" ? (
-        // Table format User Details for super admin
-        <ShuffleSortTable
-          uploadFile={uploadFile}
-          data={filteredData}
-          fileType={fileType}
-          refetchUsers={refetchUsers}
-        />
-      ) : (
-        <>
-          {/* dynamically send pdf links */}
-          <ModernCarousel
-            pdf={lastItem?.fileUrl || ""}
-            version={data?.length || 0}
-            id={lastItem?.id || 1}
-            createMarkerGroup={createMarkerGroup}
-            userId={userId}
-            markerData={markerData}
-            fileType={fileType}
-          />
-          <div className="w-full flex flex-col justify-between items-center text-justify">
-            <button
-              disabled={isApproved || isApproving || lastItem === null}
-              type="submit"
-              className="cursor-pointer w-full sm:w-1/2 p-3 2xl:p-4 shadow-md select-none bg-secondary text-white hover:bg-primary disabled:bg-opacity-70 disabled:cursor-not-allowed"
-              onClick={() => setIsOpen(true)}
-            >
-              {isApproving
-                ? <Loader2 />
-                : isApproved
-                  ? "Approved"
-                  : `Approve`}
-            </button>
-            <DeleteModal isOpen={isOpen} setIsOpen={setIsOpen} confirmDeleteCard={handleSendEmail} />
-            <div className="mt-8 flex gap-2">
-              <span>
-                <BiSolidMessageRoundedDots className="text-xl md:text-2xl text-secondary" />
-              </span>
-              <p className="text-sm md:text-base">Please review the drawings and click the &apos;Approve&apos;
-                button to confirm if this version is acceptable. You can add
-                comments in the &apos;Remarks&apos; section by viewing the drawing
-                in fullscreen and annotating directly on the image.</p>
-            </div>
-          </div>
-
-        </>
-      )}
+        RoleBased?.user?.role === "design admin" ||
+        RoleBased?.user?.role === "project admin"
+        ? renderAdminView()
+        : renderUserView()}
     </div>
   );
 };

@@ -77,7 +77,7 @@ const ResetPasswordPage = () => {
                             type={showPassword ? "text" : "password"}
                             id="password"
                             placeholder="Enter new password"
-                            className="w-full p-2 border border-gray-300 rounded"
+                            className="w-full border border-stroke bg-transparent py-2 pl-6 pr-10 text-[#0E132A] outline-none focus:border-primary focus-visible:shadow-none"
                             {...register("password")}
                         />
                         <span
@@ -145,7 +145,7 @@ const ResetPasswordPage = () => {
                             type={showConfirmPassword ? "text" : "password"}
                             id="confirmPassword"
                             placeholder="Confirm new password"
-                            className="w-full p-2 border border-gray-300 rounded"
+                            className="w-full border border-stroke bg-transparent py-2 pl-6 pr-10 text-[#0E132A] outline-none focus:border-primary focus-visible:shadow-none"
                             {...register("confirmPassword")}
                         />
                         <span

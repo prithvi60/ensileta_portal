@@ -41,9 +41,6 @@ const SpringModal = ({ isOpen, setIsOpen, setActive, type, confirmDeleteCard }: 
                             <div className="grid w-16 h-16 mx-auto mb-2 text-3xl text-white rounded-full bg-warning place-items-center">
                                 <FiAlertCircle />
                             </div>
-                            {/* <h3 className="mb-2 text-3xl font-bold text-center text-info">
-                                Disclaimer
-                            </h3> */}
                             <p className="mb-6 text-center text-white">
                                 {`Are you certain you want to ${type ? "delete" : "approve"} this`} ?
                                 <br />
