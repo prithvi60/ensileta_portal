@@ -1,21 +1,13 @@
 import React, { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePDFJS } from "@/hooks/usePdfJS";
-import { FaArrowLeft, FaArrowRight, FaDownload } from "react-icons/fa6";
-import { GiVirtualMarker } from "react-icons/gi";
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
 import Slider from "react-slick";
 import ImageMarker, { Marker, MarkerComponentProps } from "react-image-marker";
 import { FaCircleArrowUp } from "react-icons/fa6";
 import { useSession } from "next-auth/react";
 import { BiSolidMessageRoundedDots } from "react-icons/bi";
-import Link from "next/link";
-import { Loader } from "../Loader";
 import Loader2 from "../Loader2";
-import {
-  TransformComponent,
-  TransformWrapper,
-  useControls,
-} from "react-zoom-pan-pinch";
 
 declare global {
   interface HTMLElement {
@@ -56,62 +48,53 @@ export default function ModernCarousel({
 
   usePDFJS(async (pdfjs) => {
     try {
-      setLoading(true);
+      setLoading(true)
+      if (!pdf) throw new Error("PDF URL is undefined or empty");
+
       const response = await fetch(pdf);
       if (!response.ok) throw new Error("PDF file not found");
 
-      const data = await response.arrayBuffer();
-      const loadingTask = pdfjs.getDocument(new Uint8Array(data));
-      const pdfDocument = await loadingTask.promise;
+      const pdfData = await response.arrayBuffer();
+      const pdfDocument = await pdfjs.getDocument(new Uint8Array(pdfData)).promise;
       const imgArray: string[] = [];
-      const scale = 3; // Increased scale for better quality
+      const scale = 3; // Higher scale for better quality
+
       for (let i = 1; i <= pdfDocument.numPages; i++) {
         const page = await pdfDocument.getPage(i);
         const viewport = page.getViewport({ scale });
         const canvas = document.createElement("canvas");
         const context = canvas.getContext("2d");
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
 
         if (context) {
-          const renderContext = {
-            canvasContext: context,
-            viewport: viewport,
-          };
-          await page.render(renderContext).promise;
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+          await page.render({ canvasContext: context, viewport }).promise;
           imgArray.push(canvas.toDataURL());
         }
       }
       setImgs(imgArray);
-      setLoading(false);
     } catch (error) {
       console.error("Error loading PDF:", error);
+    } finally {
       setLoading(false);
     }
   });
 
-  const trend = idx > prevIdx ? 1 : -1;
-  const imageIndex = Math.abs(idx % imgs.length);
-
   // Add a keydown event listener to handle navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft") {
-        // Navigate to the previous image
-        setPrevIdx(idx);
-        setIdx((prev) => prev - 1);
-      } else if (e.key === "ArrowRight") {
-        // Navigate to the next image
-        setPrevIdx(idx);
-        setIdx((prev) => prev + 1);
-      }
+      if (e.key === "ArrowLeft") navigate(-1);
+      if (e.key === "ArrowRight") navigate(1);
     };
 
     window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [idx, setIdx, setPrevIdx]);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [idx]);
+
+  const navigate = (direction: number) => {
+    setPrevIdx(idx);
+    setIdx((prev) => prev + direction);
+  };
 
   const handlePointerDown = (e: React.PointerEvent<HTMLImageElement>) => {
     if (e.pointerType === "touch" || e.pointerType === "mouse") {
@@ -119,20 +102,13 @@ export default function ModernCarousel({
     }
   };
 
+  const trend = idx > prevIdx ? 1 : -1;
+  const imageIndex = Math.abs(idx % imgs.length);
+
   return (
     <div className="h-[250px] 2xl:h-[390px] bg-black relative w-full max-w-6xl mx-auto overflow-hidden">
-      {/* {fileType === "viewboq" && (
-        <Link target='_blank' href={pdf} download className="absolute -top-9 sm:-top-11 lg:-top-14 right-2">
-          <button className="rounded-sm w-max p-2 bg-secondary hover:animate-pulse capitalize flex items-center gap-2">
-            <h4 className="tracking-wide text-sm md:text-base lg:text-lg text-white hidden sm:block">Download Now</h4>
-            <FaDownload className="text-lg lg:text-xl text-white" />
-          </button>
-        </Link>)} */}
       <button
-        onClick={() => {
-          setPrevIdx(idx);
-          setIdx((pv) => pv - 1);
-        }}
+        onClick={() => navigate(-1)}
         className="bg-primary hover:bg-primary/50 transition-colors text-white p-2 absolute z-10 left-0 top-0 bottom-0"
       >
         <svg
@@ -186,9 +162,6 @@ export default function ModernCarousel({
                 onPointerDown={(e) => handlePointerDown(e)} // Handle tap-and-hold on mobile
                 draggable="false" // Disable drag-and-drop
               />
-              {/* <div className={`${loading ? "block " : "hidden"} absolute bottom-40 right-96`}>
-                <Loader2 />
-              </div> */}
             </div>
           )}
         </AnimatePresence>
@@ -196,10 +169,7 @@ export default function ModernCarousel({
       <div className="absolute inset-0 z-[10] pointer-events-none" />{" "}
       {/* Transparent overlay */}
       <button
-        onClick={() => {
-          setPrevIdx(idx);
-          setIdx((pv) => pv + 1);
-        }}
+        onClick={() => navigate(1)}
         className="bg-primary hover:bg-primary/50 transition-colors text-white p-2 absolute z-10 right-0 top-0 bottom-0"
       >
         <svg
@@ -216,10 +186,10 @@ export default function ModernCarousel({
           />
         </svg>
       </button>
-      <AnimatePresence initial={false} custom={trend}>
+      <AnimatePresence custom={trend}>
         {loading ? (
           <div
-            className={`p-2 rounded-lg absolute z-20 left-10 bottom-4 bg-white/10 backdrop-blur-lg font-semibold shadow-lg`}
+            className={`p-2 rounded-lg absolute z-20 left-10 bottom-4 bg-white/10 backdrop-blur-lg shadow-lg`}
           >
             <Loader2 />
           </div>
@@ -293,7 +263,20 @@ const titleVariants = {
   }),
 };
 
-const SpringModal = ({
+interface SpringModalProps {
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
+  createMarkerGroup: (markers: Array<Marker[]>) => void;
+  markerData: string | null;
+  images: string[];
+  userName: string;
+  userId: number;
+  id: number;
+  fileType: string;
+}
+
+
+const SpringModal: React.FC<SpringModalProps> = ({
   isOpen,
   setIsOpen,
   createMarkerGroup,
@@ -303,30 +286,20 @@ const SpringModal = ({
   userId,
   id,
   fileType,
-}: {
-  isOpen: boolean;
-  setIsOpen: Function;
-  createMarkerGroup: any;
-  images: string[];
-  userName: string;
-  userId: number;
-  id: number;
-  markerData: any;
-  fileType: string;
 }) => {
   const [isMarkerEnabled, setIsMarkerEnabled] = useState<boolean>(false);
   const [index, setIndex] = useState<number>(0);
-  const transformWrapperRef = useRef<any>(null);
-  const sliderRef = useRef<Slider | null>(null);
   const [markers, setMarkers] = useState<
     Array<Array<Marker & { comment?: string }>>
   >(
     Array.from({ length: images.length }, (_, index) => (index === 0 ? [] : []))
   );
+  const transformWrapperRef = useRef<any>(null);
+  const sliderRef = useRef<Slider | null>(null);
 
   useEffect(() => {
     if (markerData) {
-      const parsedMarkers = JSON.parse(markerData);
+      const parsedMarkers: Marker[][] = JSON.parse(markerData);
       setMarkers(parsedMarkers);
     }
   }, [markerData]);
@@ -340,22 +313,17 @@ const SpringModal = ({
   // Key-down event for slider navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft") {
-        // Navigate to the previous slide
-        if (sliderRef.current && index > 0) {
-          sliderRef.current.slickPrev();
-        }
-      } else if (e.key === "ArrowRight") {
-        // Navigate to the next slide
-        if (sliderRef.current && index < images.length - 1) {
-          sliderRef.current.slickNext();
-        }
+      if (e.key === "ArrowLeft" && index > 0) {
+        sliderRef.current?.slickPrev();
+      } else if (e.key === "ArrowRight" && index < images.length - 1) {
+        sliderRef.current?.slickNext();
       }
     };
 
     if (isOpen) {
       window.addEventListener("keydown", handleKeyDown);
     }
+
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
@@ -400,7 +368,7 @@ const SpringModal = ({
     slidesToScroll: 1,
     nextArrow: <NextArrow currentSlide={index} slideCount={images.length} />,
     prevArrow: <PrevArrow currentSlide={index} />,
-    afterChange: (current: number) => setIndex(current),
+    afterChange: handleSliderChange,
   };
 
   const toggleFullScreen = (shouldEnterFullScreen: boolean) => {
@@ -436,16 +404,6 @@ const SpringModal = ({
       }
     }
   };
-
-  // const handleRemoveMarker = (imageIndex: number, top: number, left: number) => {
-  //   setMarkers((prevMarkers) => {
-  //     const updatedMarkers = [...prevMarkers];
-  //     updatedMarkers[imageIndex] = updatedMarkers[imageIndex].filter(
-  //       (marker) => marker.top !== top || marker.left !== left
-  //     );
-  //     return updatedMarkers;
-  //   });
-  // };
 
   useEffect(() => {
     toggleFullScreen(isOpen);
@@ -558,13 +516,11 @@ const SpringModal = ({
 
 const CustomMarker = ({
   onAddComment,
-  // onRemoveMarker,
   markers,
   top,
   left,
 }: MarkerComponentProps & {
   onAddComment: (marker: Marker, comment: string) => void;
-  // onRemoveMarker: (top: number, left: number) => void;
   markers: any;
 }) => {
   const [isHovered, setIsHovered] = useState<boolean>(false);
@@ -575,11 +531,13 @@ const CustomMarker = ({
   const { data: session } = useSession();
   const userName = session?.user?.name || "Guest";
   const [user, setUser] = useState<string>(userName);
+
   useEffect(() => {
     if (isHovered && inputRef.current) {
       inputRef.current.focus();
     }
   }, [isHovered]);
+
   useEffect(() => {
     const existingMarker = markers.find(
       (marker: { top: Number }) => marker.top === top
@@ -603,7 +561,7 @@ const CustomMarker = ({
   // @ts-ignore
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter") {
-      e.preventDefault(); // Prevents default action of "Enter" key
+      e.preventDefault();
       addComment();
     }
   };
@@ -613,16 +571,13 @@ const CustomMarker = ({
   };
 
   const handleBlur = () => {
-    // console.log("blur");
-    // console.log(inputValue);
     addComment();
-    // console.log("blur after");
   };
 
   const handleMouseLeave = () => {
     setIsHovered(false);
     if (inputRef.current && inputValue) {
-      inputRef.current.blur(); // Force textarea to lose focus
+      inputRef.current.blur();
     }
   };
 

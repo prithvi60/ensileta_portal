@@ -7,23 +7,33 @@ import { ADD_BOQ_FILENAME, CREATE_MARKER_GROUP_BOQ, GET_ALL_BOQ_VIEW, GET_MARKER
 import { useMutation, useQuery } from "@apollo/client";
 import { usePathname } from "next/navigation";
 
+type FileData = {
+    id: number;
+    filename: string;
+    fileUrl: string;
+    version: number;
+    userId: number;
+    createdAt: string;
+};
+
 interface GetAllBOQViewResponse {
-    getAllBOQFiles: Array<{
-        id: number;
-        filename: string;
-        fileUrl: string;
-        version: number;
-        userId: number;
-        createdAt: string;
-    }>;
+    getAllBOQFiles: FileData[];
 }
 
+type MarkerGroupResponse = {
+    getMarkerGroupByBoqId: {
+        data: any;
+    };
+};
+
 const Page = () => {
-    const [uploadFile] = useMutation(ADD_BOQ_FILENAME);
-    const { data, loading } = useQuery<GetAllBOQViewResponse>(GET_ALL_BOQ_VIEW);
-    const { data: AllUsers, refetch } = useQuery(GET_USERS);
     const pathname = usePathname();
-    const fileType = pathname.split("/").pop();
+    const fileType = pathname.split("/").pop() || "";
+    const { data, loading: filesLoading } = useQuery<GetAllBOQViewResponse>(GET_ALL_BOQ_VIEW);
+    const { data: AllUsers, refetch } = useQuery(GET_USERS);
+
+    const [uploadFile] = useMutation(ADD_BOQ_FILENAME);
+
     const lastItem =
         data?.getAllBOQFiles[data?.getAllBOQFiles.length - 1] ||
         data?.getAllBOQFiles[0] ||
@@ -34,20 +44,21 @@ const Page = () => {
         ],
         awaitRefetchQueries: true,
     });
-    const { data: markerBoq } = useQuery(GET_MARKER_GROUP_BY_ID_BOQ, {
+    const { data: markerBoq } = useQuery<MarkerGroupResponse>(GET_MARKER_GROUP_BY_ID_BOQ, {
         variables: { drawingBoqId: lastItem?.id },
+        skip: !lastItem?.id,
     });
 
-    const createData = async (markers: any) => {
+    const handleCreateMarkerGroup = async (markers: any): Promise<void> => {
+        if (!lastItem?.id) return;
+
         try {
-            const { data } = await createMarkerGroup({
+            await createMarkerGroup({
                 variables: {
                     data: markers,
                     drawingBoqId: lastItem?.id,
                 },
             });
-            // console.log("Created Marker Group:", data);
-            // alert("Successfully saved!");
         } catch (error) {
             console.error("Error creating marker group:", error);
         }
@@ -56,7 +67,7 @@ const Page = () => {
     return (
         <DefaultLayout>
             <section className="h-full w-full">
-                {loading ? (
+                {filesLoading ? (
                     <Loader />
                 ) : (
                     <GetAll2dView
@@ -68,7 +79,7 @@ const Page = () => {
                         title={"Your BOQ Drawings"}
                         refetchUsers={refetch}
                         lastItem={lastItem}
-                        createMarkerGroup={createData}
+                        createMarkerGroup={handleCreateMarkerGroup}
                         markerData={markerBoq?.getMarkerGroupByBoqId?.data}
                     />
                 )}
