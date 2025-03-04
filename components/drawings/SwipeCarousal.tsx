@@ -1,25 +1,27 @@
 import React, { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePDFJS } from "@/hooks/usePdfJS";
-import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
+import { FaArrowLeft, FaArrowRight, FaCircleArrowUp } from "react-icons/fa6";
 import Slider from "react-slick";
 import ImageMarker, { Marker, MarkerComponentProps } from "react-image-marker";
-import { FaCircleArrowUp } from "react-icons/fa6";
-import { useSession } from "next-auth/react";
 import { BiSolidMessageRoundedDots } from "react-icons/bi";
 import Loader2 from "../Loader2";
+import { useSession } from "next-auth/react";
 
+// Global fullscreen API declarations
 declare global {
   interface HTMLElement {
     webkitRequestFullscreen?: () => Promise<void>;
   }
-
   interface Document {
     webkitExitFullscreen?: () => Promise<void>;
     webkitFullscreenElement?: Element;
   }
 }
 
+// =============================================================================
+// ModernCarousel Component
+// =============================================================================
 export default function ModernCarousel({
   pdf,
   version,
@@ -32,9 +34,9 @@ export default function ModernCarousel({
   pdf: string;
   version: number;
   id: number;
-  createMarkerGroup: any;
+  createMarkerGroup: (markers: Array<Marker[]>) => void;
   userId: number;
-  markerData: any;
+  markerData: string | null;
   fileType: string;
 }) {
   const [idx, setIdx] = useState(0);
@@ -44,11 +46,10 @@ export default function ModernCarousel({
   const [loading, setLoading] = useState(true);
   const { data: session } = useSession();
   const userName = session?.user?.name || "Guest";
-  // console.log(pdf);
 
   usePDFJS(async (pdfjs) => {
     try {
-      setLoading(true)
+      setLoading(true);
       if (!pdf) throw new Error("PDF URL is undefined or empty");
 
       const response = await fetch(pdf);
@@ -57,7 +58,7 @@ export default function ModernCarousel({
       const pdfData = await response.arrayBuffer();
       const pdfDocument = await pdfjs.getDocument(new Uint8Array(pdfData)).promise;
       const imgArray: string[] = [];
-      const scale = 3; // Higher scale for better quality
+      const scale = 6; // Higher scale for better quality
 
       for (let i = 1; i <= pdfDocument.numPages; i++) {
         const page = await pdfDocument.getPage(i);
@@ -66,6 +67,8 @@ export default function ModernCarousel({
         const context = canvas.getContext("2d");
 
         if (context) {
+          // Disable smoothing for crisp output
+          context.imageSmoothingEnabled = false;
           canvas.width = viewport.width;
           canvas.height = viewport.height;
           await page.render({ canvasContext: context, viewport }).promise;
@@ -80,13 +83,12 @@ export default function ModernCarousel({
     }
   });
 
-  // Add a keydown event listener to handle navigation
+  // Keydown navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "ArrowLeft") navigate(-1);
       if (e.key === "ArrowRight") navigate(1);
     };
-
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [idx]);
@@ -98,15 +100,16 @@ export default function ModernCarousel({
 
   const handlePointerDown = (e: React.PointerEvent<HTMLImageElement>) => {
     if (e.pointerType === "touch" || e.pointerType === "mouse") {
-      e.preventDefault(); // Prevent default actions for both mouse and touch inputs
+      e.preventDefault();
     }
   };
 
   const trend = idx > prevIdx ? 1 : -1;
-  const imageIndex = Math.abs(idx % imgs.length);
+  const imageIndex = imgs.length > 0 ? Math.abs(idx % imgs.length) : 0;
 
   return (
     <div className="h-[250px] 2xl:h-[390px] bg-black relative w-full max-w-6xl mx-auto overflow-hidden">
+      {/* Left Arrow */}
       <button
         onClick={() => navigate(-1)}
         className="bg-primary hover:bg-primary/50 transition-colors text-white p-2 absolute z-10 left-0 top-0 bottom-0"
@@ -116,11 +119,28 @@ export default function ModernCarousel({
           height="20px"
           viewBox="0 0 1024 1024"
           className="icon"
-          version="1.1"
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
             d="M768 903.232l-50.432 56.768L256 512l461.568-448 50.432 56.768L364.928 512z"
+            fill="#fafafa"
+          />
+        </svg>
+      </button>
+      {/* Right Arrow */}
+      <button
+        onClick={() => navigate(1)}
+        className="bg-primary hover:bg-primary/50 transition-colors text-white p-2 absolute z-10 right-0 top-0 bottom-0"
+      >
+        <svg
+          width="20px"
+          height="20px"
+          viewBox="0 0 1024 1024"
+          className="icon"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M256 120.768l50.432-56.768L768 512l-461.568 448-50.432-56.768L659.072 512z"
             fill="#fafafa"
           />
         </svg>
@@ -137,12 +157,16 @@ export default function ModernCarousel({
               exit="exit"
               key={imgs[imageIndex]}
               src={imgs[imageIndex]}
-              alt={"image"}
-              style={{ y: "-50%", x: "-50%" }}
-              className="aspect-square max-h-[90%] max-w-[calc(100%_-_80px)] mx-auto bg-black object-cover shadow-2xl absolute left-1/2 top-1/2"
-              onContextMenu={(e) => e.preventDefault()} // Disable right-click
-              onPointerDown={(e) => handlePointerDown(e)} // Handle tap-and-hold on mobile
-              draggable="false" // Disable drag-and-drop
+              alt="image"
+              style={{
+                y: "-50%",
+                x: "-50%",
+                imageRendering: "crisp-edges",
+              }}
+              className="aspect-square max-h-[90%] max-w-[calc(100%_-_80px)] mx-auto bg-black shadow-2xl absolute left-1/2 top-1/2"
+              onContextMenu={(e) => e.preventDefault()}
+              onPointerDown={handlePointerDown}
+              draggable="false"
             />
           ) : (
             <div className="relative w-full h-full">
@@ -155,42 +179,21 @@ export default function ModernCarousel({
                 exit="exit"
                 key={imgs[imageIndex]}
                 src={"/logo/newlogo.png"}
-                alt={"image"}
+                alt="image"
                 style={{ y: "-50%", x: "-50%" }}
                 className="aspect-video max-h-[90%] max-w-[calc(100%_-_80px)] mx-auto bg-black object-contain shadow-2xl absolute left-1/2 top-1/2"
-                onContextMenu={(e) => e.preventDefault()} // Disable right-click
-                onPointerDown={(e) => handlePointerDown(e)} // Handle tap-and-hold on mobile
-                draggable="false" // Disable drag-and-drop
+                onContextMenu={(e) => e.preventDefault()}
+                onPointerDown={(e) => handlePointerDown(e)}
+                draggable="false"
               />
             </div>
           )}
         </AnimatePresence>
       </div>
-      <div className="absolute inset-0 z-[10] pointer-events-none" />{" "}
-      {/* Transparent overlay */}
-      <button
-        onClick={() => navigate(1)}
-        className="bg-primary hover:bg-primary/50 transition-colors text-white p-2 absolute z-10 right-0 top-0 bottom-0"
-      >
-        <svg
-          width="20px"
-          height="20px"
-          viewBox="0 0 1024 1024"
-          className="icon"
-          version="1.1"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M256 120.768L306.432 64 768 512l-461.568 448L256 903.232 659.072 512z"
-            fill="#fafafa"
-          />
-        </svg>
-      </button>
+      <div className="absolute inset-0 z-[10] pointer-events-none" />
       <AnimatePresence custom={trend}>
         {loading ? (
-          <div
-            className={`p-2 rounded-lg absolute z-20 left-10 bottom-4 bg-white/10 backdrop-blur-lg shadow-lg`}
-          >
+          <div className="p-2 rounded-lg absolute z-20 left-10 bottom-4 bg-white/10 backdrop-blur-lg shadow-lg">
             <Loader2 />
           </div>
         ) : (
@@ -203,9 +206,7 @@ export default function ModernCarousel({
             key={imgs[imageIndex]}
             className="text-white text-base md:text-xl p-2 rounded-lg bg-white/10 backdrop-blur-lg font-semibold shadow-lg absolute z-20 left-10 bottom-4"
           >
-            {version === 0
-              ? "Your document will show here after upload"
-              : `Version: ${version}`}
+            {version === 0 ? "Your document will show here after upload" : `Version: ${version}`}
           </motion.span>
         )}
       </AnimatePresence>
@@ -239,30 +240,36 @@ export default function ModernCarousel({
   );
 }
 
+// =============================================================================
+// Framer Motion Variants
+// =============================================================================
 const imgVariants = {
-  initial: (trend: 1 | 0) => ({
+  initial: (trend: number) => ({
     x: trend === 1 ? "200%" : "-200%",
     opacity: 0,
   }),
   animate: { x: "-50%", opacity: 1 },
-  exit: (trend: 1 | 0) => ({
+  exit: (trend: number) => ({
     x: trend === 1 ? "-200%" : "200%",
     opacity: 0,
   }),
 };
 
 const titleVariants = {
-  initial: (trend: 1 | 0) => ({
+  initial: (trend: number) => ({
     y: trend === 1 ? 20 : -20,
     opacity: 0,
   }),
   animate: { y: 0, opacity: 1 },
-  exit: (trend: 1 | 0) => ({
+  exit: (trend: number) => ({
     y: trend === 1 ? -20 : 20,
     opacity: 0,
   }),
 };
 
+// =============================================================================
+// SpringModal Component with Zoom, Panning, and Always Visible Arrows
+// =============================================================================
 interface SpringModalProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
@@ -274,7 +281,6 @@ interface SpringModalProps {
   id: number;
   fileType: string;
 }
-
 
 const SpringModal: React.FC<SpringModalProps> = ({
   isOpen,
@@ -289,14 +295,15 @@ const SpringModal: React.FC<SpringModalProps> = ({
 }) => {
   const [isMarkerEnabled, setIsMarkerEnabled] = useState<boolean>(false);
   const [index, setIndex] = useState<number>(0);
-  const [markers, setMarkers] = useState<
-    Array<Array<Marker & { comment?: string }>>
-  >(
-    Array.from({ length: images.length }, (_, index) => (index === 0 ? [] : []))
+  const [markers, setMarkers] = useState<Array<Array<Marker & { comment?: string }>>>(
+    Array.from({ length: images.length }, () => [])
   );
-  const transformWrapperRef = useRef<any>(null);
+  // New zoom state (persisting across slides)
+  const [zoom, setZoom] = useState<number>(1);
   const sliderRef = useRef<Slider | null>(null);
+  const { data: session } = useSession();
 
+  // Load markers from markerData if provided
   useEffect(() => {
     if (markerData) {
       const parsedMarkers: Marker[][] = JSON.parse(markerData);
@@ -304,36 +311,14 @@ const SpringModal: React.FC<SpringModalProps> = ({
     }
   }, [markerData]);
 
-  useEffect(() => {
-    if (transformWrapperRef.current) {
-      transformWrapperRef.current.resetTransform();
-    }
-  }, [index]);
-
-  // Key-down event for slider navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft" && index > 0) {
-        sliderRef.current?.slickPrev();
-      } else if (e.key === "ArrowRight" && index < images.length - 1) {
-        sliderRef.current?.slickNext();
-      }
-    };
-
-    if (isOpen) {
-      window.addEventListener("keydown", handleKeyDown);
-    }
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isOpen, index, images.length]);
-
   const handleSliderChange = (newIndex: number) => {
     setIndex(newIndex);
   };
 
-  // Update the handleAddMarker function to accept an image index
+  // Zoom control functions with increased max zoom (3.6)
+  const zoomIn = () => setZoom((prev) => Math.min(prev + 0.2, 3.6));
+  const zoomOut = () => setZoom((prev) => Math.max(prev - 0.2, 1));
+
   const handleAddMarker = (
     imageIndex: number,
     marker: Marker,
@@ -341,12 +326,10 @@ const SpringModal: React.FC<SpringModalProps> = ({
     user: string,
     userId: number
   ) => {
-    const newMarker = { ...marker, comment: comment, user, userId };
+    const newMarker = { ...marker, comment, user, userId };
     setMarkers((prevMarkers) => {
       const updatedMarkers = [...prevMarkers];
-      const filteredMarkers =
-        updatedMarkers[imageIndex]?.filter((m) => m.top !== newMarker.top) ||
-        [];
+      const filteredMarkers = updatedMarkers[imageIndex]?.filter((m) => m.top !== newMarker.top) || [];
       updatedMarkers[imageIndex] = [...filteredMarkers, newMarker];
       return updatedMarkers;
     });
@@ -357,57 +340,17 @@ const SpringModal: React.FC<SpringModalProps> = ({
       await createMarkerGroup(markers);
     } finally {
       setIsOpen(false);
-      toggleFullScreen(isOpen);
     }
   };
 
+  // Slider settings without built-in arrows
   const settings = {
     dots: false,
     infinite: false,
     slidesToShow: 1,
     slidesToScroll: 1,
-    nextArrow: <NextArrow currentSlide={index} slideCount={images.length} />,
-    prevArrow: <PrevArrow currentSlide={index} />,
     afterChange: handleSliderChange,
   };
-
-  const toggleFullScreen = (shouldEnterFullScreen: boolean) => {
-    const element = document.documentElement; // Use the root element for full screen
-
-    if (shouldEnterFullScreen) {
-      // Enter full-screen mode
-      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-        if (element.requestFullscreen) {
-          element.requestFullscreen().catch((err) => {
-            console.error(
-              `Error attempting to enable full-screen mode: ${err.message} (${err.name})`
-            );
-          });
-        } else if (element.webkitRequestFullscreen) {
-          // Safari fallback
-          element.webkitRequestFullscreen();
-        }
-      }
-    } else {
-      // Exit full-screen mode
-      if (document.fullscreenElement || document.webkitFullscreenElement) {
-        if (document.exitFullscreen) {
-          document.exitFullscreen().catch((err) => {
-            console.error(
-              `Error attempting to exit full-screen mode: ${err.message} (${err.name})`
-            );
-          });
-        } else if (document.webkitExitFullscreen) {
-          // Safari fallback
-          document.webkitExitFullscreen();
-        }
-      }
-    }
-  };
-
-  useEffect(() => {
-    toggleFullScreen(isOpen);
-  }, [isOpen]);
 
   return (
     <AnimatePresence>
@@ -417,56 +360,80 @@ const SpringModal: React.FC<SpringModalProps> = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={handleClose}
-          className="bg-black/90 backdrop-blur p-8 fixed inset-0 z-[1001] grid place-items-center overflow-y-scroll"
+          className="bg-black/90 backdrop-blur p-8 fixed inset-0 z-[1001] grid place-items-center overflow-y-auto"
         >
           <motion.div
             initial={{ scale: 0, rotate: "12.5deg" }}
             animate={{ scale: 1, rotate: "0deg" }}
             exit={{ scale: 0, rotate: "0deg" }}
-            className="text-white p-6 w-full max-w-80 md:max-w-125 lg:max-w-203 xl:max-w-7xl relative h-full"
+            className="text-white p-6 w-full max-w-7xl relative"
             onClick={(e) => e.stopPropagation()}
-            onContextMenu={(e) => e.preventDefault()} // Disable right-click
+            onContextMenu={(e) => e.preventDefault()}
           >
-            <div className="slider-container">
-              <Slider
-                {...settings}
-                ref={sliderRef}
-                afterChange={handleSliderChange}
+            {/* Scrollable container for panning */}
+            <div style={{ width: "100%", maxHeight: "90vh", overflow: "auto", position: "relative" }}>
+              <div
+                className="slider-container"
+                style={{
+                  transform: `scale(${zoom})`,
+                  transformOrigin: "top center",
+                  width: "100%",
+                }}
               >
-                {images.map((src, idx) => {
-                  return (
-                    <>
-                      <ImageMarker
-                        key={idx}
-                        src={src}
-                        markers={markers[idx] || []} // Pass markers for the current image
-                        onAddMarker={
-                          (marker: Marker) =>
-                            handleAddMarker(idx, marker, "", userName, userId) // Pass the current image index
-                        }
-                        markerComponent={(props) => (
-                          <CustomMarker
-                            {...props}
-                            onAddComment={(marker, comment) =>
-                              handleAddMarker(
-                                idx,
-                                marker,
-                                comment,
-                                userName,
-                                userId
-                              )
-                            } // Pass the current image index
-                            // onRemoveMarker={(top, left) => handleRemoveMarker(idx, top, left)}
-                            markers={markers[idx] || []} // Pass markers for the current image
-                          />
-                        )}
-                        extraClass={`cursor-crosshair ${!isMarkerEnabled ? "pointer-events-none" : ""
-                          }`}
-                      />
-                    </>
-                  );
-                })}
-              </Slider>
+                <Slider {...settings} ref={sliderRef}>
+                  {images.map((src, idx) => (
+                    <div key={idx}>
+                      <div style={{ imageRendering: "crisp-edges" }}>
+                        <ImageMarker
+                          src={src}
+                          markers={markers[idx] || []}
+                          onAddMarker={(marker: Marker) =>
+                            handleAddMarker(idx, marker, "", userName, userId)
+                          }
+                          markerComponent={(props) => (
+                            <CustomMarker
+                              {...props}
+                              onAddComment={(marker, comment) =>
+                                handleAddMarker(idx, marker, comment, userName, userId)
+                              }
+                              markers={markers[idx] || []}
+                            />
+                          )}
+                          extraClass={`cursor-crosshair ${!isMarkerEnabled ? "pointer-events-none" : ""}`}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </Slider>
+              </div>
+              {/* Always-visible custom arrow buttons */}
+              <button
+                onClick={() => sliderRef.current?.slickPrev()}
+                className="absolute top-1/2 left-2 transform -translate-y-1/2 z-50 p-2 bg-primary text-white rounded-full"
+              >
+                <FaArrowLeft />
+              </button>
+              <button
+                onClick={() => sliderRef.current?.slickNext()}
+                className="absolute top-1/2 right-2 transform -translate-y-1/2 z-50 p-2 bg-primary text-white rounded-full"
+              >
+                <FaArrowRight />
+              </button>
+            </div>
+            {/* Zoom Controls */}
+            <div className="absolute bottom-4 right-4 flex space-x-2 z-50">
+              <button
+                onClick={zoomOut}
+                className="px-3 py-1 bg-secondary text-white rounded hover:bg-primary transition-colors"
+              >
+                -
+              </button>
+              <button
+                onClick={zoomIn}
+                className="px-3 py-1 bg-secondary text-white rounded hover:bg-primary transition-colors"
+              >
+                +
+              </button>
             </div>
           </motion.div>
           <div className="fixed top-0 left-0 flex">
@@ -475,7 +442,7 @@ const SpringModal: React.FC<SpringModalProps> = ({
             </div>
             <button
               onClick={(e) => {
-                e.stopPropagation(); // Prevent event from bubbling up
+                e.stopPropagation();
                 handleClose();
               }}
               className="bg-secondary hover:bg-primary transition-colors text-white p-2 ml-4"
@@ -484,21 +451,15 @@ const SpringModal: React.FC<SpringModalProps> = ({
             </button>
           </div>
           {fileType !== "viewboq" && (
-            <div
-              className="fixed top-0 right-0 flex bg-white"
-              onClick={(e) => {
-                e.stopPropagation(); // Prevent event from bubbling up
-              }}
-            >
+            <div className="fixed top-0 right-0 flex bg-white" onClick={(e) => e.stopPropagation()}>
               {isMarkerEnabled && (
                 <div className="text-black text-sm p-2 text-justify items-center flex">
-                  Click anywhere to add comment. Please Enter/ click Arrow
-                  button to save.
+                  Click anywhere to add comment. Please Enter/ click Arrow button to save.
                 </div>
               )}
               <button
-                type="submit"
-                className="cursor-pointer w-max  p-4 shadow-md select-none bg-secondary text-white hover:bg-primary"
+                type="button"
+                className="cursor-pointer w-max p-4 shadow-md select-none bg-secondary text-white hover:bg-primary"
                 onClick={(e) => {
                   e.stopPropagation();
                   setIsMarkerEnabled((o) => !o);
@@ -514,6 +475,9 @@ const SpringModal: React.FC<SpringModalProps> = ({
   );
 };
 
+// =============================================================================
+// CustomMarker Component with Inverse Scaling for Marker Size
+// =============================================================================
 const CustomMarker = ({
   onAddComment,
   markers,
@@ -526,7 +490,6 @@ const CustomMarker = ({
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>("");
   const [storedValue, setStoredValue] = useState<string>("");
-
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const { data: session } = useSession();
   const userName = session?.user?.name || "Guest";
@@ -539,11 +502,9 @@ const CustomMarker = ({
   }, [isHovered]);
 
   useEffect(() => {
-    const existingMarker = markers.find(
-      (marker: { top: Number }) => marker.top === top
-    );
+    const existingMarker = markers.find((marker: { top: number }) => marker.top === top);
     if (existingMarker) {
-      setInputValue(existingMarker.comment || ""); // Set comment if exists
+      setInputValue(existingMarker.comment || "");
       setStoredValue(existingMarker.comment || "");
       setUser(existingMarker.user);
     }
@@ -558,7 +519,6 @@ const CustomMarker = ({
     }
   };
 
-  // @ts-ignore
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -581,49 +541,46 @@ const CustomMarker = ({
     }
   };
 
+  // Inverse scale marker content so it stays consistent in size (adjust factor as needed)
   return (
-    <div
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={handleMouseLeave}
-      className="relative"
-    >
-      {isHovered ? (
-        <div className="relative bg-primary bg-opacity-30 rounded-lg p-2 ">
-          <label className="mb-.5 block font-extrabold text-white drop-shadow-lg">
-            {user}
-          </label>
-          <div className="relative">
-            <textarea
-              ref={inputRef}
-              // disabled={storedValue.length > 0}
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onBlur={handleBlur}
-              placeholder="Add comments"
-              className=" scrollbar-hidden z-1000 w-full rounded-lg border bg-white border-stroke bg-transparent py-2 pl-2 pr-10 text-[#0E132A] outline-none focus:border-primary focus-visible:shadow-none mr-8"
-              onKeyDown={handleKeyDown}
-              rows={1}
-            />
-            {storedValue.length === 0 ? (
-              <button
-                className="absolute right-4 top-[42%] transform -translate-y-1/2 cursor-pointer "
-                onClick={handleBtn} // Trigger handleKeyDown on click
-              // disabled={storedValue.length > 0}
-              >
-                <FaCircleArrowUp size={24} className={"text-secondary"} />
-              </button>
-            ) : null}
+    <div style={{ transform: `scale(${1})`, transformOrigin: "top left" }}>
+      <div onMouseEnter={() => setIsHovered(true)} onMouseLeave={handleMouseLeave} className="relative">
+        {isHovered ? (
+          <div className="relative bg-primary bg-opacity-30 rounded-lg p-2">
+            <label className="mb-.5 block font-extrabold text-white drop-shadow-lg">
+              {user}
+            </label>
+            <div className="relative">
+              <textarea
+                ref={inputRef}
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onBlur={handleBlur}
+                placeholder="Add comments"
+                className="scrollbar-hidden z-1000 w-full rounded-lg border bg-white border-stroke bg-transparent py-2 pl-2 pr-10 text-[#0E132A] outline-none focus:border-primary focus-visible:shadow-none mr-8"
+                onKeyDown={handleKeyDown}
+                rows={1}
+              />
+              {storedValue.length === 0 && (
+                <button className="absolute right-4 top-[42%] transform -translate-y-1/2 cursor-pointer" onClick={handleBtn}>
+                  <FaCircleArrowUp size={24} className="text-secondary" />
+                </button>
+              )}
+            </div>
           </div>
-        </div>
-      ) : (
-        <div className="absolute top-0 left-0 flex items-center ">
-          <BiSolidMessageRoundedDots className="bg-white rounded-full text-5xl sm:text-6xl text-secondary shadow-md p-2" />
-        </div>
-      )}
+        ) : (
+          <div className="absolute top-0 left-0 flex items-center">
+            <BiSolidMessageRoundedDots className="bg-white rounded-full text-5xl sm:text-6xl text-secondary shadow-md p-2" />
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
+// =============================================================================
+// NextArrow and PrevArrow (Unused in modal; retained for main carousel)
+// =============================================================================
 function NextArrow({
   currentSlide,
   slideCount,
@@ -636,10 +593,9 @@ function NextArrow({
   const isDisabled = currentSlide === slideCount - 1;
   return (
     <div
-      className={`p-1.5 md:p-2 xl:p-3 rounded-full ${isDisabled
-        ? "bg-gray-400 cursor-not-allowed"
-        : "bg-primary cursor-pointer"
-        } absolute top-[25%] -right-5 md:-right-10 xl:-right-14 group`}
+      className={`p-1.5 md:p-2 xl:p-3 rounded-full ${
+        isDisabled ? "bg-gray-400 cursor-not-allowed" : "bg-primary cursor-pointer"
+      } absolute top-[25%] -right-5 md:-right-10 xl:-right-14 group`}
       onClick={!isDisabled ? onClick : undefined}
     >
       <FaArrowRight className="text-sm text-white md:text-lg xl:text-xl group-hover:text-secondary" />
@@ -657,10 +613,9 @@ function PrevArrow({
   const isDisabled = currentSlide === 0;
   return (
     <div
-      className={`p-1.5 md:p-2 xl:p-3 rounded-full ${isDisabled
-        ? "bg-gray-400 cursor-not-allowed"
-        : "bg-primary cursor-pointer"
-        } absolute top-[25%] -left-5 md:-left-10 xl:-left-14 group`}
+      className={`p-1.5 md:p-2 xl:p-3 rounded-full ${
+        isDisabled ? "bg-gray-400 cursor-not-allowed" : "bg-primary cursor-pointer"
+      } absolute top-[25%] -left-5 md:-left-10 xl:-left-14 group`}
       onClick={!isDisabled ? onClick : undefined}
     >
       <FaArrowLeft className="text-sm text-white md:text-lg xl:text-xl group-hover:text-secondary" />
