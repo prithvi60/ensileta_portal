@@ -397,6 +397,7 @@ const SpringModal: React.FC<SpringModalProps> = ({
                                 handleAddMarker(idx, marker, comment, userName, userId)
                               }
                               markers={markers[idx] || []}
+                              zoom={zoom}
                             />
                           )}
                           extraClass={`cursor-crosshair ${!isMarkerEnabled ? "pointer-events-none" : ""}`}
@@ -483,9 +484,10 @@ const CustomMarker = ({
   markers,
   top,
   left,
+  zoom
 }: MarkerComponentProps & {
   onAddComment: (marker: Marker, comment: string) => void;
-  markers: any;
+  markers: any;zoom:any;
 }) => {
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>("");
@@ -540,10 +542,10 @@ const CustomMarker = ({
       inputRef.current.blur();
     }
   };
-
+// console.log(zoom)
   // Inverse scale marker content so it stays consistent in size (adjust factor as needed)
   return (
-    <div style={{ transform: `scale(${1})`, transformOrigin: "top left" }}>
+    <div style={{ transform: `scale(${1/zoom})`, transformOrigin: "top left" }}>
       <div onMouseEnter={() => setIsHovered(true)} onMouseLeave={handleMouseLeave} className="relative">
         {isHovered ? (
           <div className="relative bg-primary bg-opacity-30 rounded-lg p-2">
