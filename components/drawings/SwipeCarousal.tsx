@@ -50,7 +50,7 @@ export default function ModernCarousel({
   usePDFJS(async (pdfjs) => {
     try {
       setLoading(true);
-      if (!pdf) throw new Error("PDF URL is undefined or empty");
+      if (!pdf) return
 
       const response = await fetch(pdf);
       if (!response.ok) throw new Error("PDF file not found");
@@ -487,7 +487,7 @@ const CustomMarker = ({
   zoom
 }: MarkerComponentProps & {
   onAddComment: (marker: Marker, comment: string) => void;
-  markers: any;zoom:any;
+  markers: any; zoom: any;
 }) => {
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>("");
@@ -542,10 +542,10 @@ const CustomMarker = ({
       inputRef.current.blur();
     }
   };
-// console.log(zoom)
+  // console.log(zoom)
   // Inverse scale marker content so it stays consistent in size (adjust factor as needed)
   return (
-    <div style={{ transform: `scale(${1/zoom})`, transformOrigin: "top left" }}>
+    <div style={{ transform: `scale(${1 / zoom})`, transformOrigin: "top left" }}>
       <div onMouseEnter={() => setIsHovered(true)} onMouseLeave={handleMouseLeave} className="relative">
         {isHovered ? (
           <div className="relative bg-primary bg-opacity-30 rounded-lg p-2">
@@ -595,9 +595,8 @@ function NextArrow({
   const isDisabled = currentSlide === slideCount - 1;
   return (
     <div
-      className={`p-1.5 md:p-2 xl:p-3 rounded-full ${
-        isDisabled ? "bg-gray-400 cursor-not-allowed" : "bg-primary cursor-pointer"
-      } absolute top-[25%] -right-5 md:-right-10 xl:-right-14 group`}
+      className={`p-1.5 md:p-2 xl:p-3 rounded-full ${isDisabled ? "bg-gray-400 cursor-not-allowed" : "bg-primary cursor-pointer"
+        } absolute top-[25%] -right-5 md:-right-10 xl:-right-14 group`}
       onClick={!isDisabled ? onClick : undefined}
     >
       <FaArrowRight className="text-sm text-white md:text-lg xl:text-xl group-hover:text-secondary" />
@@ -615,9 +614,8 @@ function PrevArrow({
   const isDisabled = currentSlide === 0;
   return (
     <div
-      className={`p-1.5 md:p-2 xl:p-3 rounded-full ${
-        isDisabled ? "bg-gray-400 cursor-not-allowed" : "bg-primary cursor-pointer"
-      } absolute top-[25%] -left-5 md:-left-10 xl:-left-14 group`}
+      className={`p-1.5 md:p-2 xl:p-3 rounded-full ${isDisabled ? "bg-gray-400 cursor-not-allowed" : "bg-primary cursor-pointer"
+        } absolute top-[25%] -left-5 md:-left-10 xl:-left-14 group`}
       onClick={!isDisabled ? onClick : undefined}
     >
       <FaArrowLeft className="text-sm text-white md:text-lg xl:text-xl group-hover:text-secondary" />

@@ -541,3 +541,25 @@ export const TOGGLE_APPROVE_DRAWING = gql`
     toggleApproveDrawing(id: $id, drawingType: $drawingType)
   }
 `;
+
+// Generate OTP
+
+export const GENERATE_OTP = gql`
+  mutation GenerateOtp($email: String!) {
+    generateOtp(email: $email) {
+      success
+      message
+      otp
+      expiresAt
+    }
+  }
+`;
+
+export const LOGOUT_MUTATION = gql`
+  mutation Logout($email: String!) {
+    logout(email: $email) {
+      success
+      message
+    }
+  }
+`;

@@ -281,10 +281,10 @@ const Column = ({
                 className={`h-full w-full transition-colors ${active ? "bg-success/50" : "bg-success/0"
                     }`}
             >
-                {filteredCards.map((c: any) => {
+                {filteredCards.map((c: any, index: number) => {
                     return (
                         <Card
-                            key={c.id}
+                            key={index}
                             {...c}
                             handleDragStart={handleDragStart}
                             handleCardUpdate={handleCardUpdate}

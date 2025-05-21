@@ -39,7 +39,7 @@ export const ShuffleLoader = () => {
             const secondElement = document.querySelector(`[data-block-id="${second.id}"]`);
 
             if (!firstElement || !secondElement) {
-                console.error("Element not found:", { firstElement, secondElement });
+                // console.error("Element not found:", { firstElement, secondElement });
                 return;
             }
 

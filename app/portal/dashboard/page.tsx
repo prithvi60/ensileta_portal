@@ -15,6 +15,7 @@ const Page = () => {
           width={450}
           height={450}
           alt="bg-image"
+          sizes="(min-width: 1380px) 256px, (min-width: 1280px) calc(63.75vw - 611px), 242px"
         />
         <p className="text-lg sm:text-2xl font-semibold font-satoshi leading-6 sm:leading-snug tracking-wide italic text-primary w-full text-center sm:w-4/5">
           Decorating is not about making stage sets, it’s not about making

@@ -71,7 +71,7 @@ const ForgotPassword = () => {
         >
             <div className="w-full justify-center flex mb-4">
                 <div className="w-64 h-14 relative items-center flex justify-center">
-                    <Image alt="logo" src={"/logo/newlogo.png"} fill />
+                    <Image alt="logo" src={"/logo/newlogo.png"} fill priority sizes="(min-width: 1380px) 256px, (min-width: 1280px) calc(63.75vw - 611px), 242px" />
                 </div>
             </div>
             {isSubmitted ? (
@@ -112,8 +112,8 @@ const ForgotPassword = () => {
                             disabled={isSubmitting}
                             type="submit"
                             className={`w-full cursor-pointer p-4 text-white transition bg-secondary ${isSubmitting
-                                    ? "bg-opacity-40 cursor-not-allowed"
-                                    : "hover:bg-opacity-90"
+                                ? "bg-opacity-40 cursor-not-allowed"
+                                : "hover:bg-opacity-90"
                                 }`}
                         >
                             {isSubmitting ? <Loader2 /> : "Send Reset Email"}

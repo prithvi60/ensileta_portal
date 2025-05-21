@@ -61,7 +61,7 @@ const ResetPasswordPage = () => {
         <div className="rounded-md border-4 border-secondary w-full max-w-lg mx-auto bg-white shadow-xl m-4 p-3 md:p-6">
             <div className="w-full justify-center flex mb-4">
                 <div className="w-64 h-14 relative items-center flex justify-center">
-                    <Image alt="logo" src={"/logo/newlogo.png"} fill />
+                    <Image alt="logo" src={"/logo/newlogo.png"} fill priority sizes="(min-width: 1380px) 256px, (min-width: 1280px) calc(63.75vw - 611px), 242px" />
                 </div>
             </div>
             <form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-7">

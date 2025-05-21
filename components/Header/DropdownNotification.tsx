@@ -1,12 +1,23 @@
 
 import React, { useState } from "react";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
+import { useMutation } from "@apollo/client";
+import { LOGOUT_MUTATION } from "@/lib/Queries";
 
 const DropdownNotification = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notifying, setNotifying] = useState(true);
-  const handleLogout = () => {
-    signOut({ redirect: true, callbackUrl: "/api/auth/signin" });
+  const [logoutMutation] = useMutation(LOGOUT_MUTATION);
+  const { data: session } = useSession()
+  const email = session?.user?.email
+  const handleLogout = async () => {
+    if (email) {
+      await logoutMutation({
+        variables: { email }
+      });
+      console.log("notify", email);
+    }
+    await signOut({ redirect: true, callbackUrl: "/api/auth/signin" });
     localStorage.removeItem("selectedMenu");
   }
 

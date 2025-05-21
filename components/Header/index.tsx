@@ -57,7 +57,7 @@ const Header = (props: {
           {/* </div> */}
           {/* <div > */}
           <div className="w-64 h-10 relative hidden sm:block">
-            <Image alt="logo" src={"/logo/newlogo.png"} fill />
+            <Image alt="logo" src={"/logo/newlogo.png"} fill priority sizes="(min-width: 1380px) 256px, (min-width: 1280px) calc(63.75vw - 611px), 242px" />
           </div>
           {/* <div className=""> */}
           {sessionStatus === "loading" ? (<div></div>) : (<>

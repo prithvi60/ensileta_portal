@@ -34,3 +34,45 @@ export function generateEmailTemplate(mainContent: any) {
     </html>
     `;
 }
+
+export function generateOtpEmailTemplate(otp: string, expiryTime: string) {
+  const imageUrl = "https://ik.imagekit.io/webibee/newlogo2.png?updatedAt=1730964119061";
+
+  return `
+    <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f9f9f9; padding: 20px; border-radius: 8px; max-width: 600px; margin: 0 auto; border: 1px solid #ddd;">
+      <div style="text-align: center; margin-bottom: 20px;">
+        <img src="${imageUrl}" alt="Ensileta Interiors Logo" style="width: 150px; height: auto;">
+      </div>
+      <h2 style="color: #333; font-size: 24px; margin-bottom: 20px;">One-Time Password (OTP) for Ensileta Interiors Account</h2>
+      <p style="font-size: 16px; color: #555;">
+        Use the following one-time password (OTP) to sign in to your Ensileta Interiors Account:
+      </p>
+      <p style="font-size: 24px; font-weight: bold; color:#64A24E; text-align: center; margin: 20px 0;">
+        ${otp}
+      </p>
+      <p style="font-size: 16px; color: #555;">
+        This OTP is valid for <span style="margin-left: 1.5px; margin-right: 1.5px; font-weight: bold;">10 minutes</span> until <span style="margin-left: 1.5px; margin-right: 1.5px; font-weight: bold;">${expiryTime} </span> (GMT +05:30).
+      </p>
+      <p style="font-size: 16px; color: #555;">
+        For further clarifications, please contact this number:
+        <span><strong>9380289546</strong></span>.
+      </p>
+      <p style="font-size: 16px; color: #555;">Greetings from Ensileta Interiors Team!</p>
+      <br/>
+      <br/>
+      <div style="font-size: 16px;">
+        <h3 style="font-size: 24px; color:#64A24E;">Ensileta Interior</h3>
+          <p><strong>Address:</strong> No.77 Old no:43 Second floor, Chamiers Rd, Chennai, Tamil Nadu 600028</p>
+      </div>
+      <div style="text-align: center; margin-top: 20px; font-size: 14px;">
+        <p style="margin: 0;">
+          © ${new Date().getFullYear()} 
+          <span style="margin-left: 1.5px; margin-right: 1.5px;">
+            <a target="_blank" href="https://www.ensileta.com" style="color: #007bff; text-decoration: none;">Ensileta Interiors</a>
+          </span>
+          . All rights reserved.
+        </p>
+      </div>
+    </div>
+  `;
+}

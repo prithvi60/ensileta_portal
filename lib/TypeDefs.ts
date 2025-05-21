@@ -181,6 +181,34 @@ input UpdateKanbanCardInput {
   column: String!
 }
 
+  type Otp {
+  id: ID!
+  email: String!
+  otp: String! # Numeric OTP
+  expiresAt: String!
+  verified: Boolean!
+  createdAt: String!
+}
+
+type GenerateOtpResponse {
+  success: Boolean!
+  message: String
+  otp: String
+  expiresAt: String
+}
+
+type VerifyOtpResponse {
+  success: Boolean!
+  message: String
+  token: String
+  user: User 
+}
+
+type LogoutResponse {
+  success: Boolean!
+  message: String
+}
+
 enum DrawingType {
   DRAWING_2D
   DRAWING_3D
@@ -225,7 +253,7 @@ enum DrawingType {
     ): User
 
     login(email: String!, password: String!): User!
-    logout: Boolean!
+    logout(email: String!): LogoutResponse
     updateUser(
       id: Int!,
       username: String
@@ -260,5 +288,9 @@ enum DrawingType {
 
     # excess one
     createMarkerGroupBOQ(data: JSON!, drawingBoqId: Int!): MarkerGroupBoq!
+
+    # OTP Generator
+    generateOtp(email: String!): GenerateOtpResponse!
+    verifyOtp(email: String!, otp: String!): VerifyOtpResponse!
   }
 `;

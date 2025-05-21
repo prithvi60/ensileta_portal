@@ -3,15 +3,25 @@ import Link from "next/link";
 import Image from "next/image";
 import ClickOutside from "@/components/Sidebar/ClickOutside";
 import { signOut, useSession } from "next-auth/react";
+import { useMutation } from "@apollo/client";
+import { LOGOUT_MUTATION } from "@/lib/Queries";
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const { data: session } = useSession()
-  const handleLogout = () => {
-    signOut({ redirect: true, callbackUrl: "/api/auth/signin" });
-  }
-  const userName = session?.user?.name
+  const [logoutMutation] = useMutation(LOGOUT_MUTATION);
+  const { data: session } = useSession();
+  const email = session?.user?.email;
 
+  const handleLogout = async () => {
+    if (email) {
+      await logoutMutation({
+        variables: { email },
+      });
+      console.log("user", email);
+    }
+    await signOut({ redirect: true, callbackUrl: "/api/auth/signin" });
+  };
+  const userName = session?.user?.name;
 
   return (
     <ClickOutside onClick={() => setDropdownOpen(false)} className="relative">
@@ -135,7 +145,10 @@ const DropdownUser = () => {
               </Link>
             </li> */}
           </ul>
-          <button className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base" onClick={handleLogout}>
+          <button
+            className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
+            onClick={handleLogout}
+          >
             <svg
               className="fill-current"
               width="22"

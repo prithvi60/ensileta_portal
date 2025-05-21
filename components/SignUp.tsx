@@ -187,17 +187,18 @@ export const SignUp = () => {
                 <div className="hidden w-full xl:block xl:w-1/2 lg:sticky lg:top-0 py-4 sm:py-12.5 xl:py-17.5">
                     <div className="p-4 sm:px-16 sm:py-0 space-y-5 text-center flex justify-center items-center flex-col">
                         <div className="w-64 h-14 relative items-center flex justify-center mb-8">
-                            <Image alt="logo" src={"/logo/newlogo.png"} fill />
+                            <Image alt="logo" src={"/logo/newlogo.png"} fill priority sizes="(min-width: 1380px) 256px, (min-width: 1280px) calc(63.75vw - 611px), 242px" />
                         </div>
                         <h2 className="text-2xl font-bold text-secondary sm:text-2xl w-full text-center">
-              Our Prestigious Clients
-            </h2>
+                            Our Prestigious Clients
+                        </h2>
                         <span className="mt-15 inline-block">
                             <Image
                                 src="/cover/ensiletaclients.png"
                                 alt="clients"
                                 width={450}
                                 height={250}
+                                priority
                             />
                         </span>
                     </div>
