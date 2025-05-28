@@ -86,6 +86,8 @@ const TableRows = ({
     fileType,
     refetchUsers,
 }: TableRowsProps) => {
+    // console.log(data, "data in table rows");
+
     return (
         <>
             {data && (
@@ -136,32 +138,6 @@ const TableRows = ({
                                     refetchUsers={refetchUsers}
                                 />
                             </td>
-                            {/* <td className="p-2 sm:p-4">
-                                {fileType === "view2d" ? (
-                                    <ViewModalWrapper
-                                        pdf={
-                                            user?.drawing2Dfiles[user?.drawing2Dfiles.length - 1]
-                                                ?.fileUrl || null
-                                        }
-                                    />
-                                ) : fileType === "view3d" ? (
-                                    <ViewModalWrapper
-                                        pdf={
-                                            user?.drawing3Dfiles[user?.drawing3Dfiles.length - 1]
-                                                ?.fileUrl || null
-                                        }
-                                    />
-                                ) : fileType === "viewboq" ? (
-                                    <ViewModalWrapper
-                                        pdf={
-                                            user?.drawingBOQfiles[user?.drawingBOQfiles.length - 1]
-                                                ?.fileUrl || null
-                                        }
-                                    />
-                                ) : (
-                                    <ViewModalWrapper pdf={""} />
-                                )}
-                            </td> */}
                         </motion.tr>
                     ))}
                 </>

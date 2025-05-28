@@ -146,7 +146,6 @@ const authenticateUser = async (
       employeeUser?.password &&
       (await bcrypt.compare(credential, employeeUser.password))
     ) {
-      console.log("employeeUser");
 
       return {
         id: employeeUser.id.toString(),
@@ -165,7 +164,6 @@ const authenticateUser = async (
       where: { email: user?.email || employeeUser?.email },
       orderBy: { createdAt: "desc" },
     });
-    console.log(otpRecord);
 
     if (!otpRecord || otpRecord.otp !== credential) return null;
     if (otpRecord.verified) return null;
@@ -193,7 +191,6 @@ const authenticateUser = async (
     }
 
     if (employeeUser) {
-      console.log("employeeUser2");
       return {
         id: employeeUser.id.toString(),
         name: employeeUser.username,

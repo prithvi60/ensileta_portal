@@ -2,20 +2,12 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import UploadFile from "./Upload";
-import FsLightbox from "fslightbox-react";
 import { usePDFJS } from "@/hooks/usePdfJS";
 import toast from "react-hot-toast";
-import { FaArrowLeft, FaArrowRight, FaCircleArrowUp } from "react-icons/fa6";
-import { GiVirtualMarker } from "react-icons/gi";
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
 import Slider from "react-slick";
 import ImageMarker, { Marker, MarkerComponentProps } from "react-image-marker";
 import { BiSolidMessageRoundedDots } from "react-icons/bi";
-import {
-  TransformWrapper,
-  TransformComponent,
-  ReactZoomPanPinchRef,
-  useControls,
-} from "react-zoom-pan-pinch";
 const ModalWrapper = ({
   uploadFile,
   userId,

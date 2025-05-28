@@ -15,7 +15,7 @@ const DropdownNotification = () => {
       await logoutMutation({
         variables: { email }
       });
-      console.log("notify", email);
+      // console.log("notify", email);
     }
     await signOut({ redirect: true, callbackUrl: "/api/auth/signin" });
     localStorage.removeItem("selectedMenu");

@@ -17,7 +17,7 @@ const DropdownUser = () => {
       await logoutMutation({
         variables: { email },
       });
-      console.log("user", email);
+      // console.log("user", email);
     }
     await signOut({ redirect: true, callbackUrl: "/api/auth/signin" });
   };
