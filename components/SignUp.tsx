@@ -64,7 +64,7 @@ export const SignUp = () => {
     const router = useRouter();
     const [signUp] = useMutation(SIGN_UP);
     const imageUrl =
-        "https://ik.imagekit.io/webibee/newlogo2.png?updatedAt=1730964119061";
+        "https://ik.imagekit.io/a7ag28udt/ensileta-logo.png";
     // const { data: AllUsers } = useQuery(GET_USERS);
     // const SAfilteredData = AllUsers.users.filter((val: any) => val.role === "super admin")
     // console.log(SAfilteredData);

@@ -1,6 +1,6 @@
 export function generateEmailTemplate(mainContent: any) {
   const imageUrl =
-    "https://ik.imagekit.io/webibee/newlogo2.png?updatedAt=1730964119061";
+    "https://ik.imagekit.io/a7ag28udt/ensileta-logo.png";
   return `
     <!DOCTYPE html>
     <html lang="en">
@@ -36,7 +36,7 @@ export function generateEmailTemplate(mainContent: any) {
 }
 
 export function generateOtpEmailTemplate(otp: string, expiryTime: string) {
-  const imageUrl = "https://ik.imagekit.io/webibee/newlogo2.png?updatedAt=1730964119061";
+  const imageUrl = "https://ik.imagekit.io/a7ag28udt/ensileta-logo.png";
 
   return `
     <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f9f9f9; padding: 20px; border-radius: 8px; max-width: 600px; margin: 0 auto; border: 1px solid #ddd;">

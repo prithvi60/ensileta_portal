@@ -4,8 +4,7 @@ import jwt from "jsonwebtoken";
 import prisma from "@/prisma/db";
 
 const JWT_SECRET = process.env.NEXTAUTH_SECRET;
-const imageUrl =
-  "https://ik.imagekit.io/webibee/newlogo2.png?updatedAt=1730964119061";
+const imageUrl = "https://ik.imagekit.io/a7ag28udt/ensileta-logo.png";
 
 // Middleware to add CORS headers
 function setCorsHeaders(res: NextResponse) {
